@@ -84,7 +84,7 @@ class PlayState(pyknic.State):
 #        pygame.draw.rect(screen_surf, (255, 0, 0), self.renderer2.rect, 1)
 #        [ent.render(screen_surf) for ent in self.screen_space]
 #        self.screen_mouse.render(screen_surf)
-        print '-------------- render'
+#        print '-------------- render'
         flip()        
 
         
@@ -126,7 +126,6 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
         self.state = state
 
     def render(self, screen_surf, offset=None):
-        print "bitch"
         if self._world:
             self.world_rect.center = self.position.as_xy_tuple()
             offset = self.position - self.vec_center
