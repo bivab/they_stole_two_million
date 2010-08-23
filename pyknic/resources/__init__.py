@@ -1,0 +1,35 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+TODO: docstring
+"""
+
+__version__ = '$Id: __init__.py 293 2009-08-02 18:48:50Z dr0iddr0id $'
+
+if __debug__:
+    import sys
+    sys.stdout.write(u'%s loading ... \n' % (__name__))
+    import time
+    _start_time = time.time()
+
+import tiledtmxloader
+
+# base64 and gziped logo
+# use this to load it:
+#   s_dec = gzip.GzipFile(fileobj=StringIO.StringIO(base64.b64decode(str_io)), mode='rb').read()
+#   gzipper.close()
+#   imgg = pygame.image.fromstring(s_dec, (32, 32), 'RGBA')
+pyknic_logo_32x32 = u"""H4sIAAnMdUoC/+1XaVAUWRKmhJarORRPdMR1wxgDVwVEGuj7oGn6RkA5RCfQUcQrULxFWWdwR/FiRUFHRUBUUA5BQECBbsADZbxwVEQRb3C8R0VXOjdfdYOu7vyeP1MRX1R1Veb3vZcv38tsM7O/rj/z6m3HsPgK9gwGondvBxqWJlh9BmuGI8PK2tHKZsCw/jb2g+3pd1/YdPv1prkI55c6TIYFO9HdtQfr3EdzkjzceVs9vfkpE3iC1AkS4S4vuXA3SyPcwwoW7WWFitJZEYIM7ymqHV4xyVEjclJjx2YHZfBnkXfkG7EhtrQP+hIOwoWcLM4GDzei0a3nvXrsKFkmx7MbAQe5Pop8nkh5TKBQHxcGqStFEZoq0XRttXi2VideoNVL4jT1fsvmHuJvq4wc3fwiwtLwZJK1oSxy7K/ReYKtmnrJUmJD26KP5qQoinCokEtZLJATbqLRrSfZ6ePuv489nkC2n8OSH+EJlEV8uapUEKSuEE5RnxDNQP252hrxIo1OtCxQJ074cQs77yrb9Wm76zBoDzeHRxOt4MnIEXBJ4NqxJo1/KLDWbw2xRZ+F6DsHOaary4URyDlRcZQfID/MFciyOCyiKU7zdqP1M9kTAnK4XEUhX6YqEQQSe1q7WjQP57JYrRetjGwI3pR7c8+Zeyti3reNGQrXffpBa2gvaAliQPP4gXB/wrfweH9q58G7mXURZwOT1HrhShxDHBm/aQzhSuRGDX+iRTTFqUZ92QEOibsE467GWIWifRQ9b9TW1Irj5zVM21Navqq1KXmqoSF6BNQFmUNtEAVXJ1NwaRKFvyk4PdkaLi73hpbsFYaKxtSbcxujduG4V5nGMAfXIYpw4zqo5Hk8sSyb40PPn8w9l8sjsVGVCYLVlcJpaD9boxMvnFgrXZ14dkFhxdbA5ycn20O5ygzKNQgtReMc0Z1IQWUgBScJtGY0Ts0cAWdKf3y67vKKI4F6STzhwlyIxjWdStaWaBFN8U5vDzIOMh4ydxIjnPv3ap14fnip4IfdcV51tdGc94Wq3pAvN4M8OdWDAoReQ0GVmoJCBQVHlRQUIYpVCIUZVE51hqZFYZ1pcZ41oceF/0TOeWRNMQZhqEViIJLs9uled3865ypxfNXi6JhMzpZS5aibLS7OhgI2AzL8KMhEZHyG/VKMAeqWILLxOdufggOIgzIKDtEwgzo3JtwZOtRQFDjq2swD3CRVtWgWxiCSzsVCvtQv3deH5CPJeWWZIERTIZyRkOiZ0eDu8rRtkDPcGjoYCnwtIUVAwXb+J6Qg0oQYA9Q5gpq7hEb8LKJgN4GYgr04xvoJqD/YGe4g1ylPl46Vm1i7NZgHqBVMNKWZvhwSB3kRVxFepZ6ZeyP9+IN1CZ2tw/8GLQMGQIvzQKgXWcLPyLfel4KffBCm+yY2zlmCccFvWzgUbOYY7wTbeDgujMsFHya0DBxEc7WNHgMP96W9zW7ZWxx6QhklL+bJpVlsniyPI5qri4o913Hmchd0GQzv38Or3Fxo9fKCG/2doEFoCScmGuO9ETUTvChY5UnBWhbOF+OShrH4gWXEBl9jXPJRuzqYgkZPG2ju1x/apFJ4o9cDGAzw0fCx69RjfWN0zdS5kixv7tbG9cn3X999BF9cnVeuwL3QMGiQDoZKU46XYK7lBFCQLjHGOovkhcQYbzK+Asy/45iTFbg3KoIs4JK/KzyaPQc+tLV9SQ9tr27fS9TFJ5bdLqro/Nj54cvvH589g0dLl8EF/zFwTG1uzGvEMQI11fO7SPXpuft3kdIMSrVMuKYWwOPVa+Djixdf6b/+8OpN+vmdGdpCiTz54vodHe/an3V/e3v5MrSGhEBTXye4MMABigUWcBhjelj+fxDwNXLwfTnLEi73dYQrTk5wJzQU3jU19WjfeX37wdqG5etw74vkeVyRopinjDsTk3Dpybkbz/PzDdc9POCinR1ccnSESw6OUPWtNew37bnPkfUHyMa1qR/GhMvoSzgI13WP8fAs70hX/cPqC9G1U+PkxVyFNMuXZ6o5CkUZP2TKCWVs2iy3mrNO9h8uMu3ggr09jfMOtrgP7XCde9Fr/Ueg95+EASUT+kCjHbPHn3DVD3J4u3mhR8nkStkc1OrZf/T5cxTrTqkgWIXnT2CFcF786nE5J//u9PwXa1s4b2sLzQFyaC8vgpLlSkjhmkEKz+yr82Abvt8uZEDVhhnwW1kxXBcI4byNDTTa2ELpPwa0L04an645KYxBjUj6DMYzz2+fry/WHl9T7dHSde8kff4uiN7N2pErdLndFhtr+M8j4/Z43XEfdCmLYKd2CGzi9oKNuNcJNvMsID18FDTmbIb3b17RtiTnb82a2ZWpGH4t6gB7i1ovnk9zkzp4TKBBTbFkj4+XLIvthWcgn6yBqkw4CevUd3S90osXRVRK1+ffymp4Z/i0P7q6PsKTO7/C6eTlcHhcP8hnD4eLB/8NLzvu0vu7J7+7fu/Mup5aO/mEJJFwIWcMck/DGheiwNgTTcku7/H+GWzsezAGBTw/rM9aUw3C2i+ej3VrSVCd/9ot1/917PG7hy9NA4CXNTXQJBTBaStrOI1r2xwxBd7daP60t3+//Vvi1VV52IskEA7kmmfqAcJMc5cEYNyx/rqb+g8vrId8ugYbe59IrJcz0W8B9gBLsZdYvfBC9N5zD3St9zZsMJzFM13fqxfUMhg09Obm8Ms4N3hSdLSrrqO6Oeb8d2noE681as/XkLhjP2XqgWSk9mLce/oPugcx1mGRspivJDEitdo0hvmmHmhFeJUsaWPUyFOVtoz3+l7moLOwoKGnzKHcvve79XEeNaF1ip+ILfYdi8m8TdqRKmPNUeB+E2Kv541xN/ZfeKeRietwiMtWFPBJLqqwTofgepE4fI88c7Skh6gVLwmsEcUvWTs2t8CF+VRnRoGOwjNnpH17bJL7frRZpdGLl6B2LPFB3xmEg3Ahp5LkHPafvkSL1t/p7Sbc5jWuByle7uJd3iy/fT586X5fqf8htso/lxMkO8IJk+VzpwYUcKcHFHJnyop50ZGbPRK3uzo0Jrv3ORuW4plA3pFvxIbYEh/i63+QrSRckn0+POT2Qo0eTV7S+DHMITbWn8GKvn9jY2v3jQ3TbpitnZ2LrT3CAeGI6GM33LYvAXMEs4/TAKshfQdaOZPn7ve0jdHWgfYlHMjFHGpj+z8aCFtna+u//gH+udd/Aar7J0sAEAAA"""
+
+
+#        main = sys.modules['__main__']
+#        if hasattr(main, '__file__'):
+#            return os.path.dirname(main.__file__)
+
+
+if __debug__:
+    _dt = time.time() - _start_time
+    sys.stdout.write(u'%s loaded: %fs \n' % (__name__, _dt))
+
+
