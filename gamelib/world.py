@@ -128,7 +128,8 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
     def render(self, screen_surf, offset=None):
         if self._world:
             self.world_rect.center = self.position.as_xy_tuple()
-            offset = self.position - self.vec_center
+            #offset = self.position - self.vec_center
+            offset = Vec3(0,0)
             clipped_surf = screen_surf.subsurface(self.rect)
             [entity.render(clipped_surf, offset, self.screen_pos) for entity in self._world.get_entities_in_region(self.world_rect)]
     def screen_to_world(self, coord):

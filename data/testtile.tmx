@@ -5,7 +5,7 @@
  </tileset>
  <layer name="Tile Layer 1" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XwQnAIBBFwT0G60j/aTFYgIlgkA+ZgT2JFx8etgoAgF2OjcO7/k7XwvT758ToMUePLHpk0SPLao9WenzJ/8iiRxY9suiRZbRLt4cz+zkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwL/cuCfBqkCcAAA=
+   H4sIAAAAAAAAA+3XMQrAIBBFwS3Fc+T+uWLwACaCSfjFDGwlNj4stlVV+2l4Nt7p3Jhx/1gYPdbokUWPLHpk2e3RS483+R9Z9MiiRxY9ssx26X5zZj8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgG9csmQnDECcAAA=
   </data>
  </layer>
  <layer name="Tile Layer 3" width="100" height="100">
@@ -14,7 +14,7 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="100" height="100">
-  <object name="" x="177" y="144" width="50" height="49">
+  <object name="" x="65" y="48" width="50" height="49">
    <properties>
     <property name="foo" value="bar"/>
    </properties>
