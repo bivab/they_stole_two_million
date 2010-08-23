@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 u"""
-TileMap loader for python for Tiled, a generic tile map editor 
+TileMap loader for python for Tiled, a generic tile map editor
 from http://mapeditor.org/ .
 It loads the \*.tmx files produced by Tiled.
 """
 
-__version__ = u'$Id: tiledtmxloader.py 293 2009-08-02 18:48:50Z dr0iddr0id $'
+__version__ = u'$Id: tiledtmxloader.py 382 2010-07-14 18:39:21Z dr0iddr0id@gmail.com $'
 __author__ = u'DR0ID_ @ 2009'
 
 if __debug__:
@@ -45,30 +45,30 @@ class IImageLoader(object):
     def load_image(self, filename, colorkey=None): # -> image
         u"""
         Load a single image.
-        
+
         :Parameters:
             filename : string
                 Path to the file to be loaded.
             colorkey : tuple
                 The (r, g, b) color that should be used as colorkey (or magic color).
                 Default: None
-        
+
         :rtype: image
-        
+
         """
         raise NotImplementedError(u'This should be implemented in a inherited class')
 
     def load_image_file_like(self, file_like_obj, colorkey=None): # -> image
         u"""
         Load a image from a file like object.
-        
+
         :Parameters:
             file_like_obj : file
                 This is the file like object to load the image from.
             colorkey : tuple
                 The (r, g, b) color that should be used as colorkey (or magic color).
                 Default: None
-        
+
         :rtype: image
         """
         raise NotImplementedError(u'This should be implemented in a inherited class')
@@ -76,7 +76,7 @@ class IImageLoader(object):
     def load_image_parts(self, filename, margin, spacing, tile_width, tile_height, colorkey=None): #-> [images]
         u"""
         Load different tile images from one source image.
-        
+
         :Parameters:
             filename : string
                 Path to image to be loaded.
@@ -91,15 +91,15 @@ class IImageLoader(object):
             colorkey : tuple
                 The (r, g, b) color that should be used as colorkey (or magic color).
                 Default: None
-            
+
         Luckily that iteration is so easy in python::
-        
+
             ...
             w, h = image_size
             for y in xrange(margin, h, tile_height + spacing):
                 for x in xrange(margin, w, tile_width + spacing):
                     ...
-            
+
         :rtype: a list of images
         """
         raise NotImplementedError(u'This should be implemented in a inherited class')
@@ -108,9 +108,9 @@ class IImageLoader(object):
 class ImageLoaderPygame(IImageLoader):
     u"""
     Pygame image loader.
-    
+
     It uses an internal image cache. The methods return Surface.
-    
+
     :Undocumented:
         pygame
     """
@@ -166,12 +166,12 @@ class ImageLoaderPygame(IImageLoader):
 class ImageLoaderPyglet(IImageLoader):
     u"""
     Pyglet image loader.
-    
+
     It uses an internal image cache. The methods return some form of
     AbstractImage. The resource module is not used for loading the images.
-    
+
     Thanks to HydroKirby from #pyglet to contribute the ImageLoaderPyglet and the pyglet demo!
-    
+
     :Undocumented:
         pyglet
     """
@@ -199,6 +199,7 @@ class ImageLoaderPyglet(IImageLoader):
         img_part = image.get_region(x, y, w, h)
         return img_part
 
+
     def load_image_parts(self, filename, margin, spacing, tile_width, tile_height, colorkey=None): #-> [images]
         source_img = self._img_cache.get(filename, None)
         if source_img is None:
@@ -215,7 +216,7 @@ class ImageLoaderPyglet(IImageLoader):
         return images
 
     def load_image_file_like(self, file_like_obj, colorkey=None): # -> image
-        # pygame.image.load can load from a path and from a file-like object
+        # pyglet.image.load can load from a path and from a file-like object
         # that is why here it is redirected to the other method
         return self.load_image(file_like_obj, colorkey, file_like_obj)
 
@@ -265,8 +266,8 @@ class TileMap(object):
 
     def __init__(self):
 #        This is the top container for all data. The gid is the global id (for a image).
-#        Before calling convert most of the values are strings. Some additional 
-#        values are also calculated, see convert() for details. After calling 
+#        Before calling convert most of the values are strings. Some additional
+#        values are also calculated, see convert() for details. After calling
 #        convert, most values are integers or floats where appropriat.
         u"""
         The TileMap holds all the map data.
@@ -337,7 +338,7 @@ class TileMap(object):
     def load(self, image_loader):
         u"""
         loads all images using a IImageLoadermage implementation and fills up
-        the indexed_tiles dictionary. 
+        the indexed_tiles dictionary.
         The image may have per pixel alpha or a colorkey set.
         """
         self._image_loader = image_loader
@@ -402,10 +403,11 @@ class TileMap(object):
             layer.decode()
 #-------------------------------------------------------------------------------
 
+
 class TileSet(object):
     u"""
     A tileset holds the tiles and its images.
-    
+
     :Ivariables:
         firstgid : int
             the first gid of this tileset
@@ -418,7 +420,7 @@ class TileSet(object):
         indexed_images : dict
             after calling load() it is dict containing id: image
         indexed_tiles : dict
-            after calling load() it is a dict containing 
+            after calling load() it is a dict containing
             gid: (offsetx, offsety, image) , the image corresponding to the gid
         spacing : int
             the spacing between tiles
@@ -430,7 +432,7 @@ class TileSet(object):
             the actual width of the tile, can be different from the tilewidth of the map
         tilehight : int
             the actual hight of th etile, can be different from the tilehight of the  map
-    
+
     """
 
     def __init__(self):
@@ -451,7 +453,7 @@ class TileSet(object):
 class TileImage(object):
     u"""
     An image of a tile or just an image.
-    
+
     :Ivariables:
         id : int
             id of this image (has nothing to do with gid)
@@ -484,7 +486,7 @@ class TileImage(object):
 class Tile(object):
     u"""
     A single tile.
-    
+
     :Ivariables:
         id : int
             id of the tile gid = TileSet.firstgid + Tile.id
@@ -504,16 +506,16 @@ class Tile(object):
 class TileLayer(object):
     u"""
     A layer of the world.
-    
+
     :Ivariables:
         x : int
             position of layer in the world in number of tiles (not pixels)
         y : int
             position of layer in the world in number of tiles (not pixels)
         width : int
-            layer width in tiles
+            number of tiles in x direction
         height : int
-            layer height in tiles
+            number of tiles in y direction
         pixel_width : int
             width of layer in pixels
         pixel_height : int
@@ -522,9 +524,9 @@ class TileLayer(object):
             name of this layer
         opacity : float
             float from 0 (full transparent) to 1.0 (opaque)
-        decod_content : list
-            list of gid going through the map::
-            
+        decoded_content : list
+            list of graphics id going through the map::
+
                 e.g [1, 1, 1, ]
                 where decoded_content[0] is (0,0)
                       decoded_content[1] is (1,0)
@@ -533,7 +535,11 @@ class TileLayer(object):
                       decoded_content[1] is (0,1)
                       ...
                       decoded_content[1] is (width,height)
-    
+
+                usage: graphics id = decoded_content[tile_x + tile_y * width]
+        content2D : list
+            list of list, usage: graphics id = content2D[x][y]
+
     """
 
     def __init__(self):
@@ -551,6 +557,7 @@ class TileLayer(object):
         self.decoded_content = []
         self.visible = True
         self.properties = {} # {name: value}
+        self.content2D = None
 
     def decode(self):
         u"""
@@ -576,6 +583,18 @@ class TileLayer(object):
             val = ord(str(s[idx])) | (ord(str(s[idx + 1])) << 8) | \
                  (ord(str(s[idx + 2])) << 16) | (ord(str(s[idx + 3])) << 24)
             self.decoded_content.append(val)
+        # generate the 2D version
+        self._gen_2D()
+
+    def _gen_2D(self):
+        self.content2D = []
+        # generate the needed lists
+        for xpos in xrange(self.width):
+            self.content2D.append([])
+        # fill them
+        for xpos in xrange(self.width):
+            for ypos in xrange(self.height):
+                self.content2D[xpos].append(self.decoded_content[xpos + ypos * self.width])
 
     def pretty_print(self):
         num = 0
@@ -587,10 +606,11 @@ class TileLayer(object):
             print s
 #-------------------------------------------------------------------------------
 
+
 class MapObjectGroup(object):
     u"""
     Group of objects on the map.
-    
+
     :Ivariables:
         x : int
             the x position
@@ -604,7 +624,7 @@ class MapObjectGroup(object):
             name of the group
         objects : list
             list of the map objects
-    
+
     """
 
     def __init__(self):
@@ -621,7 +641,7 @@ class MapObjectGroup(object):
 class MapObject(object):
     u"""
     A single object on the map.
-    
+
     :Ivariables:
         x : int
             x position relative to group x position
@@ -707,7 +727,7 @@ def printer(obj, ident=''):
 #-------------------------------------------------------------------------------
 class TileMapParser(object):
     u"""
-    Allows to parse and decode map files for 'Tiled', a open source map editor 
+    Allows to parse and decode map files for 'Tiled', a open source map editor
     written in java. It can be found here: http://mapeditor.org/
     """
 
@@ -789,6 +809,7 @@ class TileMapParser(object):
             setattr(obj, attr_name, attrs.get(attr_name).nodeValue)
         self._get_properties(node, obj)
 
+
     def _get_properties(self, node, obj):
         props = {}
         for properties_node in self._get_nodes(node.childNodes, u'properties'):
@@ -797,7 +818,7 @@ class TileMapParser(object):
                     props[property_node.attributes[u'name'].nodeValue] = property_node.attributes[u'value'].nodeValue
                 except KeyError:
                     props[property_node.attributes[u'name'].nodeValue] = property_node.lastChild.nodeValue
-        obj.properties = props
+        obj.properties.update(props)
 
 
     #-- parsers --#
@@ -826,7 +847,7 @@ class TileMapParser(object):
 
     def parse_decode_load(self, file_name, image_loader):
         u"""
-        Parses the data, decodes them and loads the images as pygame surfaces.
+        Parses the data, decodes them and loads the images using the image_loader.
         :return: instance of TileMap
         """
         world_map = self.parse_decode(file_name)
@@ -879,7 +900,7 @@ def demo_pygame(file_name):
                     cam_offset_x += world_map.tilewidth
                 elif event.key == pygame.K_RIGHT:
                     cam_offset_x -= world_map.tilewidth
-        
+
         # draw the map
         if dirty:
             dirty = False
@@ -887,13 +908,13 @@ def demo_pygame(file_name):
                 if layer.visible:
                     idx = 0
                     # loop over all tiles
-                    for y in xrange(0, layer.pixel_height, world_map.tileheight):
-                        for x in xrange(0, layer.pixel_width, world_map.tilewidth):
+                    for ypos in xrange(0, layer.height):
+                        for xpos in xrange(0, layer.width):
                             # add offset in number of tiles
-                            x += layer.x * world_map.tilewidth
-                            y += layer.y * world_map.tileheight
+                            x = (xpos + layer.x) * world_map.tilewidth
+                            y = (ypos + layer.y) * world_map.tileheight
                             # get the gid at this position
-                            img_idx = layer.decoded_content[idx]
+                            img_idx = layer.content2D[xpos][ypos]
                             idx += 1
                             if img_idx:
                                 # get the actual image and its offset
@@ -934,22 +955,32 @@ def demo_pygame(file_name):
 #-------------------------------------------------------------------------------
 
 def demo_pyglet(file_name):
+    """Loads and views a map using pyglet.
+
+    Holding the arrow keys will scroll along the map.
+    Holding the left shift key will make you scroll faster.
+    Pressing the escape key ends the application.
+    """
+
     import pyglet
     from pyglet.gl import glTranslatef, glLoadIdentity
 
-
     world_map = TileMapParser().parse_decode(file_name)
-    # This is a list because pyglet's scoping is annoying.
+    # delta is the x/y position of the map view.
+    # delta is a list because the scoping is different for immutable types.
+    # This list can be used within the update method.
     delta = [0.0, 0.0]
     window = pyglet.window.Window()
 
     @window.event
     def on_draw():
         window.clear()
+        # Reset the "eye" back to the default location.
         glLoadIdentity()
+        # Move the "eye" to the current location on the map.
         glTranslatef(delta[0], delta[1], 0.0)
         batch.draw()
-    
+
     keys = pyglet.window.key.KeyStateHandler()
     window.push_handlers(keys)
     world_map.load(ImageLoaderPyglet())
@@ -965,29 +996,32 @@ def demo_pyglet(file_name):
         if keys[pyglet.window.key.DOWN]:
             delta[1] += speed
 
+    # Generate the graphics for every visible tile.
     batch = pyglet.graphics.Batch()
     groups = []
     sprites = []
     for group_num, layer in enumerate(world_map.layers[:]):
-        if not layer.visible:
+        if layer.visible is False:
             continue
         groups.append(pyglet.graphics.OrderedGroup(group_num))
-        id_index = 0
-        # Reversed for pyglet's y-perspective.
-        for y in xrange(layer.pixel_height - world_map.tileheight,
-            -world_map.tileheight, -world_map.tileheight):
-            for x in xrange(0, layer.pixel_width, world_map.tilewidth):
-                image_id = layer.decoded_content[id_index]
-                id_index += 1
+        for xtile in range(layer.width):
+            for ytile in range(layer.height):
+                image_id = layer.content2D[xtile][ytile]
                 if image_id:
-                    offset_x, offset_y, image_file = \
-                        world_map.indexed_tiles[image_id]
+                    # o_x and o_y are offsets. They are not helpful here.
+                    o_x, o_y, image_file = world_map.indexed_tiles[image_id]
+                    # To compensate for pyglet's upside-down y-axis, the
+                    # Sprites are placed in rows that are backwards compared
+                    # to what was loaded into the map. The "max - current"
+                    # formula does this reversal.
                     sprites.append(pyglet.sprite.Sprite(image_file,
-                        x, y , batch=batch,
-                        group=groups[group_num]))
+                        xtile * world_map.tilewidth,
+                        layer.pixel_height - (ytile+1) * world_map.tileheight,
+                        batch=batch, group=groups[group_num]))
 
     pyglet.clock.schedule_interval(update, 1.0 / 60.0)
     pyglet.app.run()
+
 
 #-------------------------------------------------------------------------------
 def main():
@@ -1016,6 +1050,3 @@ if __name__ == '__main__':
 if __debug__:
     _dt = time.time() - _start_time
     sys.stdout.write(u'%s loaded: %fs \n' % (__name__, _dt))
-
-
-
