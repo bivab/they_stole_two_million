@@ -86,12 +86,12 @@ class PlayState(pyknic.State):
                 self.game_time.event_update += ent.update
 
                 
-                # map objects
-                for obj_group in world_map.object_groups:
-                    for obj in obj_group.objects:
-                        if hasattr(obj, 'type'):
-                            thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height)
-                            actionables.append(thing)
+        # map objects
+        for obj_group in world_map.object_groups:
+            for obj in obj_group.objects:
+                if hasattr(obj, 'type'):
+                    thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height)
+                    actionables.append(thing)
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
