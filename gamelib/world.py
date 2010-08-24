@@ -92,19 +92,21 @@ class PlayState(pyknic.State):
         self.world.add_renderer(self.renderer1)
         self.game_time.event_update += self.renderer1.update
 
-        player = Player(None, Vec3(32, 32), Vec3(50, 0))
-        self.world.add_entity(player)
-        self.game_time.event_update += player.update
+        self.player = Player(None, Vec3(32, 32))
+        self.world.add_entity(self.player)
+        self.game_time.event_update += self.player.update
+
+        self.events.key_down += self.player.on_key_down
+        self.events.key_up += self.player.on_key_up
 
         self.coll_detector = pyknic.collision.CollisionDetector()
-        self.coll_detector.register_once('player', 'walls', [player], impassables, \
+        self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
 
 
 
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
-
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
@@ -147,7 +149,6 @@ class TheWorld(pyknic.world.IWorld):
             if entities:
                 return entities
         return None
-
 
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
@@ -196,5 +197,41 @@ class Player(pyknic.entity.Entity):
         self.rect.size = img.get_size()
 
     def collision_response(self, other):
-        #print self.rect, other.rect
-        self.velocity = Vec3(0,0)
+        print self.rect, other.rect
+        print self.velocity
+        import math
+        if self.velocity.x > 0 and self.position.x < other.position.x:
+            self.position.x -= 1
+            self.velocity.x = 0
+        if self.velocity.x < 0 and self.position.x > other.position.x:
+            self.position.x += 1
+            self.velocity.x = 0
+        if self.velocity.y > 0 and self.position.y < other.position.y:
+            self.position.y -= 1
+            self.velocity.y = 0
+        if self.velocity.y < 0 and self.position.y > other.position.y:
+            self.position.y += 1
+            self.velocity.y = 0
+
+    def on_key_down(self, key, mod, unicode):
+        speed = 50
+        if key == K_UP:
+            self.velocity.y = -1 * speed
+        if key == K_DOWN:
+            self.velocity.y = speed
+        if key == K_LEFT:
+            self.velocity.x = -1 * speed
+        if key == K_RIGHT:
+            self.velocity.x = speed
+        #print key, mod, unicode
+
+    def on_key_up(self, key, mod):
+        if key == K_UP:
+            self.velocity.y = 0
+        if key == K_DOWN:
+            self.velocity.y = 0
+        if key == K_LEFT:
+            self.velocity.x = 0
+        if key == K_RIGHT:
+            self.velocity.x = 0
+        #print key, mod
