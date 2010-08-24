@@ -92,11 +92,7 @@ class PlayState(pyknic.State):
         self.world.add_renderer(self.renderer1)
         self.game_time.event_update += self.renderer1.update
 
-        player = Player(self)
-        player.layer = 10000
-        player.position = Vec3(32, 32)
-        player.velocity = Vec3(50, 0)
-
+        player = Player(None, Vec3(32, 32), Vec3(50, 0))
         self.world.add_entity(player)
         self.game_time.event_update += player.update
 
@@ -190,21 +186,15 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
     def hit(self, coord):
         return self.rect.collidepoint(coord.as_xy_tuple())
 
+class Player(pyknic.entity.Entity):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
+        img = pygame.Surface((16, 16))
+        img.fill((255, 0, 0))
+        spr = Spr(img, offset=Vec3(8,8))
+        self.layer = 10000
+        super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.rect.size = img.get_size()
 
-class MyEntity(pyknic.entity.Entity):
-    def __init__(self, state):
-        image = pygame.Surface((16, 16))
-        image.fill((255, 0, 0))
-        spr = Spr(image,offset=Vec3(8,8))
-
-        super(MyEntity, self).__init__(spr)
-
-class Player(MyEntity):
     def collision_response(self, other):
-        pass
-        #self.velocity = Vec3(0,0)
-
-
-    def update(self, gdt, gt, dt, t, *args, **kwargs):
-        super(MyEntity, self).update(gdt, gt, dt, t, *args, **kwargs)
-
+        #print self.rect, other.rect
+        self.velocity = Vec3(0,0)
