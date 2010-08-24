@@ -53,9 +53,6 @@ class PlayState(pyknic.State):
                     pass  
                     
                 spr = Spr()
-    
-                      
-                
                 for y in xrange(0, layer.pixel_height, world_map.tileheight):
                     for x in xrange(0, layer.pixel_width, world_map.tilewidth):
                         img_idx = layer.decoded_content[idx]
@@ -127,46 +124,13 @@ class PlayState(pyknic.State):
         flip()
 
     def coll_player_wall(self, player, wall, dummy = 0):
-        #pdb.set_trace()
- #       print "boing"
         player.collision_response(wall) 
-        
     
     def coll_player_stuff(self, player, thing):
         print "fuufuuu@#$@#$"
         
     def update(self, gdt, gt, dt, t, *args):
         self.coll_detector.check()
-
-class PlayerWallCollisionStrategy(object):
-    def check_broad(self, name1, name2, coll_groups):
-        print "foo"
-        entity = coll_groups[name1][0]
-        walls = coll_groups[name2]
-        objects2 = [w.rect for w in walls]
-        return [(entity, walls[idx]) for idx in entity.rect.collidelistall(objects2)] 
-
-
-        #return  pyknic.collision.brute_force_rect(coll_groups[name1], coll_groups[name2])
-        
-        
-    def check_narrow(self, pairs_list, coll_funcs):
-        pass
-        # check for collision
-#        print pairs_list
-        for player, wall in pairs_list:
-            coll_funcs[(player.__class__, wall.__class__)](player, wall, 0)
-            #            print player.position
-#            d = player.position - wall.position
-#            n = d.project_onto(wall.normal)
-#            n_len = n.length
-#            # check length of wall also
-#            if n_len <= player.bounding_radius and n.dot(wall.normal)>0:
-#                # collision response
-#                coll_funcs[(ball.__class__, wall.__class__)](player, wall, player.bounding_radius - n_len)
-
-
-
         # TODO: call only when requesting action menu
         self.actionable_detector.check()
                                         
@@ -284,7 +248,7 @@ class Player(MyEntity):
 
     def update(self, gdt, gt, dt, t):
         super(Player, self).update(gdt, gt, dt, t)
-        print self.position.x, self.position.y, self.rect
+   #     print self.position.x, self.position.y, self.rect
         self.position.x = (self.position.x + self.x_speed) % 1024 
         self.position.y = (self.position.y + self.y_speed) % 768  
     #    if self.velocity.lengthSQ:
@@ -296,6 +260,6 @@ class Player(MyEntity):
     #        #self.spr.pause()
     #        pass
     def collision_response(self, other):
-        self.x_speed = -1 * self.x_speed
-        self.y_speed =  -1 * self.y_speed
+        self.x_speed = -1 #* self.x_speed
+        self.y_speed =  -1 #* self.y_speed
     
