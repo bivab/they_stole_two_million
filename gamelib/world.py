@@ -101,17 +101,17 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(32, 32))
         self.world.add_entity(self.player)
         self.game_time.event_update += self.player.update
-
+        
+        self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
+        self.world.add_entity(self.action_menu)
+        
         self.events.key_down += self.player.on_key_down
+        self.events.key_down += self.action_menu.on_key_down
         self.events.key_up += self.player.on_key_up
 
         self.coll_detector = pyknic.collision.CollisionDetector()
         self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-        
-        self.actionable_detector = pyknic.collision.CollisionDetector()
-        self.actionable_detector.register_once('player', 'stuff', [self.player], actionables, \
-                    AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
         
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
@@ -124,15 +124,40 @@ class PlayState(pyknic.State):
 
     def coll_player_wall(self, player, wall, dummy = 0):
         player.collision_response(wall) 
-    
-    def coll_player_stuff(self, player, thing):
-        print "fuufuuu@#$@#$"
         
     def update(self, gdt, gt, dt, t, *args):
         self.coll_detector.check()
-        # TODO: call only when requesting action menu
-        self.actionable_detector.check()
                                         
+class ActionMenu(pyknic.entity.Entity):
+    def __init__(self, screen, player, actionables):
+        Entity.__init__(self, spr=Spr(image=pygame.Surface((100, 100)) ))
+        self.screen = screen
+        self.player = player
+        self.visible = False
+        self.layer = 1000000
+        self.actionable_detector = pyknic.collision.CollisionDetector()
+        self.actionable_detector.register_once('player', 'stuff', [self.player], actionables, \
+                    AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
+        
+    def on_key_down(self, key, mod, code):
+        if code != 'a':
+            return
+        self.visible = not self.visible
+        if self.visible == True:
+            # update menu
+            self.actionable_detector.check()
+
+
+    def coll_player_stuff(self, player, thing):
+        print "fuufuuu@#$@#$"
+    
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        if not self.visible:
+            return
+        font = pygame.font.Font(None,25)
+        text = font.render("YourText",1,(255,255,255,0)) #font.render( Text , antialias , Color(r,g,b,a))
+        screen_surf.blit(text,(10,100)) #screen = yoursurface
+                
 class TheWorld(pyknic.world.IWorld):
     def add_entity(self, entity):
         if entity not in self._entities:
