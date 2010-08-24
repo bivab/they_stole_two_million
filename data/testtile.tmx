@@ -18,7 +18,7 @@
    <property name="passable" value="false"/>
   </properties>
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XsQkAMAhFQUv3nzgjKATkF3dgmcaHRbqq+miY/e5p+16PHT2y6JFFjyxXe9Jjx31k0SOLHln0yHL1N9cDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGYP4xqnTECcAAA=
+   H4sIAAAAAAAAA+3XMQrAIAxAUd2c2yO09z+jo4ugRQiBvgfZdMnHwVZKaUHD2umedu/rsUePXPTIRY9covakxx7vIxc9cpnt6apj7vr9/sm5v5vt6aljXj1CRf3N9QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAtQ4JehLCQJwAAA==
   </data>
  </layer>
  <layer name="Doorways" width="100" height="100">
@@ -27,9 +27,10 @@
   </data>
  </layer>
  <objectgroup name="Object" width="100" height="100">
-  <object name="" x="65" y="48" width="30" height="31">
+  <object name="My beautiful blue desk" type="Desk" x="67" y="114" width="88" height="43">
    <properties>
-    <property name="foo" value="bar"/>
+    <property name="locked" value="true"/>
+    <property name="rob" value="1000"/>
    </properties>
   </object>
  </objectgroup>

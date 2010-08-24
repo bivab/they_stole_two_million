@@ -37,6 +37,8 @@ class PlayState(pyknic.State):
         world_map = TileMapParser().parse_decode_load("data/testtile.tmx", ImageLoaderPygame())
         assert world_map.orientation == "orthogonal"
         impassables = []
+        actionables = []
+        
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
                 layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height))
@@ -86,6 +88,14 @@ class PlayState(pyknic.State):
                 self.world.add_entity(ent)
                 self.game_time.event_update += ent.update
 
+                
+                # map objects
+                for obj_group in world_map.object_groups:
+                    for obj in obj_group.objects:
+                        if hasattr(obj, 'type'):
+                            thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height)
+                            actionables.append(thing)
+
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
@@ -101,9 +111,11 @@ class PlayState(pyknic.State):
         self.coll_detector = pyknic.collision.CollisionDetector()
         self.coll_detector.register_once('player', 'walls', [player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-  
-  
-
+        
+        self.actionable_detector = pyknic.collision.CollisionDetector()
+        self.actionable_detector.register_once('player', 'stuff', [player], actionables, \
+                    AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
+        
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
 
@@ -119,6 +131,9 @@ class PlayState(pyknic.State):
  #       print "boing"
         player.collision_response(wall) 
         
+    
+    def coll_player_stuff(self, player, thing):
+        print "fuufuuu@#$@#$"
         
     def update(self, gdt, gt, dt, t, *args):
         self.coll_detector.check()
@@ -152,6 +167,9 @@ class PlayerWallCollisionStrategy(object):
 
 
 
+        # TODO: call only when requesting action menu
+        self.actionable_detector.check()
+                                        
 class TheWorld(pyknic.world.IWorld):
     def add_entity(self, entity):
         if entity not in self._entities:
@@ -238,10 +256,17 @@ class MyEntity(pyknic.entity.Entity):
     def elapsed(self):
         self.position += Vec3(10, 10)
 
+class InteractiveThing(Entity):
+    def __init__(self, x, y, width, height):
+        Entity.__init__(self, None, Vec3(x, y))
+        self.bounding_radius = 16
+        self.rect.size = (width, height)
+        self.layer =  10
 
 class Player(MyEntity):
     def __init__(self, state,x,y):
         super(Player, self).__init__(state)
+        self.bounding_radius = 8
         self.position.x = x
         self.position.y = y
         self.rect = Rect(x,y,16,16)
