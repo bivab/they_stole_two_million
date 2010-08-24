@@ -1,15 +1,16 @@
 import pygame
 
 import pyknic
-from pyknic.collision import AABBCollisionStrategy
+from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
+from pyknic.geometry import Vec3
 from pyknic.entity import Entity
 from pyknic.entity import Spr
-from pyknic.geometry import Vec3
-from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
+from pyknic.collision import AABBCollisionStrategy
 
-from entities import InteractiveThing, Player, ActionMenu
-from ui import SimpleRenderer
 from world import TheWorld
+from entities import InteractiveThing, Player, ActionMenu
+
+from ui import SimpleRenderer
 
 class PlayState(pyknic.State):
     def __init__(self,  *args, **kwargs):
@@ -75,11 +76,8 @@ class PlayState(pyknic.State):
         for obj_group in world_map.object_groups:
             for obj in obj_group.objects:
                 if hasattr(obj, 'type'):
-                    thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height, obj.properties)
-                    actionables.append(thing.blow_up())
-                    impassables.append(thing)
-                    self.world.add_entity(thing)
-                    self.game_time.event_update += thing.update
+                    thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height)
+                    actionables.append(thing)
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
@@ -101,10 +99,6 @@ class PlayState(pyknic.State):
         self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
 
-        self.setup_update_events()
-
-    def setup_update_events(self):
-        self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
 
