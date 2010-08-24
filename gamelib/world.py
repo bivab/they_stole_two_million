@@ -45,13 +45,13 @@ class PlayState(pyknic.State):
                 layer_img.fill((255, 0, 255))
                 layer_img.set_colorkey((255, 0, 255))
                 idx = 0
-                
+
                 impassable = False
                 try:
                     impassable = layer.properties['passable'] == 'false'
                 except KeyError:
-                    pass  
-                    
+                    pass
+
                 spr = Spr()
                 for y in xrange(0, layer.pixel_height, world_map.tileheight):
                     for x in xrange(0, layer.pixel_width, world_map.tilewidth):
@@ -59,13 +59,13 @@ class PlayState(pyknic.State):
                         idx += 1
                         if img_idx:
                             offx, offy, screen_img = world_map.indexed_tiles[img_idx]
-                            
+
                             if impassable:
                                 ent = Entity(None, Vec3(x + offx, y + offy))
                                 ent.rect.size = screen_img.get_size()
                                 ent.layer = layernum * 10
                                 impassables.append(ent)
-                            
+
                             screen_img = screen_img.convert()
                             if layer.opacity > -1:
                                 screen_img.set_alpha(None)
@@ -93,29 +93,28 @@ class PlayState(pyknic.State):
                             thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height)
                             actionables.append(thing)
 
-
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
         self.game_time.event_update += self.renderer1.update
 
-        player = Player(self,70,50)
-        player.layer = 10000
-        print player.rect
-        self.world.add_entity(player)
-        self.game_time.event_update += player.update
+        self.player = Player(None, Vec3(32, 32))
+        self.world.add_entity(self.player)
+        self.game_time.event_update += self.player.update
+
+        self.events.key_down += self.player.on_key_down
+        self.events.key_up += self.player.on_key_up
 
         self.coll_detector = pyknic.collision.CollisionDetector()
-        self.coll_detector.register_once('player', 'walls', [player], impassables, \
+        self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
         
         self.actionable_detector = pyknic.collision.CollisionDetector()
-        self.actionable_detector.register_once('player', 'stuff', [player], actionables, \
+        self.actionable_detector.register_once('player', 'stuff', [self.player], actionables, \
                     AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
         
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
-
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
@@ -163,7 +162,6 @@ class TheWorld(pyknic.world.IWorld):
                 return entities
         return None
 
-
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
     def __init__(self, state, cam_rect):
@@ -201,65 +199,58 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
     def hit(self, coord):
         return self.rect.collidepoint(coord.as_xy_tuple())
 
-
-class MyEntity(pyknic.entity.Entity):
-
-    def __init__(self, state):
-#        super(MyEntity, self).__init__()
-        image = pygame.Surface((16, 16))
-        image.fill((255, 0, 0))
-        spr = Spr(image,offset=Vec3(8,8))
-        
-        super(MyEntity, self).__init__(spr)
-        self.state = state
-        self.rect.w = 16
-        self.rect.h = 16
-        self._off = Vec3(0, 0)
-
-
-    def elapsed(self):
-        self.position += Vec3(10, 10)
-
-class InteractiveThing(Entity):
+class InteractiveThing(pyknic.entity.Entity):
     def __init__(self, x, y, width, height):
         Entity.__init__(self, None, Vec3(x, y))
         self.bounding_radius = 16
         self.rect.size = (width, height)
-        self.layer =  10
+        self.layer =  1
 
-class Player(MyEntity):
-    def __init__(self, state,x,y):
-        super(Player, self).__init__(state)
-        self.bounding_radius = 8
-        self.position.x = x
-        self.position.y = y
-        self.rect = Rect(x,y,16,16)
-    #    #anims = pyknic.animation.load_animation(state.game_time, 'data/myanim')
-    #    #self.sprites = {}
-    #    #self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
-    #    #self.spr = self.sprites[pyknic.utilities.utilities.Direction.S]
+class Player(pyknic.entity.Entity):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
+        img = pygame.Surface((16, 16))
+        img.fill((255, 0, 0))
+        spr = Spr(img, offset=Vec3(8,8))
+        self.layer = 10000
+        super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.rect.size = img.get_size()
 
-    x_speed = 1
-    y_speed = 1
-    
-
-    def update(self, gdt, gt, dt, t):
-        super(Player, self).update(gdt, gt, dt, t)
-   #     print self.position.x, self.position.y, self.rect
-        self.position.x = (self.position.x + self.x_speed) % 1024 
-        self.position.y = (self.position.y + self.y_speed) % 768  
-    #    if self.velocity.lengthSQ:
-    #        #self.spr.play()
-    #        #dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
-    #        #self.spr = self.sprites[dir]
-    #        pass
-    #    else:
-    #        #self.spr.pause()
-    #        pass
     def collision_response(self, other):
-        self.x_speed = -1 #* self.x_speed
-        self.y_speed =  -1 #* self.y_speed
-    
+        print self.rect, other.rect
+        print self.velocity
+        import math
+        if self.velocity.x > 0 and self.position.x < other.position.x:
+            self.position.x -= 1
+            self.velocity.x = 0
+        if self.velocity.x < 0 and self.position.x > other.position.x:
+            self.position.x += 1
+            self.velocity.x = 0
+        if self.velocity.y > 0 and self.position.y < other.position.y:
+            self.position.y -= 1
+            self.velocity.y = 0
+        if self.velocity.y < 0 and self.position.y > other.position.y:
+            self.position.y += 1
+            self.velocity.y = 0
+
+    def on_key_down(self, key, mod, unicode):
+        speed = 50
+        if key == K_UP:
+            self.velocity.y = -1 * speed
+        if key == K_DOWN:
+            self.velocity.y = speed
+        if key == K_LEFT:
+            self.velocity.x = -1 * speed
+        if key == K_RIGHT:
+            self.velocity.x = speed
+        #print key, mod, unicode
+
+    def on_key_up(self, key, mod):
+        if key == K_UP:
+            self.velocity.y = 0
+        if key == K_DOWN:
+            self.velocity.y = 0
+        if key == K_LEFT:
+            self.velocity.x = 0
+        if key == K_RIGHT:
+            self.velocity.x = 0
+        #print key, mod
