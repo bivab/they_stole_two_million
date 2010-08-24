@@ -35,6 +35,7 @@ class PlayState(pyknic.State):
     def on_init(self, app):
         world_map = TileMapParser().parse_decode_load("data/testtile.tmx", ImageLoaderPygame())
         assert world_map.orientation == "orthogonal"
+        impassables = []
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
                 layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height))
@@ -62,6 +63,12 @@ class PlayState(pyknic.State):
                 ent = Entity(spr, Vec3(0, 0))
                 ent.rect.size = spr.image.get_size()
                 ent.layer = layernum * 10
+                try:
+                    if layer.properties['passable'] == 'false':
+                        impassables.append(ent)
+                        print impassables
+                except KeyError:
+                    pass
                 self.world.add_entity(ent)
                 self.game_time.event_update += ent.update
 
@@ -70,6 +77,19 @@ class PlayState(pyknic.State):
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
         self.game_time.event_update += self.renderer1.update
+
+        player = Player(self)
+        player.position.x = 20
+        player.position.y = 20
+        player.layer = 10000
+        self.world.add_entity(player)
+        self.game_time.event_update += player.update
+
+        self.coll_detector = pyknic.collision.CollisionDetector()
+        self.coll_detector.register_once('player', 'walls', [player], [impassables], \
+                    PlayerWallCollisionStrategy(), (Player, Entity), self.coll_player_wall)
+
+
 
 #        self.game_time.event_update += self.update
         self.game_time.event_update += self.render
@@ -80,6 +100,26 @@ class PlayState(pyknic.State):
         screen_surf.fill((0, 0, 0))
         self.world.render(screen_surf)
         flip()
+
+    def coll_player_wall(self, player, wall, depth):
+        print player, wall
+
+class PlayerWallCollisionStrategy(object):
+    def check_broad(self, name1, name2, coll_groups):
+        print name1, name2, coll_groups
+        return pyknic.collision.brute_force_rect(coll_groups[name1], coll_groups[name2])
+
+    def check_narrow(self, pairs_list, coll_funcs):
+            # check for collision
+            print pairs_list
+            for player, wall in pairs_list:
+                d = player.position - wall.position
+                n = d.project_onto(wall.normal)
+                n_len = n.length
+                # check length of wall also
+                if n_len <= player.bounding_radius and n.dot(wall.normal)>0:
+                    # collision response
+                    coll_funcs[(ball.__class__, wall.__class__)](player, wall, player.bounding_radius - n_len)
 
 
 
@@ -125,7 +165,14 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
             #offset = self.position - self.vec_center
             offset = Vec3(0,0)
             clipped_surf = screen_surf.subsurface(self.rect)
-            [entity.render(clipped_surf, offset, self.screen_pos) for entity in self._world.get_entities_in_region(self.world_rect)]
+            #[entity.render(clipped_surf, offset, self.screen_pos) for entity in self._world.get_entities_in_region(self.world_rect)]
+            ents = SortedList(self._world.get_entities_in_region(self.world_rect), lambda e: -e.position.z + e.layer)
+            for entity in ents:
+                entity.render(clipped_surf, offset, self.screen_pos)
+#                if entity.position.z > -900:
+#                    scale = 1000. / (entity.position.z + 1000.)
+#                    if scale == 1.0:
+
 
     def screen_to_world(self, coord):
         x = self.position.x + coord[0] - self.rect.topleft[0] - self.vec_center.x
@@ -144,3 +191,52 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
         return self.rect.collidepoint(coord.as_xy_tuple())
 
 
+class MyEntity(pyknic.entity.Entity):
+
+    def __init__(self, state):
+        super(MyEntity, self).__init__()
+        self.state = state
+        spr = Spr()
+        spr.image = pygame.Surface((16, 16))
+        spr.image.fill((255, 0, 0))
+        super(MyEntity, self).__init__(spr, Vec3(random.randint(0, 255), random.randint(0, 255)))
+        self.rect.w = 16
+        self.rect.h = 16
+        self._off = Vec3(0, 0)
+
+    def update(self, gdt, gt, dt, t):
+        super(MyEntity, self).update(gdt, gt, dt, t)
+        if self.target:
+            self.position = self.target.position + self._off
+            self.rect.center = self.position.as_xy_tuple()
+
+    def elapsed(self):
+        self.position += Vec3(10, 10)
+
+
+class Player(MyEntity):
+    pass
+    #def __init__(self, state):
+    #    super(Player, self).__init__(state)
+    #    #anims = pyknic.animation.load_animation(state.game_time, 'data/myanim')
+    #    #self.sprites = {}
+    #    #self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+    #    #self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+    #    #self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+    #    #self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+    #    #self.spr = self.sprites[pyknic.utilities.utilities.Direction.S]
+
+    def update(self, gdt, gt, dt, t):
+        super(Player, self).update(gdt, gt, dt, t)
+        self.position.x += 3
+        self.position.y += 3
+    #    if self.velocity.lengthSQ:
+    #        #self.spr.play()
+    #        #dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+    #        #self.spr = self.sprites[dir]
+    #        pass
+    #    else:
+    #        #self.spr.pause()
+    #        pass
+    def collision_response(self, other):
+        print other
