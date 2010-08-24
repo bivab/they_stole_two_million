@@ -43,30 +43,30 @@ class PlayState(pyknic.State):
                 layer_img.fill((255, 0, 255))
                 layer_img.set_colorkey((255, 0, 255))
                 idx = 0
-                
+
                 impassable = False
                 try:
                     impassable = layer.properties['passable'] == 'false'
                 except KeyError:
-                    pass  
-                    
+                    pass
+
                 spr = Spr()
-    
-                      
-                
+
+
+
                 for y in xrange(0, layer.pixel_height, world_map.tileheight):
                     for x in xrange(0, layer.pixel_width, world_map.tilewidth):
                         img_idx = layer.decoded_content[idx]
                         idx += 1
                         if img_idx:
                             offx, offy, screen_img = world_map.indexed_tiles[img_idx]
-                            
+
                             if impassable:
                                 ent = Entity(None, Vec3(x + offx, y + offy))
                                 ent.rect.size = screen_img.get_size()
                                 ent.layer = layernum * 10
                                 impassables.append(ent)
-                            
+
                             screen_img = screen_img.convert()
                             if layer.opacity > -1:
                                 screen_img.set_alpha(None)
@@ -92,17 +92,19 @@ class PlayState(pyknic.State):
         self.world.add_renderer(self.renderer1)
         self.game_time.event_update += self.renderer1.update
 
-        player = Player(self,70,50)
+        player = Player(self)
         player.layer = 10000
-        print player.rect
+        player.position = Vec3(32, 32)
+        player.velocity = Vec3(50, 0)
+
         self.world.add_entity(player)
         self.game_time.event_update += player.update
 
         self.coll_detector = pyknic.collision.CollisionDetector()
         self.coll_detector.register_once('player', 'walls', [player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-  
-  
+
+
 
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
@@ -115,42 +117,11 @@ class PlayState(pyknic.State):
         flip()
 
     def coll_player_wall(self, player, wall, dummy = 0):
-        #pdb.set_trace()
- #       print "boing"
-        player.collision_response(wall) 
-        
-        
+        player.collision_response(wall)
+
+
     def update(self, gdt, gt, dt, t, *args):
         self.coll_detector.check()
-
-class PlayerWallCollisionStrategy(object):
-    def check_broad(self, name1, name2, coll_groups):
-        print "foo"
-        entity = coll_groups[name1][0]
-        walls = coll_groups[name2]
-        objects2 = [w.rect for w in walls]
-        return [(entity, walls[idx]) for idx in entity.rect.collidelistall(objects2)] 
-
-
-        #return  pyknic.collision.brute_force_rect(coll_groups[name1], coll_groups[name2])
-        
-        
-    def check_narrow(self, pairs_list, coll_funcs):
-        pass
-        # check for collision
-#        print pairs_list
-        for player, wall in pairs_list:
-            coll_funcs[(player.__class__, wall.__class__)](player, wall, 0)
-            #            print player.position
-#            d = player.position - wall.position
-#            n = d.project_onto(wall.normal)
-#            n_len = n.length
-#            # check length of wall also
-#            if n_len <= player.bounding_radius and n.dot(wall.normal)>0:
-#                # collision response
-#                coll_funcs[(ball.__class__, wall.__class__)](player, wall, player.bounding_radius - n_len)
-
-
 
 class TheWorld(pyknic.world.IWorld):
     def add_entity(self, entity):
@@ -221,56 +192,19 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
 
 
 class MyEntity(pyknic.entity.Entity):
-
     def __init__(self, state):
-#        super(MyEntity, self).__init__()
         image = pygame.Surface((16, 16))
         image.fill((255, 0, 0))
         spr = Spr(image,offset=Vec3(8,8))
-        
+
         super(MyEntity, self).__init__(spr)
-        self.state = state
-        self.rect.w = 16
-        self.rect.h = 16
-        self._off = Vec3(0, 0)
-
-
-    def elapsed(self):
-        self.position += Vec3(10, 10)
-
 
 class Player(MyEntity):
-    def __init__(self, state,x,y):
-        super(Player, self).__init__(state)
-        self.position.x = x
-        self.position.y = y
-        self.rect = Rect(x,y,16,16)
-    #    #anims = pyknic.animation.load_animation(state.game_time, 'data/myanim')
-    #    #self.sprites = {}
-    #    #self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
-    #    #self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
-    #    #self.spr = self.sprites[pyknic.utilities.utilities.Direction.S]
-
-    x_speed = 1
-    y_speed = 1
-    
-
-    def update(self, gdt, gt, dt, t):
-        super(Player, self).update(gdt, gt, dt, t)
-        print self.position.x, self.position.y, self.rect
-        self.position.x = (self.position.x + self.x_speed) % 1024 
-        self.position.y = (self.position.y + self.y_speed) % 768  
-    #    if self.velocity.lengthSQ:
-    #        #self.spr.play()
-    #        #dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
-    #        #self.spr = self.sprites[dir]
-    #        pass
-    #    else:
-    #        #self.spr.pause()
-    #        pass
     def collision_response(self, other):
-        self.x_speed = -1 * self.x_speed
-        self.y_speed =  -1 * self.y_speed
-    
+        pass
+        #self.velocity = Vec3(0,0)
+
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        super(MyEntity, self).update(gdt, gt, dt, t, *args, **kwargs)
+
