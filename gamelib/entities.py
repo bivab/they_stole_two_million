@@ -10,11 +10,102 @@ from pyknic.geometry import Vec3
 from pyknic.geometry import Vec3
 
 class InteractiveThing(pyknic.entity.Entity):
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, properties):
         Entity.__init__(self, None, Vec3(x, y))
-        self.bounding_radius = 16
         self.rect.size = (width, height)
         self.layer =  1
+        self.properties = properties
+        self.thing = None#Desk(properties)
+        self.layer = 100
+
+    def get_actions(self, player):
+        if not self.thing:
+            self.thing = Desk(self.properties, self.rect)
+        return self.thing.get_actions(player)
+
+    def blow_up(self):
+        t = InteractiveThing(self.rect.x-15, self.rect.y-15, \
+                            self.rect.width+30, self.rect.height+30, self.properties)
+        t.thing = self
+        return t
+
+
+    def update(self, *args, **kwargs):
+        self.thing.update(args, kwargs)
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        if not self.thing:
+            self.thing = Desk(self.properties, self.rect)
+        self.thing.render(screen_surf, offset, screen_offset)
+
+
+class Desk(object):
+    def __init__(self, properties, rect):
+        self.properties = properties
+        self.rect = rect
+        self.color = (255, 100, 0)
+        self.actions = []
+        self.lockpick_time = 1
+        self.smash_time = 0
+        self.timer = None
+        self.setup()
+
+    def setup(self):
+        for key, value in self.properties.items():
+            if key == 'rob':
+                self.value = int(value)
+            elif key == 'locked' and value == 'true':
+                self.locked = True
+            elif key == 'lockpick_time':
+                self.unlock_time = int(value)
+            elif key == 'smash_time':
+                self.smash_time = int(value)
+            else:
+                print 'Unkwon key %s, %s' % (key, value)
+
+    def get_actions(self, player):
+        actions = []
+        if self.locked:
+            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+        elif self.value:
+            actions.append(('Rob', self.make_action(self.rob, 1)))
+        return actions
+
+    def open(self, player):
+        self.locked = False
+        self.color = (0, 255, 0)
+
+    def make_action(self, callback, timer):
+        def func(player):
+            self.timer = [timer, callback, [player]]
+        return func
+
+    def lockpick(self, player):
+        self.open(player)
+
+    def smash(self, player):
+        self.open(player)
+        self.color = (0, 55, 100)
+
+    def rob(self, player):
+        player.add_money(self.value)
+        self.value = 0
+        self.color = (255, 100, 0)
+
+    def update(self, *args, **kwargs):
+        if self.timer:
+            if self.timer[0] == 0 :
+                self.timer[1](*self.timer[2])
+                self.timer = None
+            else:
+                self.timer[0] -= 1
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = pygame.Surface((self.rect.width, self.rect.height))
+        image.fill(self.color)
+
+        screen_surf.blit(image, (self.rect.x, self.rect.y))
 
 class Player(pyknic.entity.Entity):
     def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
@@ -24,6 +115,11 @@ class Player(pyknic.entity.Entity):
         self.layer = 10000
         super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.rect.size = img.get_size()
+        self.money = 0
+
+    def add_money(self, amount):
+        self.money += amount
+        print 'Wuhooo, I\'m rich %d' % self.money
 
     def collision_response(self, other):
         print self.rect, other.rect
@@ -75,22 +171,59 @@ class ActionMenu(pyknic.entity.Entity):
         self.actionable_detector = pyknic.collision.CollisionDetector()
         self.actionable_detector.register_once('player', 'stuff', [self.player], actionables, \
                     AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
+        self.items = []
 
     def on_key_down(self, key, mod, code):
         if code != 'a':
-            return
-        self.visible = not self.visible
+            if not self.visible:
+                return
+            try:
+                value = int(code) - 1
+                if value in xrange(len(self.items)):
+                    self.items[value][1](self.player)
+            except ValueError:
+                pass
+        else:
+            self.visible = not self.visible
+            self.update_items()
+
+    def update_items(self):
         if self.visible == True:
+            self.items = []
             # update menu
             self.actionable_detector.check()
+        if not self.items:
+            self.visible = False
 
 
     def coll_player_stuff(self, player, thing):
-        print "fuufuuu@#$@#$"
+        self.items.extend(thing.get_actions(player))
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        self.update_items()
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         if not self.visible:
             return
+        # align to player
+        self.position = Vec3(self.player.position.x+10, self.player.position.y +10)
+
+        # setup sprite for menu
+        self.spr.image = pygame.Surface((100, 100))
+        self.spr.image.fill((255, 0,0))
+
+        # draw menu title
         font = pygame.font.Font(None,25)
-        text = font.render("YourText",1,(255,255,255,0)) #font.render( Text , antialias , Color(r,g,b,a))
-        screen_surf.blit(text,(10,100)) #screen = yoursurface
+        text = font.render("Actions",1,(255,255,255,0))
+        self.spr.image.blit(text,(0,0))
+
+        # draw menu items
+        font = pygame.font.Font(None,20)
+        y = 15
+        for item, _ in self.items:
+            text = font.render(item,1,(255,255,255,0))
+            self.spr.image.blit(text,(0,y))
+            y += 10
+
+        # actually render
+        Entity.render(self, screen_surf)
