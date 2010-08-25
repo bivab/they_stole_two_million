@@ -10,22 +10,35 @@ from pyknic.geometry import Vec3
 from pyknic.geometry import Vec3
 
 class InteractiveThing(pyknic.entity.Entity):
-    def __init__(self, x, y, width, height, properties):
+    def __init__(self, x, y, width, height, properties, thing_type, impassables):
         Entity.__init__(self, None, Vec3(x, y))
         self.rect.size = (width, height)
         self.layer =  1
         self.properties = properties
-        self.thing = None#Desk(properties)
+        self.thing = None
         self.layer = 100
+        self.thing_type = thing_type
+        self.impassables = impassables
 
     def get_actions(self, player):
+        t = self.get_thing()
+        return t.get_actions(player)
+
+    def get_thing(self):
         if not self.thing:
-            self.thing = Desk(self.properties, self.rect)
-        return self.thing.get_actions(player)
+            if self.thing_type == 'Desk':
+                self.thing = Desk(self.properties, self.rect)
+            elif self.thing_type == 'Door':
+                self.thing = Door(self.properties, self.rect, self)
+
+        # if not self.thing:
+        # self.thing = globals()[self.thing_type](self.properties, self.rect)
+        return self.thing
 
     def blow_up(self):
         t = InteractiveThing(self.rect.x-15, self.rect.y-15, \
-                            self.rect.width+30, self.rect.height+30, self.properties)
+                            self.rect.width+30, self.rect.height+30, \
+                            self.properties, self.thing_type, self.impassables)
         t.thing = self
         return t
 
@@ -34,64 +47,33 @@ class InteractiveThing(pyknic.entity.Entity):
         self.thing.update(args, kwargs)
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        if not self.thing:
-            self.thing = Desk(self.properties, self.rect)
-        self.thing.render(screen_surf, offset, screen_offset)
+        t = self.get_thing()
+        t.render(screen_surf, offset, screen_offset)
+
+    def make_impassable(self):
+        self.impassables.append(self)
+
+    def make_passable(self):
+        if self in self.impassables:
+            self.impassables.remove(self)
 
 
-class Desk(object):
-    def __init__(self, properties, rect):
+class InteractiveDelegate(object):
+    def __init__(self, properties, rect, entity = None):
         self.properties = properties
         self.rect = rect
         self.color = (255, 100, 0)
-        self.actions = []
-        self.lockpick_time = 1
-        self.smash_time = 0
         self.timer = None
+        self.entity = entity
         self.setup()
 
     def setup(self):
-        for key, value in self.properties.items():
-            if key == 'rob':
-                self.value = int(value)
-            elif key == 'locked' and value == 'true':
-                self.locked = True
-            elif key == 'lockpick_time':
-                self.unlock_time = int(value)
-            elif key == 'smash_time':
-                self.smash_time = int(value)
-            else:
-                print 'Unkwon key %s, %s' % (key, value)
-
-    def get_actions(self, player):
-        actions = []
-        if self.locked:
-            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
-            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
-        elif self.value:
-            actions.append(('Rob', self.make_action(self.rob, 1)))
-        return actions
-
-    def open(self, player):
-        self.locked = False
-        self.color = (0, 255, 0)
+        xxx
 
     def make_action(self, callback, timer):
         def func(player):
             self.timer = [timer, callback, [player]]
         return func
-
-    def lockpick(self, player):
-        self.open(player)
-
-    def smash(self, player):
-        self.open(player)
-        self.color = (0, 55, 100)
-
-    def rob(self, player):
-        player.add_money(self.value)
-        self.value = 0
-        self.color = (255, 100, 0)
 
     def update(self, *args, **kwargs):
         if self.timer:
@@ -106,6 +88,114 @@ class Desk(object):
         image.fill(self.color)
 
         screen_surf.blit(image, (self.rect.x, self.rect.y))
+
+class Door(InteractiveDelegate):
+    def __init__(self, properties, rect, entity):
+        InteractiveDelegate.__init__(self, properties, rect, entity)
+        self.lockpick_time = 3
+        self.smashed = False
+        self.default_color = (123,123,123)
+        self.color = self.default_color
+
+    def setup(self):
+        if 'locked' in self.properties:
+            self.locked = self.properties['locked'] == True
+            self.closed = True
+        else:
+            self.locked = True
+            if 'closed' in self.properties:
+                self.closed = self.properties['closed'] == True
+            else:
+                self.closed = True
+
+    def get_actions(self, player):
+        actions = []
+        if self.smashed:
+            return actions
+
+        if self.locked:
+            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+        elif self.closed:
+            actions.append(('Open', self.make_action(self.open, 1)))
+        elif not self.closed:
+            actions.append(('Close', self.make_action(self.close, 1)))
+        if not self.smashed:
+            actions.append(('Smash', self.make_action(self.smash, 1)))
+        return actions
+
+    def open(self, player):
+        if not self.locked:
+            self.color = (0,0,0,255)
+            self.closed = False
+            self.entity.make_passable()
+
+    def lockpick(self, player):
+        self.locked = False
+
+    def smash(self, player):
+        self.color = (1,1,1, 255)
+        self.locked = False
+        self.closed = False
+        self.smashed = True
+        self.entity.make_passable()
+
+    def close(self, player):
+        self.color = self.default_color
+        self.closed = True
+        self.entity.make_impassable()
+
+class Desk(InteractiveDelegate):
+    def __init__(self, properties, rect):
+        InteractiveDelegate.__init__(self, properties, rect)
+        self.lockpick_time = 1
+        self.smash_time = 0
+
+    def setup(self):
+        for key, value in self.properties.items():
+            if key == 'rob':
+                self.value = int(value)
+            elif key == 'locked' and value == 'true':
+                self.locked = True
+            elif key == 'lockpick_time':
+                self.unlock_time = int(value)
+            elif key == 'smash_time':
+                self.smash_time = int(value)
+            else:
+                print 'Unknown key %s, %s' % (key, value)
+
+    def get_actions(self, player):
+        actions = []
+        if self.locked:
+            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+        elif self.value:
+            actions.append(('Rob', self.make_action(self.rob, 1)))
+        elif not self.locked:
+            actions.append(('Close', self.make_action(self.close, 1)))
+
+        return actions
+
+    def open(self, player):
+        self.locked = False
+        self.color = (0, 255, 0)
+
+    def close(self, player):
+        self.locked = True
+        self.color = (255, 100, 0)
+
+
+    def lockpick(self, player):
+        self.open(player)
+
+    def smash(self, player):
+        self.open(player)
+        self.color = (0, 55, 100)
+
+    def rob(self, player):
+        player.add_money(self.value)
+        self.value = 0
+        self.color = (255, 100, 0)
+
 
 class Player(pyknic.entity.Entity):
     def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):

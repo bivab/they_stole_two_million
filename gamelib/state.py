@@ -75,7 +75,9 @@ class PlayState(pyknic.State):
         for obj_group in world_map.object_groups:
             for obj in obj_group.objects:
                 if hasattr(obj, 'type'):
-                    thing = InteractiveThing(obj.x, obj.y, obj.width, obj.height, obj.properties)
+                    thing = InteractiveThing(obj.x, obj.y, obj.width, \
+                                obj.height, obj.properties, obj.type, \
+                                impassables)
                     actionables.append(thing.blow_up())
                     impassables.append(thing)
                     self.world.add_entity(thing)
