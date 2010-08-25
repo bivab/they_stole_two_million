@@ -93,6 +93,9 @@ class PlayState(pyknic.State):
         self.guard = Guard(None, Vec3(320, 32))
         self.world.add_entity(self.guard)
 
+        self.guard = Guard(None, Vec3(320, 32))
+        self.world.add_entity(self.guard)
+
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
 
@@ -112,8 +115,9 @@ class PlayState(pyknic.State):
         self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
-        self.game_time.event_update += self.renderer1
+        self.game_time.event_update += self.renderer1.update
         self.game_time.event_update += self.player.update
+        #self.game_time.event_update += self.guard.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
@@ -129,4 +133,3 @@ class PlayState(pyknic.State):
         self.guard.update_x(gdt, gt, dt, t, *args)
         self.enemy_coll_detector.check()
         self.guard.update_y(gdt, gt, dt, t, *args)
-        self.renderer1.update(gdt, gt, dt, t, *args)
