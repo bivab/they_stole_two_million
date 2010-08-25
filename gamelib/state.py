@@ -82,11 +82,11 @@ class PlayState(pyknic.State):
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
-        self.game_time.event_update += self.renderer1.update
+        #self.game_time.event_update += self.renderer1.update
 
         self.player = Player(None, Vec3(32, 32))
         self.world.add_entity(self.player)
-        self.game_time.event_update += self.player.update
+        #self.game_time.event_update += self.player.update
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
@@ -112,4 +112,9 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
+        self.player.update_x(gdt, gt, dt, t, *args)
         self.coll_detector.check()
+        self.player.update_y(gdt, gt, dt, t, *args)
+        self.coll_detector.check()
+
+        self.renderer1.update(gdt, gt, dt, t, *args)
