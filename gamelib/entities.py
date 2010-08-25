@@ -7,7 +7,6 @@ from pyknic.collision import AABBCollisionStrategy
 from pyknic.entity import Entity
 from pyknic.entity import Spr
 from pyknic.geometry import Vec3
-from pyknic.geometry import Vec3
 
 class InteractiveThing(pyknic.entity.Entity):
     def __init__(self, x, y, width, height, properties, thing_type, impassables):

@@ -1,13 +1,11 @@
 import pygame
 
 import pyknic
+from pyknic.entity import Entity, Spr
+from pyknic.geometry import Vec3
+from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
 from pyknic.collision import AABBCollisionStrategy
-from pyknic.entity import Entity
-from pyknic.entity import Spr
-from pyknic.geometry import Vec3
-from pyknic.geometry import Vec3
-from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
-from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
+
 
 from world import TheWorld
 from entities import InteractiveThing, Player, ActionMenu
