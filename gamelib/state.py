@@ -13,15 +13,73 @@ from entities import InteractiveThing, Player, ActionMenu, Guard
 
 from ui import SimpleRenderer
 
-class PlayState(pyknic.State):
+import pygame
+
+class StartState(pyknic.State):
     def __init__(self,  *args, **kwargs):
+        super(StartState, self).__init__(*args, **kwargs)
+        self.levels = ['testtile', 'level1', 'Level2']
+        self.selected_level = 0
+    
+    def on_init(self, app):
+        self.draw_menu(0)
+    
+    def on_resume(self):
+        self.draw_menu(self.selected_level)
+
+    def on_key_down(self, key, mod, unicode):
+        u"""Default event handler for key presses.
+         - escape: pops this state
+         - F3: take a screenshot
+        
+        """
+        if pygame.K_ESCAPE == key:
+            self.on_quit()
+        elif pygame.K_F3 == key:
+            pyknic.utilities.take_screenshot(self.the_app.config['paths']['screenshots'])
+        elif key == pygame.K_UP:
+            if self.selected_level > 0:
+                self.draw_menu(self.selected_level-1)
+        elif key == pygame.K_DOWN:
+            if self.selected_level+1 < len(self.levels):
+                self.draw_menu(self.selected_level+1)
+        elif key == pygame.K_RETURN:
+            self.start_level(self.selected_level)
+
+    def draw_menu(self, selected_level=None):
+        self.selected_level = selected_level
+        
+        font = pygame.font.SysFont("Dejavu Sans", 18)
+        title = font.render(self.the_app.config['display']['caption'], True, (0, 255, 0))
+        s = pygame.display.get_surface()
+        s.fill((0,0,0))
+        r = s.blit(title, (0,0))
+
+        for i, level in enumerate(self.levels):
+            if i == selected_level:
+                color = (255,0,0)
+            else:
+                color = (0,255,0)
+            levelfont = font.render(level, True, color)
+            r = s.blit(levelfont, (0, r.bottom))
+
+        pygame.display.flip()
+
+    def start_level(self, level):
+        l = self.levels[level]
+        print "Starting %s" % l
+        self.the_app.push_state(PlayState(l))
+
+class PlayState(pyknic.State):
+    def __init__(self, level = 'testtile', *args, **kwargs):
         super(PlayState, self).__init__(*args, **kwargs)
         self.world = TheWorld()
         self.game_time = pyknic.timing.GameTime()
+        self.level = level
 
 
     def on_init(self, app):
-        world_map = TileMapParser().parse_decode_load("data/testtile.tmx", ImageLoaderPygame())
+        world_map = TileMapParser().parse_decode_load("data/%s.tmx" % self.level, ImageLoaderPygame())
         assert world_map.orientation == "orthogonal"
         impassables = []
         actionables = []
