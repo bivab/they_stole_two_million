@@ -343,8 +343,9 @@ class ActionMenu(pyknic.entity.Entity):
         # draw menu items
         font = pygame.font.Font(None,20)
         y = 15
-        for item, _ in self.items:
-            text = font.render(item,1,(255,255,255,0))
+        for i in range(len(self.items)):
+            item, _ = self.items[i]
+            text = font.render("%d: %s" % (i+1, item),1,(255,255,255,0))
             self.spr.image.blit(text,(0,y))
             y += 10
 
