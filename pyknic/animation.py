@@ -399,7 +399,7 @@ def load_animation(scheduler, anim_file_name, version=['animation', '0.0.1', 'py
                         rect_name = frame_dict[fkey]
                         rdata = rects_data[fkey][rect_name]
                         r = pygame.Rect(rdata[:4])
-                        img = pygame.Surface(r.size)
+                        img = pygame.Surface(r.size, pygame.SRCALPHA)
                         img.blit(source_image, (0, 0), r)
                         if colorkey:
                             img.set_colorkey(tuple(colorkey))
