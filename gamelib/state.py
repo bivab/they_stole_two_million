@@ -27,9 +27,7 @@ class PlayState(pyknic.State):
 
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
-                layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height))
-                layer_img.fill((255, 0, 255))
-                layer_img.set_colorkey((255, 0, 255))
+                layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height), pygame.SRCALPHA)
                 idx = 0
 
                 impassable = False
