@@ -1,8 +1,8 @@
 import pyknic
 from pyknic.geometry import Vec3
-from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
-from pyknic.timing import GameTime
 from pyknic.utilities import SortedList
+from pyknic.timing import GameTime
+from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
 
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
