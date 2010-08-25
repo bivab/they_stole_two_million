@@ -65,6 +65,7 @@ class InteractiveDelegate(object):
         self.color = (255, 100, 0)
         self.timer = None
         self.entity = entity
+        self.smashed = False
         self.setup()
 
     def setup(self):
@@ -92,7 +93,7 @@ class InteractiveDelegate(object):
 class Door(InteractiveDelegate):
     def __init__(self, properties, rect, entity):
         InteractiveDelegate.__init__(self, properties, rect, entity)
-        self.lockpick_time = 3
+        self.lockpick_time = 50
         self.smashed = False
         self.default_color = (123,123,123)
         self.color = self.default_color
@@ -120,7 +121,7 @@ class Door(InteractiveDelegate):
         elif not self.closed:
             actions.append(('Close', self.make_action(self.close, 1)))
         if not self.smashed:
-            actions.append(('Smash', self.make_action(self.smash, 1)))
+            actions.append(('Smash', self.make_action(self.smash, 10)))
         return actions
 
     def open(self, player):
@@ -149,6 +150,7 @@ class Desk(InteractiveDelegate):
         InteractiveDelegate.__init__(self, properties, rect)
         self.lockpick_time = 1
         self.smash_time = 0
+        self.closed = True
 
     def setup(self):
         for key, value in self.properties.items():
@@ -165,30 +167,35 @@ class Desk(InteractiveDelegate):
 
     def get_actions(self, player):
         actions = []
-        if self.locked:
-            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+        if not self.smashed:
             actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
-        elif self.value:
+            if self.locked:
+                actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            if self.closed and not self.locked:
+                actions.append(('Open', self.make_action(self.open, 1)))
+            if not self.closed:
+                actions.append(('Close', self.make_action(self.close, 1)))
+        if not self.closed and self.value:
             actions.append(('Rob', self.make_action(self.rob, 1)))
-        elif not self.locked:
-            actions.append(('Close', self.make_action(self.close, 1)))
-
         return actions
 
     def open(self, player):
-        self.locked = False
+        self.closed = False
         self.color = (0, 255, 0)
 
     def close(self, player):
-        self.locked = True
+        self.closed = True
         self.color = (255, 100, 0)
 
 
     def lockpick(self, player):
-        self.open(player)
+        self.locked = False
+        self.color = (123,0, 122)
 
     def smash(self, player):
-        self.open(player)
+        self.locked = False
+        self.closed = False
+        self.smashed = True
         self.color = (0, 55, 100)
 
     def rob(self, player):
