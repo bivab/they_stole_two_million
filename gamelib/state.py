@@ -28,9 +28,7 @@ class PlayState(pyknic.State):
 
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
-                layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height))
-                layer_img.fill((255, 0, 255))
-                layer_img.set_colorkey((255, 0, 255))
+                layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height), pygame.SRCALPHA)
                 idx = 0
 
                 impassable = False
@@ -88,9 +86,8 @@ class PlayState(pyknic.State):
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
-        #self.game_time.event_update += self.renderer1.update
 
-        self.player = Player(None, Vec3(32, 32))
+        self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
         self.guard = Guard(None, Vec3(320, 32))
         self.world.add_entity(self.guard)
@@ -115,6 +112,7 @@ class PlayState(pyknic.State):
         self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
+        self.game_time.event_update += self.player.update
         #self.game_time.event_update += self.guard.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):

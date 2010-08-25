@@ -215,15 +215,22 @@ class Desk(InteractiveDelegate):
 
 
 class Player(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
-        img = pygame.Surface((16, 16))
-        img.fill((255, 0, 0))
-        spr = Spr(img, offset=Vec3(8,8))
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
+        super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.layer = 10000
         self.moving = Vec3(0,0)
         super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
-        self.rect.size = img.get_size()
         self.money = 0
+
+        anims = pyknic.animation.load_animation(state.game_time, 'data/myanim')
+
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+        self.rect.size = self.spr.image.get_size()
 
     def add_money(self, amount):
         self.money += amount
@@ -233,6 +240,14 @@ class Player(pyknic.entity.Entity):
         if self.target:
             self.position = self.target.position
             self.rect.center = self.position.as_xy_tuple()
+
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
+
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
