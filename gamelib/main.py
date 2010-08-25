@@ -20,7 +20,7 @@ import pyknic
 
 
 def main():
-    pyknic.Application(state.PlayState(), '[0,100000000000)','data/custom.yaml').run()
+    pyknic.Application(state.StartState(), '[0,100000000000)','data/custom.yaml').run()
 
 
 # this is needed in order to work with py2exe
