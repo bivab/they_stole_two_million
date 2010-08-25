@@ -221,8 +221,9 @@ class Player(pyknic.entity.Entity):
         self.moving = Vec3(0,0)
         super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.money = 0
+        self.state = state
 
-        anims = pyknic.animation.load_animation(state.game_time, 'data/myanim')
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/myanim')
 
         self.sprites = {}
         self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
@@ -235,10 +236,16 @@ class Player(pyknic.entity.Entity):
     def add_money(self, amount):
         self.money += amount
         print 'Wuhooo, I\'m rich %d' % self.money
+
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         if self.target:
             self.position = self.target.position
             self.rect.center = self.position.as_xy_tuple()
+        else:
+            self.update_x(gdt, gt, dt, t, *args)
+            self.state.coll_detector.check()
+            self.update_y(gdt, gt, dt, t, *args)
+            self.state.coll_detector.check()
 
         if self.velocity.lengthSQ:
             self.spr.play()
