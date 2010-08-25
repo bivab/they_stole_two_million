@@ -89,9 +89,12 @@ class PlayState(pyknic.State):
 
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
+
         self.guard = Guard(None, Vec3(320, 32))
         self.world.add_entity(self.guard)
-        #self.game_time.event_update += self.player.update
+
+        self.guard = Guard(None, Vec3(320, 32))
+        self.world.add_entity(self.guard)
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
@@ -112,6 +115,7 @@ class PlayState(pyknic.State):
         self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
+        self.game_time.event_update += self.renderer1.update
         self.game_time.event_update += self.player.update
         #self.game_time.event_update += self.guard.update
 
@@ -125,12 +129,7 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        self.player.update_x(gdt, gt, dt, t, *args)
-        self.coll_detector.check()
-        self.player.update_y(gdt, gt, dt, t, *args)
-        self.coll_detector.check()
         self.enemy_coll_detector.check()
         self.guard.update_x(gdt, gt, dt, t, *args)
         self.enemy_coll_detector.check()
         self.guard.update_y(gdt, gt, dt, t, *args)
-        self.renderer1.update(gdt, gt, dt, t, *args)
