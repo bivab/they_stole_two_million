@@ -1,7 +1,8 @@
 import pygame
 
 import pyknic
-from pyknic.collision import AABBCollisionStrategy
+from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
+from pyknic.geometry import Vec3
 from pyknic.entity import Entity
 from pyknic.entity import Spr
 from pyknic.geometry import Vec3
