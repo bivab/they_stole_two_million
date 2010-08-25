@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 from pygame.locals import *
 
@@ -197,7 +198,6 @@ class Desk(InteractiveDelegate):
         self.closed = True
         self.color = (255, 100, 0)
 
-
     def lockpick(self, player):
         self.locked = False
         self.color = (123,0, 122)
@@ -295,7 +295,7 @@ class Player(pyknic.entity.Entity):
         self.position = Vec3(*self.rect.center)
 
     def on_key_down(self, key, mod, unicode):
-        speed = 50
+        speed = 90
         if key == K_UP:
             self.velocity.y = -speed
         if key == K_DOWN:
@@ -395,3 +395,77 @@ class ActionMenu(pyknic.entity.Entity):
 
         # actually render
         Entity.render(self, screen_surf)
+
+class Guard(pyknic.entity.Entity):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
+        img = pygame.Surface((16, 16))
+        img.fill((50, 0, 255))
+        spr = Spr(img, offset=Vec3(8,8))
+        self.layer = 10000
+        self.moving = Vec3(0,0)
+        super(Guard, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.rect.size = img.get_size()
+        self.switch_random_direction()
+
+    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.x += self.t_speed * dt * self.acceleration.x
+        self.position.x += self.t_speed * dt * self.velocity.x
+        self.moving.x = self.velocity.x
+        self.moving.y = 0
+        self.rect.center = self.position.as_xy_tuple()
+
+    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.y += self.t_speed * dt * self.acceleration.y
+        self.position.y += self.t_speed * dt * self.velocity.y
+        self.moving.x = 0
+        self.moving.y = self.velocity.y
+        self.rect.center = self.position.as_xy_tuple()
+
+    def switch_random_direction(self, wrong_direction=0):
+        import random
+        direction = int(random.random()*4)
+        if direction==0:
+            self.velocity.x = 40
+        elif direction==1:
+            self.velocity.x = -40
+        elif direction==2:
+            self.velocity.y = 40
+        elif direction==3:
+            self.velocity.y = -40
+        # if the chosen direction was the old one
+        # move back
+        if wrong_direction == direction:
+            self.velocity.y *= -1
+            self.velocity.x *= -1
+
+    def collision_response(self, other):
+        if not self.rect.colliderect(other.rect):
+            return
+
+        # smashing into wall from left
+        if self.moving.x > 0 and self.rect.right > other.rect.left:
+            self.rect.right = other.rect.left
+            self.switch_random_direction(0)
+
+        # smashing into wall from right
+        if self.moving.x < 0 and self.rect.left < other.rect.right:
+            self.rect.left = other.rect.right
+            self.switch_random_direction(1)
+
+        # smashing into wall from above
+        if self.moving.y > 0 and self.rect.bottom > other.rect.top:
+            self.rect.bottom = other.rect.top
+            self.switch_random_direction(2)
+
+        # smashing into wall from below
+        if self.moving.y < 0 and self.rect.top < other.rect.bottom:
+            self.rect.top = other.rect.bottom
+            self.switch_random_direction(3)
+
+        self.moving = Vec3(0,0)
+        self.position = Vec3(*self.rect.center)
+
+    def collidate_wall(self, player, wall, dummy = 0):
+        self.collision_response(wall)
