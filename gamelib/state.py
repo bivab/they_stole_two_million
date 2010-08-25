@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard
+from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard
 
 from ui import SimpleRenderer
 
@@ -148,6 +148,9 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
 
+        self.lguard = LurkingGuard(position=Vec3(28, 140), world=self.world)
+        self.world.add_entity(self.lguard)
+        
         self.guard = Guard(None, Vec3(320, 32))
         self.world.add_entity(self.guard)
 
@@ -167,6 +170,12 @@ class PlayState(pyknic.State):
         self.enemy_coll_detector = pyknic.collision.CollisionDetector()
         self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], impassables, \
                     AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
+        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
+        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], impassables, \
+                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
+        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
+                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
+
         self.setup_update_events()
 
     def setup_update_events(self):
@@ -191,3 +200,8 @@ class PlayState(pyknic.State):
         self.guard.update_x(gdt, gt, dt, t, *args)
         self.enemy_coll_detector.check()
         self.guard.update_y(gdt, gt, dt, t, *args)
+
+        self.lguard_coll_detector.check()
+        self.lguard.update_x(gdt, gt, dt, t, *args)
+        self.lguard_coll_detector.check()
+        self.lguard.update_y(gdt, gt, dt, t, *args)
