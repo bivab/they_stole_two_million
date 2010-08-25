@@ -402,7 +402,7 @@ class Guard(pyknic.entity.Entity):
         self.moving.y = self.velocity.y
         self.rect.center = self.position.as_xy_tuple()
 
-    def switch_random_direction(self):
+    def switch_random_direction(self, wrong_direction=0):
         import random
         direction = int(random.random()*4)
         if direction==0:
@@ -413,39 +413,38 @@ class Guard(pyknic.entity.Entity):
             self.velocity.y = 40
         elif direction==3:
             self.velocity.y = -40
+        # if the chosen direction was the old one
+        # move back
+        if wrong_direction == direction:
+            self.velocity.y *= -1
+            self.velocity.x *= -1
 
     def collision_response(self, other):
-        print "the guard is responding..."
         if not self.rect.colliderect(other.rect):
             return
 
         # smashing into wall from left
         if self.moving.x > 0 and self.rect.right > other.rect.left:
             self.rect.right = other.rect.left
+            self.switch_random_direction(0)
 
         # smashing into wall from right
         if self.moving.x < 0 and self.rect.left < other.rect.right:
             self.rect.left = other.rect.right
+            self.switch_random_direction(1)
 
         # smashing into wall from above
         if self.moving.y > 0 and self.rect.bottom > other.rect.top:
             self.rect.bottom = other.rect.top
+            self.switch_random_direction(2)
 
         # smashing into wall from below
         if self.moving.y < 0 and self.rect.top < other.rect.bottom:
             self.rect.top = other.rect.bottom
+            self.switch_random_direction(3)
 
         self.moving = Vec3(0,0)
         self.position = Vec3(*self.rect.center)
-        self.switch_random_direction()
 
     def collidate_wall(self, player, wall, dummy = 0):
         self.collision_response(wall)
-
-    def update(self, gdt, gt, dt, t, *args, **kwargs):
-        self.update_x(gdt, gdt, gt, dt, t, *args, **kwargs)
-        self.update_y(gdt, gdt, gt, dt, t, *args, **kwargs)
-        #if self.target:
-        #    self.position = self.target.position
-        #    self.rect.center = self.position.as_xy_tuple()
-
