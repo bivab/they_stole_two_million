@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 
 import pyknic
@@ -8,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu
+from entities import InteractiveThing, Player, ActionMenu, Guard
 
 from ui import SimpleRenderer
 
@@ -88,7 +89,9 @@ class PlayState(pyknic.State):
 
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
-        self.game_time.event_update += self.player.update
+        self.guard = Guard(None, Vec3(320, 32))
+        self.world.add_entity(self.guard)
+        #self.game_time.event_update += self.player.update
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
@@ -100,13 +103,17 @@ class PlayState(pyknic.State):
         self.coll_detector = pyknic.collision.CollisionDetector()
         self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-
+        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
+        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], impassables, \
+                    AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
         self.setup_update_events()
 
     def setup_update_events(self):
         self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
+        self.game_time.event_update += self.player.update
+        #self.game_time.event_update += self.guard.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
@@ -122,5 +129,8 @@ class PlayState(pyknic.State):
         self.coll_detector.check()
         self.player.update_y(gdt, gt, dt, t, *args)
         self.coll_detector.check()
-
+        self.enemy_coll_detector.check()
+        self.guard.update_x(gdt, gt, dt, t, *args)
+        self.enemy_coll_detector.check()
+        self.guard.update_y(gdt, gt, dt, t, *args)
         self.renderer1.update(gdt, gt, dt, t, *args)
