@@ -1,37 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
- <tileset firstgid="1" name="tileset_16x16_final_1" tilewidth="16" tileheight="16">
-  <image source="tileset_16x16_final_1.jpg"/>
-  <tile id="7">
-   <properties>
-    <property name="passable" value="false"/>
-   </properties>
-  </tile>
- </tileset>
- <layer name="Ground" width="100" height="100">
+<map version="1.0" orientation="orthogonal" width="40" height="40" tilewidth="16" tileheight="16">
+ <tileset firstgid="1" source="images/tileset_millions_1.tsx"/>
+ <layer name="Tile Layer 1" width="40" height="40">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XwQmAQBAEwQvGtM1AMEXx50/hBBusgklg+7XrGGOd3PJw3DvvuU9Mj3fp0aJHix4terTo0aJHix4terTM/uZ6fGe7jO/p0aJHix4terTo0aJHix4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/NUBJhbDRUCcAAA=
+   H4sIAAAAAAAAA+2VsQqDMBBAA+qoTnVx0LVd6z+0Hauj7f//Rm+IEEpNDiEkhffgTbe8IZczBgAA4BiFePLYBeZl5L6r2HvUzOkL993Eu/WRYd9TnK1LRn1ToG9K3Le519fTp+pbxZf1nVFfpZin7Ev9/52N/36NYvvVNDjzS+Q+7fvL9X7Q9999tfm9F76dcG0i9wEAAAC4fAC4SXSTABkAAA==
   </data>
  </layer>
- <layer name="Walls" width="100" height="100">
-  <properties>
-   <property name="passable" value="false"/>
-  </properties>
+ <layer name="objects" width="40" height="40">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XMQqAMBBFwaSz1iPo/c9oKYhgVEg+OAPbmWYfFjuVUqZOw72ve2p9r0cbPbLokUWPLL32pEcb/0cWPbJc7Wmuxyz1+fsv3/3d1Z7WesymR1dvbmz3+XjnfdrvWHpk0SOLHln0yKJHFj2y6JHFfQcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADQ1w64VaFNQJwAAA==
+   H4sIAAAAAAAAA+3QMQqDMBjF8ay6tlvQVcfWUR3Vtb2Q9RC9lafyORSUNNgIn0nl/eC/aMRHlCIiIjqvG7qjwvL+/eVZglKxRWslqlDt8E2Gcpk5hga1qDvof3s80NP3CAvte8AGvZFvyx2hbZt9towqnE1Le+4sQrHYItPL8fwFXSWGEAVu+PFcL7qCiIiI6P9MkJy9KQAZAAA=
   </data>
  </layer>
- <layer name="Doorways" width="100" height="100">
-  <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3OMQ0AAAgDsL34N4yMkdAqaAIAfDftAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByyErJKIECcAAA=
-  </data>
- </layer>
- <objectgroup name="Object" width="100" height="100">
-  <object name="My beautiful blue desk" type="Desk" x="67" y="114" width="88" height="43">
-   <properties>
-    <property name="locked" value="true"/>
-    <property name="rob" value="1000"/>
-   </properties>
-  </object>
- </objectgroup>
 </map>
