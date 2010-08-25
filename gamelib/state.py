@@ -85,11 +85,10 @@ class PlayState(pyknic.State):
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
-        #self.game_time.event_update += self.renderer1.update
 
-        self.player = Player(None, Vec3(32, 32))
+        self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
-        #self.game_time.event_update += self.player.update
+        self.game_time.event_update += self.player.update
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
