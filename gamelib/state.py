@@ -79,6 +79,7 @@ class PlayState(pyknic.State):
                     actionables.append(thing.blow_up())
                     impassables.append(thing)
                     self.world.add_entity(thing)
+                    self.game_time.event_update += thing.update
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)

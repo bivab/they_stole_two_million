@@ -30,6 +30,9 @@ class InteractiveThing(pyknic.entity.Entity):
         return t
 
 
+    def update(self, *args, **kwargs):
+        self.thing.update(args, kwargs)
+
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         if not self.thing:
             self.thing = Desk(self.properties, self.rect)
@@ -42,39 +45,61 @@ class Desk(object):
         self.rect = rect
         self.color = (255, 100, 0)
         self.actions = []
+        self.lockpick_time = 1
+        self.smash_time = 0
+        self.timer = None
         self.setup()
 
     def setup(self):
         for key, value in self.properties.items():
             if key == 'rob':
                 self.value = int(value)
-            if key == 'locked' and value == 'true':
+            elif key == 'locked' and value == 'true':
                 self.locked = True
+            elif key == 'lockpick_time':
+                self.unlock_time = int(value)
+            elif key == 'smash_time':
+                self.smash_time = int(value)
+            else:
+                print 'Unkwon key %s, %s' % (key, value)
 
     def get_actions(self, player):
         actions = []
         if self.locked:
-            actions.append(('Lockpick', self.lockpick))
-            actions.append(('Smash', self.smash))
+            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
         elif self.value:
-            actions.append(('Rob', self.rob))
+            actions.append(('Rob', self.make_action(self.rob, 1)))
         return actions
 
     def open(self, player):
         self.locked = False
         self.color = (0, 255, 0)
 
+    def make_action(self, callback, timer):
+        def func(player):
+            self.timer = [timer, callback, [player]]
+        return func
+
     def lockpick(self, player):
         self.open(player)
 
     def smash(self, player):
         self.open(player)
-        self.color = (0,0, 255)
+        self.color = (0, 55, 100)
 
     def rob(self, player):
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
+
+    def update(self, *args, **kwargs):
+        if self.timer:
+            if self.timer[0] == 0 :
+                self.timer[1](*self.timer[2])
+                self.timer = None
+            else:
+                self.timer[0] -= 1
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height))
@@ -172,7 +197,6 @@ class ActionMenu(pyknic.entity.Entity):
 
 
     def coll_player_stuff(self, player, thing):
-        print 'ouch'
         self.items.extend(thing.get_actions(player))
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
