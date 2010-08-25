@@ -58,7 +58,7 @@ if __name__ == "__main__":
     except getopt.GetoptError:
         usage ()
 
-    output = 0
+    output = None
     width = 0
     height = 0
     for o, a in opts:
