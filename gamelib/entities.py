@@ -34,6 +34,9 @@ class InteractiveThing(pyknic.entity.Entity):
         # self.thing = globals()[self.thing_type](self.properties, self.rect)
         return self.thing
 
+    def label(self):
+        return self.thing.label()
+
     def blow_up(self):
         t = InteractiveThing(self.rect.x-15, self.rect.y-15, \
                             self.rect.width+30, self.rect.height+30, \
@@ -70,6 +73,9 @@ class InteractiveDelegate(object):
     def setup(self):
         xxx
 
+    def label(self):
+        return 'A Thing'
+
     def make_action(self, callback, timer):
         def func(player):
             self.timer = [timer, callback, [player]]
@@ -96,6 +102,9 @@ class Door(InteractiveDelegate):
         self.smashed = False
         self.default_color = (123,123,123)
         self.color = self.default_color
+
+    def label(self):
+        return 'Door'
 
     def setup(self):
         if 'locked' in self.properties:
@@ -151,6 +160,8 @@ class Desk(InteractiveDelegate):
         self.smash_time = 0
         self.closed = True
 
+    def label(self):
+        return 'Desk'
     def setup(self):
         for key, value in self.properties.items():
             if key == 'rob':
@@ -295,6 +306,7 @@ class ActionMenu(pyknic.entity.Entity):
         self.actionable_detector.register_once('player', 'stuff', [self.player], actionables, \
                     AABBCollisionStrategy(), (Player, InteractiveThing), self.coll_player_stuff)
         self.items = []
+        self.names = []
 
     def on_key_down(self, key, mod, code):
         if code != 'a':
@@ -313,6 +325,7 @@ class ActionMenu(pyknic.entity.Entity):
     def update_items(self):
         if self.visible == True:
             self.items = []
+            self.names = []
             # update menu
             self.actionable_detector.check()
         if not self.items:
@@ -320,7 +333,9 @@ class ActionMenu(pyknic.entity.Entity):
 
 
     def coll_player_stuff(self, player, thing):
-        self.items.extend(thing.get_actions(player))
+        a = thing.get_actions(player)
+        self.names.extend([thing.label()] * len(a))
+        self.items.extend(a)
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         self.update_items()
@@ -332,7 +347,7 @@ class ActionMenu(pyknic.entity.Entity):
         self.position = Vec3(self.player.position.x+10, self.player.position.y +10)
 
         # setup sprite for menu
-        self.spr.image = pygame.Surface((100, 100))
+        self.spr.image = pygame.Surface((200, 100))
         self.spr.image.fill((255, 0,0))
 
         # draw menu title
@@ -341,11 +356,18 @@ class ActionMenu(pyknic.entity.Entity):
         self.spr.image.blit(text,(0,0))
 
         # draw menu items
-        font = pygame.font.Font(None,20)
+        fonta = pygame.font.Font(None,20)
+        fontb = pygame.font.Font(None,15)
         y = 15
+        label_text = ''
         for i in range(len(self.items)):
             item, _ = self.items[i]
-            text = font.render("%d: %s" % (i+1, item),1,(255,255,255,0))
+            if self.names[i] != label_text:
+                label_text = self.names[i]
+                label = fonta.render(label_text, 1, (255,255,255))
+                self.spr.image.blit(label,(0,y))
+                y +=15
+            text = fontb.render("%d: %s" % (i+1, item),1,(255,255,255,0))
             self.spr.image.blit(text,(0,y))
             y += 10
 
