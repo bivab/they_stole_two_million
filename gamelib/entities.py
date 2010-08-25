@@ -108,12 +108,12 @@ class Door(InteractiveDelegate):
 
     def setup(self):
         if 'locked' in self.properties:
-            self.locked = self.properties['locked'] == True
+            self.locked = self.properties['locked'] == 'true'
             self.closed = True
         else:
             self.locked = True
             if 'closed' in self.properties:
-                self.closed = self.properties['closed'] == True
+                self.closed = self.properties['closed'] == 'true'
             else:
                 self.closed = True
 
