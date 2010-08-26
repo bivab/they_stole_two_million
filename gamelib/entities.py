@@ -49,7 +49,8 @@ class InteractiveThing(pyknic.entity.Entity):
 
 
     def update(self, *args, **kwargs):
-        self.thing.update(args, kwargs)
+        t = self.get_thing()
+        t.update(args, kwargs)
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         t = self.get_thing()
