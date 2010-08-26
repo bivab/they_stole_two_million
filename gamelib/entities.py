@@ -9,6 +9,8 @@ from pyknic.entity import Entity
 from pyknic.entity import Spr
 from pyknic.geometry import Vec3
 
+from random import randint
+
 class InteractiveThing(pyknic.entity.Entity):
     def __init__(self, x, y, width, height, properties, thing_type, impassables):
         Entity.__init__(self, None, Vec3(x, y))
@@ -47,7 +49,8 @@ class InteractiveThing(pyknic.entity.Entity):
 
 
     def update(self, *args, **kwargs):
-        self.thing.update(args, kwargs)
+        t = self.get_thing()
+        t.update(args, kwargs)
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         t = self.get_thing()
@@ -397,7 +400,7 @@ class ActionMenu(pyknic.entity.Entity):
         Entity.render(self, screen_surf)
 
 class Guard(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
         img = pygame.Surface((16, 16))
         img.fill((50, 0, 255))
         spr = Spr(img, offset=Vec3(8,8))
@@ -406,6 +409,8 @@ class Guard(pyknic.entity.Entity):
         super(Guard, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.rect.size = img.get_size()
         self.switch_random_direction()
+        self.state = state
+        self.steps_made = 0
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
@@ -469,3 +474,184 @@ class Guard(pyknic.entity.Entity):
 
     def collidate_wall(self, player, wall, dummy = 0):
         self.collision_response(wall)
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        self.steps_made = self.steps_made + 1
+        if self.steps_made == 40:
+            self.switch_random_direction()
+            self.steps_made = 0
+        self.state.enemy_coll_detector.check()
+        self.update_x(gdt, gt, dt, t, *args)
+        self.state.enemy_coll_detector.check()
+        self.update_y(gdt, gt, dt, t, *args)
+
+class Fog(pyknic.entity.Entity):
+    
+    def __init__(self, player):
+        
+        self.light_objects = {}
+
+        # black surface filling the whole screen
+        self.black = pygame.Surface((1024,768), pygame.SRCALPHA)
+        self.black.fill((0,0,0,150))
+        
+        self.layer = 99999
+        self.rect = pygame.Rect(0,0,0,0)
+        self.rect.size = self.black.get_size()
+        self.position = Vec3(0,0)
+
+        # surface of the spotlight
+        self.spot = pygame.Surface((200,200), pygame.SRCALPHA)
+        self.spot.fill((0,0,0,255))
+        
+        # image for the spotlight
+        spot_png = pygame.image.load("data/images/player_light.png")
+        self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
+
+    def add(self, object, state, size):
+        # object = entity, state = boolean, size = Vec3
+        self.light_objects[object] = (state, size)
+
+    def remove(self, object):
+        self.light_objects.pop(object)
+
+    def set_state(self, object, state):
+        self.light_objects[object][0] = state
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        
+        fog = self.black.copy()
+        for obj in self.light_objects.keys():
+            
+            if self.light_objects[obj][0] is True:
+                # resize spotlight
+                resized_spot = pygame.transform.scale(self.spot, self.light_objects[obj][1])
+                
+                # calculate position
+                spot_x = obj.position.x - resized_spot.get_width()/2
+                spot_y = obj.position.y - resized_spot.get_height()/2
+
+                fog.blit(resized_spot, (spot_x,spot_y), None, pygame.BLEND_RGBA_MIN)
+        
+        # when all lights are added, draw fog
+        screen_surf.blit(fog, (self.rect.x, self.rect.y))
+
+class LurkingGuard(pyknic.entity.Entity):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None, impassables=None):
+        img = pygame.Surface((16, 16))
+        img.fill((0, 255, 0))
+        spr = Spr(img, offset=Vec3(8,8))
+        self.layer = 10000
+        self.moving = Vec3(0,0)
+        super(LurkingGuard, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.rect.size = img.get_size()
+        self.world = world
+        self.impassables = impassables
+        self.find_direction()
+
+    def find_direction(self):
+        max_speed = 50.0
+        pos_x = self.position.x
+        pos_y = self.position.y
+        lurk_rect = pygame.Rect((64,64), (pos_x-32, pos_y-32))
+        entities = self.world.get_entities_in_region(lurk_rect)
+        found_player = None
+        for e in entities:
+            if isinstance(e, Player):
+                found_player = e
+        if found_player:
+            p_pos_x = found_player.position.x
+            p_pos_y = found_player.position.y
+            if p_pos_x<pos_x:
+                left = p_pos_x
+                width = pos_x-p_pos_x
+            else:
+                left = pos_x
+                width = p_pos_x-pos_x
+            if p_pos_y<pos_y:
+                top = p_pos_y
+                height = pos_y-p_pos_y
+            else:
+                top = pos_y
+                height = p_pos_y-pos_y
+            check_rect = pygame.Rect(left, top, width, height)
+            e_collision=False
+            for e in entities:
+                if not isinstance(e, (Player, Guard, LurkingGuard)):
+                    if check_rect.colliderect(e.rect) and e in self.impassables:
+                            e_collision=True
+            v_x = p_pos_x-pos_x
+            v_y = p_pos_y-pos_y
+            if v_x>max_speed or v_y>max_speed:
+                if v_x>v_y:
+                    scale = v_x/max_speed
+                else:
+                    scale = v_y/max_speed
+                v_x = v_x/scale
+                v_y = v_y/scale
+            if not e_collision:
+                self.velocity.x = v_x
+                self.velocity.y = v_y
+            else:
+                if v_x>v_y:
+                    self.velocity.x = v_x
+                    self.velocity.y = 0
+                else:
+                    self.velocity.x = 0
+                    self.velocity.y = v_y
+        else:
+            self.velocity.x = randint(-max_speed,max_speed)
+            self.velocity.y = randint(-max_speed,max_speed)
+
+    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.x += self.t_speed * dt * self.acceleration.x
+        self.position.x += self.t_speed * dt * self.velocity.x
+        self.moving.x = self.velocity.x
+        self.moving.y = 0
+        self.rect.center = self.position.as_xy_tuple()
+
+    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.y += self.t_speed * dt * self.acceleration.y
+        self.position.y += self.t_speed * dt * self.velocity.y
+        self.moving.x = 0
+        self.moving.y = self.velocity.y
+        self.rect.center = self.position.as_xy_tuple()
+
+    def collision_response(self, other):
+        if not self.rect.colliderect(other.rect):
+            return
+
+        # smashing into wall from left
+        if self.moving.x > 0 and self.rect.right > other.rect.left:
+            self.rect.right = other.rect.left
+
+        # smashing into wall from right
+        if self.moving.x < 0 and self.rect.left < other.rect.right:
+            self.rect.left = other.rect.right
+
+        # smashing into wall from above
+        if self.moving.y > 0 and self.rect.bottom > other.rect.top:
+            self.rect.bottom = other.rect.top
+
+        # smashing into wall from below
+        if self.moving.y < 0 and self.rect.top < other.rect.bottom:
+            self.rect.top = other.rect.bottom
+
+        self.moving = Vec3(0,0)
+        self.position = Vec3(*self.rect.center)
+        
+        self.find_direction()
+
+    def collidate_wall(self, player, wall, dummy = 0):
+        self.collision_response(wall)
+
+    def collidate_player(self, player, wall, dummy = 0):
+        self.velocity.x = 0
+        self.velocity.y = 0
+        font = pygame.font.SysFont("Dejavu Sans", 32)
+        title = font.render("GAME OVER", True, (255, 0, 0))
+        s = pygame.display.get_surface()
+        r = s.blit(title, (0,0))
+        pygame.display.flip()
