@@ -493,18 +493,18 @@ class LurkingGuard(pyknic.entity.Entity):
                 found_player = True
                 p_pos_x = e.position.x
                 p_pos_y = e.position.y
-                if p_pos_x > pos_x:
-                    self.velocity.x = 50
-                elif p_pos_x < pos_x:
-                    self.velocity.x = -50
-                else:
-                    self.velocity.x = 0
-                if p_pos_y > pos_y:
-                    self.velocity.y = 50
-                elif p_pos_y < pos_y:
-                    self.velocity.y = -50
-                else:
-                    self.velocity.y = 0
+                max_speed = 50.0
+                v_x = p_pos_x-pos_x
+                v_y = p_pos_y-pos_y
+                if v_x>max_speed or v_y>max_speed:
+                    if v_x>v_y:
+                        scale = v_x/max_speed
+                    else:
+                        scale = v_y/max_speed
+                    v_x = v_x/scale
+                    v_y = v_y/scale
+                self.velocity.x = v_x
+                self.velocity.y = v_y
         if not found_player:
             self.velocity.x = 0
             self.velocity.y = 0
