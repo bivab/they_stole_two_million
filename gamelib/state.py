@@ -161,7 +161,7 @@ class PlayState(pyknic.State):
                         self.game_time.event_update += self.action_menu.update
                         self.fog.add(self.player, True, (300,300))
                     elif obj.type == 'LurkingGuard':
-                        self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), world=self.world, impassables=impassables)
+                        self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), state=self, world=self.world, impassables=impassables)
                         self.world.add_entity(self.lguard)
 
                         self.lguard_coll_detector = pyknic.collision.CollisionDetector()
@@ -169,6 +169,7 @@ class PlayState(pyknic.State):
                                     AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
                         self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
                                     AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
+                        self.game_time.event_update += self.lguard.update
                         self.fog.add(self.lguard, True, (100,100))
                     elif obj.type == 'Guard':
                         self.guard = Guard(None, Vec3(obj.x, obj.y), None, None, None, self)
@@ -210,8 +211,4 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        if hasattr(self,'lguard'):
-            self.lguard_coll_detector.check()
-            self.lguard.update_x(gdt, gt, dt, t, *args)
-            self.lguard_coll_detector.check()
-            self.lguard.update_y(gdt, gt, dt, t, *args)
+        pass
