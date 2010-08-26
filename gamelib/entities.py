@@ -12,15 +12,22 @@ from pyknic.geometry import Vec3
 from random import randint
 
 class InteractiveThing(pyknic.entity.Entity):
-    def __init__(self, x, y, width, height, properties, thing_type, impassables):
-        Entity.__init__(self, None, Vec3(x, y))
-        self.rect.size = (width, height)
-        self.layer =  1
-        self.properties = properties
+    @staticmethod
+    def build_from_object(obj, state):
+        thing = InteractiveThing(Rect(obj.x, obj.y, obj.width, obj.height), state)
+        thing.properties = obj.properties
+        thing.thing_type = obj.type
+        return thing
+
+    def __init__(self, rect, state):
+        Entity.__init__(self, None, Vec3(rect.x, rect.y))
+        self.rect.size = (rect.w, rect.h)
+        self.properties = {}
         self.thing = None
         self.layer = 100
-        self.thing_type = thing_type
-        self.impassables = impassables
+        self.thing_type = None
+        self.state = state
+        self.impassables = state.impassables
 
     def get_actions(self, player):
         t = self.get_thing()
@@ -41,12 +48,12 @@ class InteractiveThing(pyknic.entity.Entity):
         return self.thing.label()
 
     def blow_up(self):
-        t = InteractiveThing(self.rect.x-15, self.rect.y-15, \
-                            self.rect.width+30, self.rect.height+30, \
-                            self.properties, self.thing_type, self.impassables)
+        rect = Rect(self.rect.x-15, self.rect.y-15,self.rect.width+30, self.rect.height+30)
+        t = InteractiveThing(rect, self.state)
+        t.properties = self.properties
+        t.thing_type = self.thing_type
         t.thing = self
         return t
-
 
     def update(self, *args, **kwargs):
         t = self.get_thing()

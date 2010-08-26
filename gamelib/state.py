@@ -149,9 +149,7 @@ class PlayState(pyknic.State):
                         thing = Enlightened.factory(obj, self)
 
                     else:
-                        thing = InteractiveThing(obj.x, obj.y, obj.width, \
-                                    obj.height, obj.properties, obj.type, \
-                                    self.impassables)
+                        thing = InteractiveThing.build_from_object(obj, self)
                         self.actionables.append(thing.blow_up())
                         self.impassables.append(thing)
                         self.game_time.event_update += thing.update
