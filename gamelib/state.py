@@ -151,9 +151,6 @@ class PlayState(pyknic.State):
         self.guard = Guard(None, Vec3(320, 32))
         self.world.add_entity(self.guard)
 
-        self.guard = Guard(None, Vec3(320, 32))
-        self.world.add_entity(self.guard)
-
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
 
