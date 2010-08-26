@@ -236,11 +236,11 @@ class Enlightened(pyknic.entity.Entity):
             self.update_y(gdt, gt, dt, t, *args)
             self.coll_detector.check()
 
-    def collides_with(self, other_name, others, callback):
+    def collides_with(self, other_name, others, callback, other_class=Entity):
         my_name = self.__class__.__name__.lower()
 
         self.coll_detector.register_once(my_name, other_name, [self], others, \
-                    AABBCollisionStrategy(), (self.__class__, Entity), callback)
+                    AABBCollisionStrategy(), (self.__class__, other_class), callback)
 
     @staticmethod
     def factory(objekt, state):
@@ -589,7 +589,7 @@ class LurkingGuard(Enlightened):
         self.find_direction()
 
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
-        self.collides_with('player', [self.state.player], self.collidate_player)
+        self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
         self.state.fog.add(self, True, (100,100))
 
