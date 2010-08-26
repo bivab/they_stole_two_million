@@ -236,6 +236,12 @@ class Enlightened(pyknic.entity.Entity):
             self.update_y(gdt, gt, dt, t, *args)
             self.coll_detector.check()
 
+    def collides_with(self, other_name, others, callback):
+        my_name = self.__class__.__name__.lower()
+
+        self.coll_detector.register_once(my_name, other_name, [self], others, \
+                    AABBCollisionStrategy(), (self.__class__, Entity), callback)
+
     @staticmethod
     def factory(objekt, state):
         pos = Vec3(objekt.x, objekt.y)
@@ -263,8 +269,7 @@ class Player(Enlightened):
         self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
         self.rect.size = self.spr.image.get_size()
 
-        self.coll_detector.register_once('player', 'walls', [self], self.state.impassables, \
-                    AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
+        self.collides_with('walls', self.state.impassables, self.coll_player_wall)
 
         self.state.events.key_down += self.on_key_down
         self.state.events.key_up += self.on_key_up
@@ -446,8 +451,7 @@ class Guard(Enlightened):
         self.switch_random_direction()
         self.steps_made = 0
 
-        self.coll_detector.register_once('guard', 'walls', [self], [self.state.player]+self.state.impassables, \
-                    AABBCollisionStrategy(), (Guard, Entity), self.collidate_wall)
+        self.collides_with('walls', [self.state.player]+self.state.impassables, self.collidate_wall)
         self.state.fog.add(self, True, (100,100))
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
@@ -584,10 +588,8 @@ class LurkingGuard(Enlightened):
         self.random_move = False
         self.find_direction()
 
-        self.coll_detector.register_once('lguard', 'walls', [self], self.state.impassables, \
-                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.collidate_wall)
-        self.coll_detector.register_once('lguard', 'player', [self], [self.state.player], \
-                    AABBCollisionStrategy(), (LurkingGuard, Player), self.collidate_player)
+        self.collides_with('walls', self.state.impassables, self.collidate_wall)
+        self.collides_with('player', [self.state.player], self.collidate_player)
 
         self.state.fog.add(self, True, (100,100))
 
