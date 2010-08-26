@@ -92,13 +92,15 @@ class InteractiveDelegate(object):
 
     def make_action(self, callback, timer):
         def func(player):
-            self.timer = [timer, callback, [player]]
+            self.timer = [timer, callback, player]
+            player.freeze()
         return func
 
     def update(self, *args, **kwargs):
         if self.timer:
             if self.timer[0] == 0 :
-                self.timer[1](*self.timer[2])
+                self.timer[1](self.timer[2])
+                self.timer[2].unfreeze()
                 self.timer = None
             else:
                 self.timer[0] -= 1
@@ -306,6 +308,13 @@ class Player(Enlightened):
         self.state.game_time.event_update += action_menu.update
         self.state.events.key_down += action_menu.on_key_down
         self.state.world.add_entity(action_menu)
+        self.frozen = False
+
+    def freeze(self):
+        self.frozen = True
+
+    def unfreeze(self):
+        self.frozen = False
 
     def coll_player_wall(self, player, wall):
         assert player is self
@@ -349,6 +358,10 @@ class Player(Enlightened):
         self.position = Vec3(*self.rect.center)
 
     def on_key_down(self, key, mod, unicode):
+        if self.frozen:
+            self.velocity = Vec3(0,0)
+            return
+
         speed = 90
         if key == K_UP:
             self.velocity.y = -speed
