@@ -444,10 +444,16 @@ class Guard(Enlightened):
     def __init__(self, position, state):
         super(Guard, self).__init__(position, state)
 
-        img = pygame.Surface((16, 16))
-        img.fill((50, 0, 255))
-        self.spr = Spr(img, offset=Vec3(8,8))
-        self.rect.size = img.get_size()
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/copanim')
+
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+        self.rect.size = self.spr.image.get_size()
+
         self.switch_random_direction()
         self.steps_made = 0
 
@@ -525,6 +531,13 @@ class Guard(Enlightened):
             self.switch_random_direction()
             self.steps_made = 0
 
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
+
 class Fog(pyknic.entity.Entity):
     def __init__(self):
         self.light_objects = {}
@@ -578,10 +591,16 @@ class LurkingGuard(Enlightened):
     def __init__(self, position, state):
         super(LurkingGuard, self).__init__(position, state)
 
-        img = pygame.Surface((16, 16))
-        img.fill((0, 255, 0))
-        self.spr = Spr(img, offset=Vec3(8,8))
-        self.rect.size = img.get_size()
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/copanim')
+
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+        self.rect.size = self.spr.image.get_size()
+
         self.world = self.state.world
         self.impassables = self.state.impassables
         self.steps_made = 0
@@ -595,10 +614,18 @@ class LurkingGuard(Enlightened):
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
+        
         self.steps_made = self.steps_made + 1
         if self.steps_made == [64, 128][self.random_move]:
             self.find_direction()
             self.steps_made = 0
+
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
 
     def find_direction(self):
         max_speed = 50.0
