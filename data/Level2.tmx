@@ -9,11 +9,16 @@
   </data>
  </layer>
  <layer name="wall" width="100" height="100">
+  <properties>
+   <property name="passable" value="false"/>
+  </properties>
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+3dQUoEMRRF0QJ1qC7BnuoedKr7X5E6EAx0tBOTvCu5BwpEqvJ//VcNUmnwOER19XE8DDxOg9cbdVwHZ9LSz2tDn5cYvd4oLX2tuIdaDfP427m9zGPOub3MY865vcxjzrm9zGPOub12z+P5uPxv0bsF/eyeB60v82AxDxbzYDEPFvNgMQ8W82AxDxbzYFmVx9vg9UbZNQ8q2n3Wnltan7PQ7tPPB4t5sKzK42bweqPsmgftvr/Q+jIPFvNgMQ8W82AxD5ZaPy3fg7nkeKr8/vTt5/szfTwO7uO3vk6V837qrXZNz/Fyps6nVc/Nf3k+R1/TupZ5zL2mdS3zmHtN61q75tGzTzNyb8c8WMyDxTxY0nlQ99VT0nnQ9OzTjNzbMY/S7n/v0pgHy+550PbVd8+D9jnsea9de3ft+92/S/fj56OU7sc8Sul+zKOUfl9gHizmwWIeLObBYh6l9PsC8yil+zGPUrof8yil+zGPUrof8yil+zGPUrqfWv3bY+73ymfsHbR8J711/2GV9PNAk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jSr9hlqx4r/USVJkiRJkiRJkiRJkiRpvHfnrNFHQJwAAA==
   </data>
  </layer>
  <objectgroup name="Entities" width="100" height="100">
   <object name="Player" type="Player" x="216" y="298" width="41" height="39"/>
+  <object name="Guard 1" type="LurkingGuard" x="389" y="210" width="31" height="27"/>
+  <object name="Guard 2" type="Guard" x="493" y="465" width="31" height="27"/>
  </objectgroup>
 </map>

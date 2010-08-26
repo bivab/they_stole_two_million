@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog
+from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened
 
 from ui import SimpleRenderer
 
@@ -89,8 +89,8 @@ class PlayState(pyknic.State):
     def on_init(self, app):
         world_map = TileMapParser().parse_decode_load("data/%s.tmx" % self.level, ImageLoaderPygame())
         assert world_map.orientation == "orthogonal"
-        impassables = []
-        actionables = []
+        self.impassables = []
+        self.actionables = []
 
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
@@ -115,7 +115,7 @@ class PlayState(pyknic.State):
                                 ent = Entity(None, Vec3(x + offx, y + offy))
                                 ent.rect.size = screen_img.get_size()
                                 ent.layer = layernum * 10
-                                impassables.append(ent)
+                                self.impassables.append(ent)
 
                             screen_img = screen_img.convert()
                             if layer.opacity > -1:
@@ -142,49 +142,23 @@ class PlayState(pyknic.State):
             for obj in obj_group.objects:
                 if hasattr(obj, 'type'):
                     if obj.type == 'Player':
-                        #import pdb; pdb.set_trace()
-                        self.player = Player(None, Vec3(obj.x, obj.y), None, None, None,self)
+                        self.player = Enlightened.factory(obj, self)
                         self.world.add_entity(self.player)
 
-                        self.coll_detector = pyknic.collision.CollisionDetector()
-                        self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
-                                    AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-
-                        self.game_time.event_update += self.player.update
-
-                        self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
-                        self.world.add_entity(self.action_menu)
-
-                        self.events.key_down += self.player.on_key_down
-                        self.events.key_down += self.action_menu.on_key_down
-                        self.events.key_up += self.player.on_key_up
-                        self.game_time.event_update += self.action_menu.update
-                        self.fog.add(self.player, True, (300,300))
                     elif obj.type == 'LurkingGuard':
-                        self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), world=self.world, impassables=impassables)
+                        self.lguard = Enlightened.factory(obj, self)
                         self.world.add_entity(self.lguard)
 
-                        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
-                        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], impassables, \
-                                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
-                        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
-                                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
-                        self.fog.add(self.lguard, True, (100,100))
                     elif obj.type == 'Guard':
-                        self.guard = Guard(None, Vec3(obj.x, obj.y), None, None, None, self)
+                        self.guard = Enlightened.factory(obj, self)
                         self.world.add_entity(self.guard)
 
-                        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
-                        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+impassables, \
-                                    AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
-                        self.game_time.event_update += self.guard.update
-                        self.fog.add(self.guard, True, (100,100))
                     else:
                         thing = InteractiveThing(obj.x, obj.y, obj.width, \
                                     obj.height, obj.properties, obj.type, \
-                                    impassables)
-                        actionables.append(thing.blow_up())
-                        impassables.append(thing)
+                                    self.impassables)
+                        self.actionables.append(thing.blow_up())
+                        self.impassables.append(thing)
 
                         self.world.add_entity(thing)
                         self.game_time.event_update += thing.update
@@ -206,12 +180,6 @@ class PlayState(pyknic.State):
         self.world.render(screen_surf)
         flip()
 
-    def coll_player_wall(self, player, wall, dummy = 0):
-        player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        if hasattr(self,'lguard'):
-            self.lguard_coll_detector.check()
-            self.lguard.update_x(gdt, gt, dt, t, *args)
-            self.lguard_coll_detector.check()
-            self.lguard.update_y(gdt, gt, dt, t, *args)
+        pass
