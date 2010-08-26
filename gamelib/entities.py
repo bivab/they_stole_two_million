@@ -17,6 +17,9 @@ class InteractiveThing(pyknic.entity.Entity):
         thing = InteractiveThing(Rect(obj.x, obj.y, obj.width, obj.height), state)
         thing.properties = obj.properties
         thing.thing_type = obj.type
+        state.actionables.append(thing.blow_up())
+        state.impassables.append(thing)
+        state.game_time.event_update += thing.update
         return thing
 
     def __init__(self, rect, state):

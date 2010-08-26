@@ -150,9 +150,6 @@ class PlayState(pyknic.State):
 
                     else:
                         thing = InteractiveThing.build_from_object(obj, self)
-                        self.actionables.append(thing.blow_up())
-                        self.impassables.append(thing)
-                        self.game_time.event_update += thing.update
 
                     self.world.add_entity(thing)
 
