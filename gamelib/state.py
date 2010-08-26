@@ -20,10 +20,10 @@ class StartState(pyknic.State):
         super(StartState, self).__init__(*args, **kwargs)
         self.levels = ['testtile', 'level1', 'Level2']
         self.selected_level = 0
-    
+
     def on_init(self, app):
         self.draw_menu(0)
-    
+
     def on_resume(self):
         self.draw_menu(self.selected_level)
 
@@ -31,7 +31,7 @@ class StartState(pyknic.State):
         u"""Default event handler for key presses.
          - escape: pops this state
          - F3: take a screenshot
-        
+
         """
         if pygame.K_ESCAPE == key:
             self.on_quit()
@@ -48,7 +48,7 @@ class StartState(pyknic.State):
 
     def draw_menu(self, selected_level=None):
         self.selected_level = selected_level
-        
+
         titlefont = pygame.font.Font("./data/TopSecret.ttf", 64)
         font = pygame.font.SysFont("Dejavu Sans", 18)
         title = titlefont.render('[%s]' % self.the_app.config['display']['caption'], True, (0, 255, 0))
@@ -123,9 +123,7 @@ class PlayState(pyknic.State):
                                 alpha_value = int(255. * float(layer.opacity))
                                 screen_img.set_alpha(alpha_value)
                             layer_img.blit(screen_img.convert(), (x + offx, y + offy))
-                print layer.x, layer.y
-                print layer.name, layer.opacity
-                print layer.properties
+
                 layer_img.set_alpha(int(255. * float(abs(layer.opacity))))
                 spr = Spr()
                 spr.image = layer_img.convert_alpha()
@@ -136,67 +134,71 @@ class PlayState(pyknic.State):
                 self.world.add_entity(ent)
                 self.game_time.event_update += ent.update
 
+        self.fog = Fog()     # the light class (add objects to 'enlight' them)
+        self.world.add_entity(self.fog)
 
         # map objects
         for obj_group in world_map.object_groups:
             for obj in obj_group.objects:
                 if hasattr(obj, 'type'):
-                    thing = InteractiveThing(obj.x, obj.y, obj.width, \
-                                obj.height, obj.properties, obj.type, \
-                                impassables)
-                    actionables.append(thing.blow_up())
-                    impassables.append(thing)
-                    self.world.add_entity(thing)
-                    self.game_time.event_update += thing.update
+                    if obj.type == 'Player':
+                        #import pdb; pdb.set_trace()
+                        self.player = Player(None, Vec3(obj.x, obj.y), None, None, None,self)
+                        self.world.add_entity(self.player)
+
+                        self.coll_detector = pyknic.collision.CollisionDetector()
+                        self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
+                                    AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
+
+                        self.game_time.event_update += self.player.update
+
+                        self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
+                        self.world.add_entity(self.action_menu)
+
+                        self.events.key_down += self.player.on_key_down
+                        self.events.key_down += self.action_menu.on_key_down
+                        self.events.key_up += self.player.on_key_up
+                        self.game_time.event_update += self.action_menu.update
+                        self.fog.add(self.player, True, (300,300))
+                    elif obj.type == 'LurkingGuard':
+                        self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), world=self.world, impassables=impassables)
+                        self.world.add_entity(self.lguard)
+
+                        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
+                        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], impassables, \
+                                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
+                        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
+                                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
+                        self.fog.add(self.lguard, True, (100,100))
+                    elif obj.type == 'Guard':
+                        self.guard = Guard(None, Vec3(obj.x, obj.y), None, None, None, self)
+                        self.world.add_entity(self.guard)
+
+                        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
+                        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+impassables, \
+                                    AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
+                        self.game_time.event_update += self.guard.update
+                        self.fog.add(self.guard, True, (100,100))
+                    else:
+                        thing = InteractiveThing(obj.x, obj.y, obj.width, \
+                                    obj.height, obj.properties, obj.type, \
+                                    impassables)
+                        actionables.append(thing.blow_up())
+                        impassables.append(thing)
+
+                        self.world.add_entity(thing)
+                        self.game_time.event_update += thing.update
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect)
         self.world.add_renderer(self.renderer1)
 
-        self.player = Player(None, Vec3(64, 64), None, None, None,self)
-        self.world.add_entity(self.player)
-
-        self.lguard = LurkingGuard(position=Vec3(128, 140), world=self.world, impassables=impassables)
-        self.world.add_entity(self.lguard)
-
-        self.guard = Guard(None, Vec3(320, 32), None, None, None, self)
-        self.world.add_entity(self.guard)
-
-        self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
-        self.world.add_entity(self.action_menu)
-
-        self.fog = Fog(self.player)     # the light class (add objects to 'enlighten' them)
-        self.fog.add(self.player, True, (200,200))
-        self.fog.add(self.guard, True, (100,100))
-        self.fog.add(self.lguard, True, (100,100))
-        self.world.add_entity(self.fog)
-
-        self.events.key_down += self.player.on_key_down
-        self.events.key_down += self.action_menu.on_key_down
-        self.events.key_up += self.player.on_key_up
-
-        self.coll_detector = pyknic.collision.CollisionDetector()
-        self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
-                    AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
-        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+impassables, \
-                    AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
-        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
-        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], impassables, \
-                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
-        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
-                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
-
         self.setup_update_events()
 
     def setup_update_events(self):
-        self.game_time.event_update += self.action_menu.update
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
         self.game_time.event_update += self.renderer1.update
-        self.game_time.event_update += self.player.update
-        self.game_time.event_update += self.guard.update
-        #self.game_time.event_update += self.guard.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
@@ -208,7 +210,8 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        self.lguard_coll_detector.check()
-        self.lguard.update_x(gdt, gt, dt, t, *args)
-        self.lguard_coll_detector.check()
-        self.lguard.update_y(gdt, gt, dt, t, *args)
+        if hasattr(self,'lguard'):
+            self.lguard_coll_detector.check()
+            self.lguard.update_x(gdt, gt, dt, t, *args)
+            self.lguard_coll_detector.check()
+            self.lguard.update_y(gdt, gt, dt, t, *args)

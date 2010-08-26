@@ -487,7 +487,7 @@ class Guard(pyknic.entity.Entity):
 
 class Fog(pyknic.entity.Entity):
     
-    def __init__(self, player):
+    def __init__(self):
         
         self.light_objects = {}
 
@@ -509,7 +509,7 @@ class Fog(pyknic.entity.Entity):
         self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
 
     def add(self, object, state, size):
-        # object = entity, state = boolean, size = Vec3
+        # object = entity, state = boolean, size = (widht, height)
         self.light_objects[object] = (state, size)
 
     def remove(self, object):
@@ -641,7 +641,7 @@ class LurkingGuard(pyknic.entity.Entity):
 
         self.moving = Vec3(0,0)
         self.position = Vec3(*self.rect.center)
-        
+
         self.find_direction()
 
     def collidate_wall(self, player, wall, dummy = 0):
