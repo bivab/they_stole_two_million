@@ -68,6 +68,8 @@ class StartState(pyknic.State):
 
         lock = pygame.image.load('./data/images/icon_lockpicks.png')
         s.blit(lock, (16, self.the_app.config['display']['height']-16-lock.get_height()))
+        rob = pygame.image.load('./data/images/rob.png')
+        s.blit(rob, (self.the_app.config['display']['width']-16-rob.get_width(), self.the_app.config['display']['height']-16-rob.get_height()))
 
         pygame.display.flip()
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
- <tileset firstgid="1" source="images/tileset_millions_1.tsx"/>
+ <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
+  <image source="images/tileset_millions_1.png"/>
+ </tileset>
  <layer name="ground" width="100" height="100">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+3csU7bQACAYUsFwQIIVgZYeYjO7VpQpxY24P3fAEdiYCAiEXb8E77hWyzlcne/ZDnKyefDMJyT9GN0NaHricebysGCe7LNfH6NLic09XhTzmvTHrtYw7r56PH9evwZ3c7sTo+Ne/wb/Z/ZvR566KHHnvQ4GTZ/Fj3VY/YeNXq06NGiR4seLXq06NGiR4seLXq07KrH73euPY6eZvYc2ONiD/T4ivRo0aNlVz0OA2v9Cr77+ZIaPVr0aNGjRY8WPVrW9fg5THtuexdnZfaB34MterTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4tb3tcvLHNex7ncvQJq8+fvXP95oPvPAj1+Mz698XS9wU99CjTo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GhZ+n+G1Xt3jl8tvRcAAAAs4y8pDwAAAAAAG3oBAmzL50CcAAA=
