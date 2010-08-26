@@ -399,7 +399,7 @@ class ActionMenu(pyknic.entity.Entity):
         Entity.render(self, screen_surf)
 
 class Guard(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
         img = pygame.Surface((16, 16))
         img.fill((50, 0, 255))
         spr = Spr(img, offset=Vec3(8,8))
@@ -408,6 +408,8 @@ class Guard(pyknic.entity.Entity):
         super(Guard, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.rect.size = img.get_size()
         self.switch_random_direction()
+        self.state = state
+        self.steps_made = 0
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
@@ -471,6 +473,16 @@ class Guard(pyknic.entity.Entity):
 
     def collidate_wall(self, player, wall, dummy = 0):
         self.collision_response(wall)
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        self.steps_made = self.steps_made + 1
+        if self.steps_made == 40:
+            self.switch_random_direction()
+            self.steps_made = 0
+        self.state.enemy_coll_detector.check()
+        self.update_x(gdt, gt, dt, t, *args)
+        self.state.enemy_coll_detector.check()
+        self.update_y(gdt, gt, dt, t, *args)
 
 class LurkingGuard(pyknic.entity.Entity):
     def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None, impassables=None):
