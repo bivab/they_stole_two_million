@@ -176,6 +176,15 @@ class Desk(InteractiveDelegate):
         self.smash_time = 0
         self.closed = True
 
+        self.img = pygame.image.load("data/images/desk01.png").convert_alpha()
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
+        image.fill(self.color)
+        image.blit(self.img, (0,0))
+
+        screen_surf.blit(image, (self.rect.x, self.rect.y))
+
     def label(self):
         return 'Desk'
     def setup(self):
