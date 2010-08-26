@@ -223,6 +223,18 @@ class Enlightened(pyknic.entity.Entity):
         self.state = state
         self.layer = 10000
         self.moving = Vec3(0,0)
+        self.coll_detector = pyknic.collision.CollisionDetector()
+        self.state.game_time.event_update += self.update
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        if self.target:
+            self.position = self.target.position
+            self.rect.center = self.position.as_xy_tuple()
+        else:
+            self.update_x(gdt, gt, dt, t, *args)
+            self.coll_detector.check()
+            self.update_y(gdt, gt, dt, t, *args)
+            self.coll_detector.check()
 
     @staticmethod
     def factory(objekt, state):
@@ -251,11 +263,8 @@ class Player(Enlightened):
         self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
         self.rect.size = self.spr.image.get_size()
 
-        self.coll_detector = pyknic.collision.CollisionDetector()
         self.coll_detector.register_once('player', 'walls', [self], self.state.impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
-
-        self.state.game_time.event_update += self.update
 
         self.state.events.key_down += self.on_key_down
         self.state.events.key_up += self.on_key_up
@@ -275,14 +284,7 @@ class Player(Enlightened):
         print 'Wuhooo, I\'m rich %d' % self.money
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
-        if self.target:
-            self.position = self.target.position
-            self.rect.center = self.position.as_xy_tuple()
-        else:
-            self.update_x(gdt, gt, dt, t, *args)
-            self.coll_detector.check()
-            self.update_y(gdt, gt, dt, t, *args)
-            self.coll_detector.check()
+        super(Player, self).update(gdt, gt, dt, t, *args, **kwargs)
 
         if self.velocity.lengthSQ:
             self.spr.play()
@@ -444,10 +446,8 @@ class Guard(Enlightened):
         self.switch_random_direction()
         self.steps_made = 0
 
-        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
-        self.enemy_coll_detector.register_once('guard', 'walls', [self], [self.state.player]+self.state.impassables, \
+        self.coll_detector.register_once('guard', 'walls', [self], [self.state.player]+self.state.impassables, \
                     AABBCollisionStrategy(), (Guard, Entity), self.collidate_wall)
-        self.state.game_time.event_update += self.update
         self.state.fog.add(self, True, (100,100))
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
@@ -514,14 +514,12 @@ class Guard(Enlightened):
         self.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
+        super(Guard, self).update(gdt, gt, dt, t, *args, **kwargs)
+
         self.steps_made = self.steps_made + 1
         if self.steps_made == 40:
             self.switch_random_direction()
             self.steps_made = 0
-        self.enemy_coll_detector.check()
-        self.update_x(gdt, gt, dt, t, *args)
-        self.enemy_coll_detector.check()
-        self.update_y(gdt, gt, dt, t, *args)
 
 class Fog(pyknic.entity.Entity):
     def __init__(self):
@@ -586,25 +584,19 @@ class LurkingGuard(Enlightened):
         self.random_move = False
         self.find_direction()
 
-        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
-        self.lguard_coll_detector.register_once('lguard', 'walls', [self], self.state.impassables, \
+        self.coll_detector.register_once('lguard', 'walls', [self], self.state.impassables, \
                     AABBCollisionStrategy(), (LurkingGuard, Entity), self.collidate_wall)
-        self.lguard_coll_detector.register_once('lguard', 'player', [self], [self.state.player], \
+        self.coll_detector.register_once('lguard', 'player', [self], [self.state.player], \
                     AABBCollisionStrategy(), (LurkingGuard, Player), self.collidate_player)
 
         self.state.fog.add(self, True, (100,100))
-        self.state.game_time.event_update += self.update
 
-    def update(self, gdt, gt, dt, t, *args):
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
         self.steps_made = self.steps_made + 1
         if self.steps_made == [64, 128][self.random_move]:
             self.find_direction()
             self.steps_made = 0
-
-        self.lguard_coll_detector.check()
-        self.update_x(gdt, gt, dt, t, *args)
-        self.lguard_coll_detector.check()
-        self.update_y(gdt, gt, dt, t, *args)
 
     def find_direction(self):
         max_speed = 50.0
