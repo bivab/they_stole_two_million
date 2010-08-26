@@ -1,4 +1,4 @@
-import pyknic
+import pyknic, pygame
 from pyknic.geometry import Vec3
 from pyknic.utilities import SortedList
 from pyknic.timing import GameTime
@@ -6,15 +6,21 @@ from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
 
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
-    def __init__(self, state, cam_rect):
+    def __init__(self, state, cam_rect, player):
         super(SimpleRenderer, self).__init__(cam_rect)
+        self.player = player
         self.state = state
 
     def render(self, screen_surf, offset=None):
         if self._world:
-            offset = Vec3(0,0)
+            # place word relatively to the players position
+            offset = Vec3(self.player.position.x-screen_surf.get_width()/2, self.player.position.y-screen_surf.get_height()/2)
+            
             clipped_surf = screen_surf.subsurface(self.rect)
-            ents = SortedList(self._world.get_entities_in_region(self.rect), lambda e: -e.position.z + e.layer)
+            
+            # also change the display rect
+            search_rect = pygame.Rect(offset.x, offset.y, screen_surf.get_width(), screen_surf.get_height())
+            ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
             for entity in ents:
                 entity.render(clipped_surf, offset, self.screen_pos)
 
