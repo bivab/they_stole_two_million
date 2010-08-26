@@ -18,5 +18,7 @@
  </layer>
  <objectgroup name="Entities" width="100" height="100">
   <object name="Player" type="Player" x="216" y="298" width="41" height="39"/>
+  <object name="Guard 1" type="LurkingGuard" x="389" y="210" width="31" height="27"/>
+  <object name="Guard 2" type="Guard" x="493" y="465" width="31" height="27"/>
  </objectgroup>
 </map>
