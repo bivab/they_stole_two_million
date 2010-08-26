@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard
+from entities import InteractiveThing, Player, ActionMenu, Guard, Fog
 
 from ui import SimpleRenderer
 
@@ -84,6 +84,25 @@ class PlayState(pyknic.State):
         impassables = []
         actionables = []
 
+       ## test spotlight
+       #black_surface = pygame.Surface((1024,768), pygame.SRCALPHA)
+       #black_surface.fill((0,0,0,150))
+       ##black_surface.set_alpha(100)
+       ##black_surface.set_colorkey((255,255,255))
+       #black_layer = Spr()
+       #black_layer.image = black_surface
+       #black_ent = Entity(black_layer, Vec3(0, 0))
+       #black_ent.rect.size = black_layer.image.get_size()
+       #black_ent.layer = 10000
+        
+       #spot_surface = pygame.Surface((100,100), pygame.SRCALPHA)
+       #spot_surface.fill((0,0,0,255))
+       ##spot_surface.set_alpha(100)
+       #pygame.draw.circle(spot_surface, (255,255,255,0), (50,50), 50)
+       #black_surface.blit(spot_surface,(10,10), None, pygame.BLEND_RGBA_MIN)
+
+       #self.world.add_entity(black_ent)
+
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
                 layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height), pygame.SRCALPHA)
@@ -153,6 +172,9 @@ class PlayState(pyknic.State):
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
+
+        self.fog = Fog(self.player)
+        self.world.add_entity(self.fog)
 
         self.events.key_down += self.player.on_key_down
         self.events.key_down += self.action_menu.on_key_down

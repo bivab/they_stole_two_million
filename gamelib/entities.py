@@ -481,3 +481,39 @@ class Guard(pyknic.entity.Entity):
         self.update_x(gdt, gt, dt, t, *args)
         self.state.enemy_coll_detector.check()
         self.update_y(gdt, gt, dt, t, *args)
+
+class Fog(pyknic.entity.Entity):
+    def __init__(self, player):
+        
+        self.player = player
+        
+        self.black = pygame.Surface((1024,768), pygame.SRCALPHA)
+        self.black.fill((0,0,0,150))
+        
+        spr = Spr()
+        spr.image = self.black
+        
+        self.layer = 99999
+        #super(Fog, self).__init__(spr, Vec3(0,0))
+        self.rect = pygame.Rect(0,0,0,0)
+        self.rect.size = self.black.get_size()
+        self.position = Vec3(0,0)
+
+        self.spot = pygame.Surface((200,200), pygame.SRCALPHA)
+        self.spot.fill((0,0,0,255))
+        #pygame.draw.circle(self.spot, (255,255,255,0), (50,50), 50)
+        
+        spot_png = pygame.image.load("data/images/player_light.png")
+        self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
+
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        
+        # calculate position
+        spot_x = self.player.position.x - self.spot.get_width()/2
+        spot_y = self.player.position.y - self.spot.get_height()/2
+
+        temp = self.black.copy()
+        temp.blit(self.spot, (spot_x,spot_y), None, pygame.BLEND_RGBA_MIN)
+        
+        screen_surf.blit(temp, (self.rect.x, self.rect.y))
