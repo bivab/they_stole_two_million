@@ -292,9 +292,10 @@ class Player(Enlightened):
 
         self.state.fog.add(self, True, (300,300))
 
-        self.action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
-        self.state.events.key_down += self.action_menu.on_key_down
-        self.state.world.add_entity(self.action_menu)
+        action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
+        self.state.game_time.event_update += action_menu.update
+        self.state.events.key_down += action_menu.on_key_down
+        self.state.world.add_entity(action_menu)
 
     def coll_player_wall(self, player, wall):
         assert player is self
