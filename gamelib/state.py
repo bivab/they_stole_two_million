@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard
+from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog
 
 from ui import SimpleRenderer
 
@@ -49,11 +49,14 @@ class StartState(pyknic.State):
     def draw_menu(self, selected_level=None):
         self.selected_level = selected_level
         
+        titlefont = pygame.font.Font("./data/TopSecret.ttf", 64)
         font = pygame.font.SysFont("Dejavu Sans", 18)
-        title = font.render(self.the_app.config['display']['caption'], True, (0, 255, 0))
+        title = titlefont.render('[%s]' % self.the_app.config['display']['caption'], True, (0, 255, 0))
+        left = (self.the_app.config['display']['width']-title.get_width())/2
+        top = left
         s = pygame.display.get_surface()
         s.fill((0,0,0))
-        r = s.blit(title, (0,0))
+        r = s.blit(title, (left,top))
 
         for i, level in enumerate(self.levels):
             if i == selected_level:
@@ -61,7 +64,10 @@ class StartState(pyknic.State):
             else:
                 color = (0,255,0)
             levelfont = font.render(level, True, color)
-            r = s.blit(levelfont, (0, r.bottom))
+            r = s.blit(levelfont, (left, r.bottom+16))
+
+        lock = pygame.image.load('./data/images/icon_lockpicks.png')
+        s.blit(lock, (16, self.the_app.config['display']['height']-16-lock.get_height()))
 
         pygame.display.flip()
 
@@ -156,6 +162,9 @@ class PlayState(pyknic.State):
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
+
+        self.fog = Fog(self.player)     # the light around the player
+        self.world.add_entity(self.fog)
 
         self.events.key_down += self.player.on_key_down
         self.events.key_down += self.action_menu.on_key_down
