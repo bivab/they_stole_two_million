@@ -148,7 +148,7 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
 
-        self.lguard = LurkingGuard(position=Vec3(28, 140), world=self.world)
+        self.lguard = LurkingGuard(position=Vec3(28, 140), world=self.world, impassables=impassables)
         self.world.add_entity(self.lguard)
         
         self.guard = Guard(None, Vec3(320, 32))

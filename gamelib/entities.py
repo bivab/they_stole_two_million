@@ -473,7 +473,7 @@ class Guard(pyknic.entity.Entity):
         self.collision_response(wall)
 
 class LurkingGuard(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None):
+    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None, impassables=None):
         img = pygame.Surface((16, 16))
         img.fill((0, 255, 0))
         spr = Spr(img, offset=Vec3(8,8))
@@ -482,6 +482,7 @@ class LurkingGuard(pyknic.entity.Entity):
         super(LurkingGuard, self).__init__(spr, position, velocity, acceleration, coll_rect)
         self.rect.size = img.get_size()
         self.world = world
+        self.impassables = impassables
         self.find_direction()
 
     def find_direction(self):
@@ -490,24 +491,51 @@ class LurkingGuard(pyknic.entity.Entity):
         pos_y = self.position.y
         lurk_rect = pygame.Rect((64,64), (pos_x-32, pos_y-32))
         entities = self.world.get_entities_in_region(lurk_rect)
-        found_player = False
+        found_player = None
         for e in entities:
             if isinstance(e, Player):
-                found_player = True
-                p_pos_x = e.position.x
-                p_pos_y = e.position.y
-                v_x = p_pos_x-pos_x
-                v_y = p_pos_y-pos_y
-                if v_x>max_speed or v_y>max_speed:
-                    if v_x>v_y:
-                        scale = v_x/max_speed
-                    else:
-                        scale = v_y/max_speed
-                    v_x = v_x/scale
-                    v_y = v_y/scale
+                found_player = e
+        if found_player:
+            p_pos_x = found_player.position.x
+            p_pos_y = found_player.position.y
+            if p_pos_x<pos_x:
+                left = p_pos_x
+                width = pos_x-p_pos_x
+            else:
+                left = pos_x
+                width = p_pos_x-pos_x
+            if p_pos_y<pos_y:
+                top = p_pos_y
+                height = pos_y-p_pos_y
+            else:
+                top = pos_y
+                heigth = p_pos_y-pos_y
+            check_rect = pygame.Rect(left, top, width, height)
+            e_collision=False
+            for e in entities:
+                if not isinstance(e, (Player, Guard, LurkingGuard)):
+                    if check_rect.colliderect(e.rect) and e in self.impassables:
+                            e_collision=True
+            v_x = p_pos_x-pos_x
+            v_y = p_pos_y-pos_y
+            if v_x>max_speed or v_y>max_speed:
+                if v_x>v_y:
+                    scale = v_x/max_speed
+                else:
+                    scale = v_y/max_speed
+                v_x = v_x/scale
+                v_y = v_y/scale
+            if not e_collision:
                 self.velocity.x = v_x
                 self.velocity.y = v_y
-        if not found_player:
+            else:
+                if v_x>v_y:
+                    self.velocity.x = v_x
+                    self.velocity.y = 0
+                else:
+                    self.velocity.x = 0
+                    self.velocity.y = v_y
+        else:
             self.velocity.x = randint(-max_speed,max_speed)
             self.velocity.y = randint(-max_speed,max_speed)
 
