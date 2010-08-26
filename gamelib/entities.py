@@ -9,6 +9,8 @@ from pyknic.entity import Entity
 from pyknic.entity import Spr
 from pyknic.geometry import Vec3
 
+from random import randint
+
 class InteractiveThing(pyknic.entity.Entity):
     def __init__(self, x, y, width, height, properties, thing_type, impassables):
         Entity.__init__(self, None, Vec3(x, y))
@@ -483,6 +485,7 @@ class LurkingGuard(pyknic.entity.Entity):
         self.find_direction()
 
     def find_direction(self):
+        max_speed = 50.0
         pos_x = self.position.x
         pos_y = self.position.y
         lurk_rect = pygame.Rect((64,64), (pos_x-32, pos_y-32))
@@ -493,7 +496,6 @@ class LurkingGuard(pyknic.entity.Entity):
                 found_player = True
                 p_pos_x = e.position.x
                 p_pos_y = e.position.y
-                max_speed = 50.0
                 v_x = p_pos_x-pos_x
                 v_y = p_pos_y-pos_y
                 if v_x>max_speed or v_y>max_speed:
@@ -506,8 +508,8 @@ class LurkingGuard(pyknic.entity.Entity):
                 self.velocity.x = v_x
                 self.velocity.y = v_y
         if not found_player:
-            self.velocity.x = 0
-            self.velocity.y = 0
+            self.velocity.x = randint(-max_speed,max_speed)
+            self.velocity.y = randint(-max_speed,max_speed)
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
