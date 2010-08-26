@@ -68,6 +68,8 @@ class StartState(pyknic.State):
 
         lock = pygame.image.load('./data/images/icon_lockpicks.png')
         s.blit(lock, (16, self.the_app.config['display']['height']-16-lock.get_height()))
+        rob = pygame.image.load('./data/images/rob.png')
+        s.blit(rob, (self.the_app.config['display']['width']-16-rob.get_width(), self.the_app.config['display']['height']-16-rob.get_height()))
 
         pygame.display.flip()
 
@@ -154,7 +156,7 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
 
-        self.lguard = LurkingGuard(position=Vec3(28, 140), world=self.world, impassables=impassables)
+        self.lguard = LurkingGuard(position=Vec3(128, 140), world=self.world, impassables=impassables)
         self.world.add_entity(self.lguard)
 
         self.guard = Guard(None, Vec3(320, 32), None, None, None, self)
@@ -165,6 +167,8 @@ class PlayState(pyknic.State):
 
         self.fog = Fog(self.player)     # the light class (add objects to 'enlighten' them)
         self.fog.add(self.player, True, (200,200))
+        self.fog.add(self.guard, True, (100,100))
+        self.fog.add(self.lguard, True, (100,100))
         self.world.add_entity(self.fog)
 
         self.events.key_down += self.player.on_key_down
