@@ -148,7 +148,7 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
 
-        self.guard = Guard(None, Vec3(320, 32))
+        self.guard = Guard(None, Vec3(320, 32), None, None, None, self)
         self.world.add_entity(self.guard)
 
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
@@ -162,7 +162,7 @@ class PlayState(pyknic.State):
         self.coll_detector.register_once('player', 'walls', [self.player], impassables, \
                     AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
         self.enemy_coll_detector = pyknic.collision.CollisionDetector()
-        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], impassables, \
+        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+impassables, \
                     AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
         self.setup_update_events()
 
@@ -172,6 +172,7 @@ class PlayState(pyknic.State):
         self.game_time.event_update += self.render
         self.game_time.event_update += self.renderer1.update
         self.game_time.event_update += self.player.update
+        self.game_time.event_update += self.guard.update
         #self.game_time.event_update += self.guard.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
@@ -184,7 +185,4 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        self.enemy_coll_detector.check()
-        self.guard.update_x(gdt, gt, dt, t, *args)
-        self.enemy_coll_detector.check()
-        self.guard.update_y(gdt, gt, dt, t, *args)
+        pass
