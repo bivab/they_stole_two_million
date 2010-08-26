@@ -558,7 +558,7 @@ class LurkingGuard(pyknic.entity.Entity):
                 height = pos_y-p_pos_y
             else:
                 top = pos_y
-                heigth = p_pos_y-pos_y
+                height = p_pos_y-pos_y
             check_rect = pygame.Rect(left, top, width, height)
             e_collision=False
             for e in entities:
