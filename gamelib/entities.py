@@ -236,11 +236,27 @@ class Enlightened(pyknic.entity.Entity):
             self.update_y(gdt, gt, dt, t, *args)
             self.coll_detector.check()
 
-    def collides_with(self, other_name, others, callback):
+    def collides_with(self, other_name, others, callback, other_class=Entity):
         my_name = self.__class__.__name__.lower()
 
         self.coll_detector.register_once(my_name, other_name, [self], others, \
-                    AABBCollisionStrategy(), (self.__class__, Entity), callback)
+                    AABBCollisionStrategy(), (self.__class__, other_class), callback)
+
+    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.x += self.t_speed * dt * self.acceleration.x
+        self.position.x += self.t_speed * dt * self.velocity.x
+        self.moving.x = self.velocity.x
+        self.moving.y = 0
+        self.rect.center = self.position.as_xy_tuple()
+
+    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
+        dt = gdt * self.t_speed
+        self.velocity.y += self.t_speed * dt * self.acceleration.y
+        self.position.y += self.t_speed * dt * self.velocity.y
+        self.moving.x = 0
+        self.moving.y = self.velocity.y
+        self.rect.center = self.position.as_xy_tuple()
 
     @staticmethod
     def factory(objekt, state):
@@ -297,23 +313,6 @@ class Player(Enlightened):
             self.spr = self.sprites[dir]
         else:
             self.spr.pause()
-
-
-    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.x += self.t_speed * dt * self.acceleration.x
-        self.position.x += self.t_speed * dt * self.velocity.x
-        self.moving.x = self.velocity.x
-        self.moving.y = 0
-        self.rect.center = self.position.as_xy_tuple()
-
-    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.y += self.t_speed * dt * self.acceleration.y
-        self.position.y += self.t_speed * dt * self.velocity.y
-        self.moving.x = 0
-        self.moving.y = self.velocity.y
-        self.rect.center = self.position.as_xy_tuple()
 
     def collision_response(self, other):
         if not self.rect.colliderect(other.rect):
@@ -460,22 +459,6 @@ class Guard(Enlightened):
         self.collides_with('walls', [self.state.player]+self.state.impassables, self.collidate_wall)
         self.state.fog.add(self, True, (100,100))
 
-    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.x += self.t_speed * dt * self.acceleration.x
-        self.position.x += self.t_speed * dt * self.velocity.x
-        self.moving.x = self.velocity.x
-        self.moving.y = 0
-        self.rect.center = self.position.as_xy_tuple()
-
-    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.y += self.t_speed * dt * self.acceleration.y
-        self.position.y += self.t_speed * dt * self.velocity.y
-        self.moving.x = 0
-        self.moving.y = self.velocity.y
-        self.rect.center = self.position.as_xy_tuple()
-
     def switch_random_direction(self, wrong_direction=0):
         import random
         direction = int(random.random()*4)
@@ -608,7 +591,7 @@ class LurkingGuard(Enlightened):
         self.find_direction()
 
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
-        self.collides_with('player', [self.state.player], self.collidate_player)
+        self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
         self.state.fog.add(self, True, (100,100))
 
@@ -682,22 +665,6 @@ class LurkingGuard(Enlightened):
             self.random_move = True
             self.velocity.x = randint(-max_speed,max_speed)
             self.velocity.y = randint(-max_speed,max_speed)
-
-    def update_x(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.x += self.t_speed * dt * self.acceleration.x
-        self.position.x += self.t_speed * dt * self.velocity.x
-        self.moving.x = self.velocity.x
-        self.moving.y = 0
-        self.rect.center = self.position.as_xy_tuple()
-
-    def update_y(self, gdt, gt, dt, t, *args, **kwargs):
-        dt = gdt * self.t_speed
-        self.velocity.y += self.t_speed * dt * self.acceleration.y
-        self.position.y += self.t_speed * dt * self.velocity.y
-        self.moving.x = 0
-        self.moving.y = self.velocity.y
-        self.rect.center = self.position.as_xy_tuple()
 
     def collision_response(self, other):
         if not self.rect.colliderect(other.rect):
