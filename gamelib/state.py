@@ -156,15 +156,11 @@ class PlayState(pyknic.State):
                                     AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
                         self.game_time.event_update += self.lguard.update
                         self.fog.add(self.lguard, True, (100,100))
+
                     elif obj.type == 'Guard':
-                        self.guard = Guard(None, Vec3(obj.x, obj.y), None, None, None, self)
+                        self.guard = Enlightened.factory(obj, self)
                         self.world.add_entity(self.guard)
 
-                        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
-                        self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+self.impassables, \
-                                    AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
-                        self.game_time.event_update += self.guard.update
-                        self.fog.add(self.guard, True, (100,100))
                     else:
                         thing = InteractiveThing(obj.x, obj.y, obj.width, \
                                     obj.height, obj.properties, obj.type, \

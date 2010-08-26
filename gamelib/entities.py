@@ -226,7 +226,12 @@ class Enlightened(pyknic.entity.Entity):
 
     @staticmethod
     def factory(objekt, state):
-        return Player(Vec3(objekt.x, objekt.y), state)
+        pos = Vec3(objekt.x, objekt.y)
+
+        if objekt.type == 'Player':
+            return Player(pos, state)
+        elif objekt.type == 'Guard':
+            return Guard(pos, state)
 
 
 class Player(Enlightened):
@@ -426,18 +431,22 @@ class ActionMenu(pyknic.entity.Entity):
         # actually render
         Entity.render(self, screen_surf)
 
-class Guard(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
+class Guard(Enlightened):
+    def __init__(self, position, state):
+        super(Guard, self).__init__(position, state)
+
         img = pygame.Surface((16, 16))
         img.fill((50, 0, 255))
-        spr = Spr(img, offset=Vec3(8,8))
-        self.layer = 10000
-        self.moving = Vec3(0,0)
-        super(Guard, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.spr = Spr(img, offset=Vec3(8,8))
         self.rect.size = img.get_size()
         self.switch_random_direction()
-        self.state = state
         self.steps_made = 0
+
+        self.enemy_coll_detector = pyknic.collision.CollisionDetector()
+        self.enemy_coll_detector.register_once('guard', 'walls', [self], [self.state.player]+self.state.impassables, \
+                    AABBCollisionStrategy(), (Guard, Entity), self.collidate_wall)
+        self.state.game_time.event_update += self.update
+        self.state.fog.add(self, True, (100,100))
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
@@ -507,9 +516,9 @@ class Guard(pyknic.entity.Entity):
         if self.steps_made == 40:
             self.switch_random_direction()
             self.steps_made = 0
-        self.state.enemy_coll_detector.check()
+        self.enemy_coll_detector.check()
         self.update_x(gdt, gt, dt, t, *args)
-        self.state.enemy_coll_detector.check()
+        self.enemy_coll_detector.check()
         self.update_y(gdt, gt, dt, t, *args)
 
 class Fog(pyknic.entity.Entity):
