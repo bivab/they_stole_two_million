@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, Fog
+from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog
 
 from ui import SimpleRenderer
 
@@ -49,11 +49,14 @@ class StartState(pyknic.State):
     def draw_menu(self, selected_level=None):
         self.selected_level = selected_level
         
+        titlefont = pygame.font.Font("./data/TopSecret.ttf", 64)
         font = pygame.font.SysFont("Dejavu Sans", 18)
-        title = font.render(self.the_app.config['display']['caption'], True, (0, 255, 0))
+        title = titlefont.render('[%s]' % self.the_app.config['display']['caption'], True, (0, 255, 0))
+        left = (self.the_app.config['display']['width']-title.get_width())/2
+        top = left
         s = pygame.display.get_surface()
         s.fill((0,0,0))
-        r = s.blit(title, (0,0))
+        r = s.blit(title, (left,top))
 
         for i, level in enumerate(self.levels):
             if i == selected_level:
@@ -61,7 +64,10 @@ class StartState(pyknic.State):
             else:
                 color = (0,255,0)
             levelfont = font.render(level, True, color)
-            r = s.blit(levelfont, (0, r.bottom))
+            r = s.blit(levelfont, (left, r.bottom+16))
+
+        lock = pygame.image.load('./data/images/icon_lockpicks.png')
+        s.blit(lock, (16, self.the_app.config['display']['height']-16-lock.get_height()))
 
         pygame.display.flip()
 
@@ -167,6 +173,9 @@ class PlayState(pyknic.State):
         self.player = Player(None, Vec3(64, 64), None, None, None,self)
         self.world.add_entity(self.player)
 
+        self.lguard = LurkingGuard(position=Vec3(28, 140), world=self.world, impassables=impassables)
+        self.world.add_entity(self.lguard)
+
         self.guard = Guard(None, Vec3(320, 32), None, None, None, self)
         self.world.add_entity(self.guard)
 
@@ -186,6 +195,12 @@ class PlayState(pyknic.State):
         self.enemy_coll_detector = pyknic.collision.CollisionDetector()
         self.enemy_coll_detector.register_once('guard', 'walls', [self.guard], [self.player]+impassables, \
                     AABBCollisionStrategy(), (Guard, Entity), self.guard.collidate_wall)
+        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
+        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], impassables, \
+                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
+        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
+                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
+
         self.setup_update_events()
 
     def setup_update_events(self):
@@ -207,4 +222,7 @@ class PlayState(pyknic.State):
         player.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args):
-        pass
+        self.lguard_coll_detector.check()
+        self.lguard.update_x(gdt, gt, dt, t, *args)
+        self.lguard_coll_detector.check()
+        self.lguard.update_y(gdt, gt, dt, t, *args)
