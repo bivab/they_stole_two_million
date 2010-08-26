@@ -163,7 +163,8 @@ class PlayState(pyknic.State):
         self.action_menu = ActionMenu(self.the_app.screen, self.player, actionables)
         self.world.add_entity(self.action_menu)
 
-        self.fog = Fog(self.player)     # the light around the player
+        self.fog = Fog(self.player)     # the light class (add objects to 'enlighten' them)
+        self.fog.add(self.player, True, (200,200))
         self.world.add_entity(self.fog)
 
         self.events.key_down += self.player.on_key_down
