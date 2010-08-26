@@ -641,7 +641,7 @@ class LurkingGuard(pyknic.entity.Entity):
 
         self.moving = Vec3(0,0)
         self.position = Vec3(*self.rect.center)
-        
+
         self.find_direction()
 
     def collidate_wall(self, player, wall, dummy = 0):

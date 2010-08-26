@@ -39,4 +39,7 @@
    </properties>
   </object>
  </objectgroup>
+ <objectgroup name="Entities" width="200" height="200">
+  <object name="Player" type="Player" x="180" y="96" width="28" height="34"/>
+ </objectgroup>
 </map>
