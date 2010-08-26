@@ -146,16 +146,8 @@ class PlayState(pyknic.State):
                         self.world.add_entity(self.player)
 
                     elif obj.type == 'LurkingGuard':
-                        self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), state=self, world=self.world, impassables=self.impassables)
+                        self.lguard = Enlightened.factory(obj, self)
                         self.world.add_entity(self.lguard)
-
-                        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
-                        self.lguard_coll_detector.register_once('lguard', 'walls', [self.lguard], self.impassables, \
-                                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.lguard.collidate_wall)
-                        self.lguard_coll_detector.register_once('lguard', 'player', [self.lguard], [self.player], \
-                                    AABBCollisionStrategy(), (LurkingGuard, Player), self.lguard.collidate_player)
-                        self.game_time.event_update += self.lguard.update
-                        self.fog.add(self.lguard, True, (100,100))
 
                     elif obj.type == 'Guard':
                         self.guard = Enlightened.factory(obj, self)

@@ -232,6 +232,8 @@ class Enlightened(pyknic.entity.Entity):
             return Player(pos, state)
         elif objekt.type == 'Guard':
             return Guard(pos, state)
+        elif objekt.type == 'LurkingGuard':
+            return LurkingGuard(pos, state)
 
 
 class Player(Enlightened):
@@ -570,21 +572,39 @@ class Fog(pyknic.entity.Entity):
         # when all lights are added, draw fog
         screen_surf.blit(fog, (self.rect.x, self.rect.y))
 
-class LurkingGuard(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None, impassables=None):
+class LurkingGuard(Enlightened):
+    def __init__(self, position, state):
+        super(LurkingGuard, self).__init__(position, state)
+
         img = pygame.Surface((16, 16))
         img.fill((0, 255, 0))
-        spr = Spr(img, offset=Vec3(8,8))
-        self.layer = 10000
-        self.moving = Vec3(0,0)
-        super(LurkingGuard, self).__init__(spr, position, velocity, acceleration, coll_rect)
+        self.spr = Spr(img, offset=Vec3(8,8))
         self.rect.size = img.get_size()
-        self.state = state
-        self.world = world
-        self.impassables = impassables
+        self.world = self.state.world
+        self.impassables = self.state.impassables
         self.steps_made = 0
         self.random_move = False
         self.find_direction()
+
+        self.lguard_coll_detector = pyknic.collision.CollisionDetector()
+        self.lguard_coll_detector.register_once('lguard', 'walls', [self], self.state.impassables, \
+                    AABBCollisionStrategy(), (LurkingGuard, Entity), self.collidate_wall)
+        self.lguard_coll_detector.register_once('lguard', 'player', [self], [self.state.player], \
+                    AABBCollisionStrategy(), (LurkingGuard, Player), self.collidate_player)
+
+        self.state.fog.add(self, True, (100,100))
+        self.state.game_time.event_update += self.update
+
+    def update(self, gdt, gt, dt, t, *args):
+        self.steps_made = self.steps_made + 1
+        if self.steps_made == [64, 128][self.random_move]:
+            self.find_direction()
+            self.steps_made = 0
+
+        self.lguard_coll_detector.check()
+        self.update_x(gdt, gt, dt, t, *args)
+        self.lguard_coll_detector.check()
+        self.update_y(gdt, gt, dt, t, *args)
 
     def find_direction(self):
         max_speed = 50.0
@@ -694,13 +714,3 @@ class LurkingGuard(pyknic.entity.Entity):
         s = pygame.display.get_surface()
         r = s.blit(title, (0,0))
         pygame.display.flip()
-
-    def update(self, gdt, gt, dt, t, *args, **kwargs):
-        self.steps_made = self.steps_made + 1
-        if self.steps_made == [64, 128][self.random_move]:
-            self.find_direction()
-            self.steps_made = 0
-        self.state.lguard_coll_detector.check()
-        self.update_x(gdt, gt, dt, t, *args)
-        self.state.lguard_coll_detector.check()
-        self.update_y(gdt, gt, dt, t, *args)
