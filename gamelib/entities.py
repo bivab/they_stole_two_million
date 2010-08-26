@@ -217,14 +217,22 @@ class Desk(InteractiveDelegate):
         self.color = (255, 100, 0)
 
 
-class Player(pyknic.entity.Entity):
-    def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
-        super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
+class Enlightened(pyknic.entity.Entity):
+    def __init__(self, position, state):
+        super(Enlightened, self).__init__(None, position)
+        self.state = state
         self.layer = 10000
         self.moving = Vec3(0,0)
-        super(Player, self).__init__(spr, position, velocity, acceleration, coll_rect)
+
+    @staticmethod
+    def factory(objekt, state):
+        return Player(Vec3(objekt.x, objekt.y), state)
+
+
+class Player(Enlightened):
+    def __init__(self, position, state):
+        super(Player, self).__init__(position, state)
         self.money = 0
-        self.state = state
 
         anims = pyknic.animation.load_animation(self.state.game_time, 'data/myanim')
 
@@ -236,6 +244,25 @@ class Player(pyknic.entity.Entity):
         self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
         self.rect.size = self.spr.image.get_size()
 
+        self.coll_detector = pyknic.collision.CollisionDetector()
+        self.coll_detector.register_once('player', 'walls', [self], self.state.impassables, \
+                    AABBCollisionStrategy(), (Player, Entity), self.coll_player_wall)
+
+        self.state.game_time.event_update += self.update
+
+        self.state.events.key_down += self.on_key_down
+        self.state.events.key_up += self.on_key_up
+
+        self.state.fog.add(self, True, (300,300))
+
+        self.action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
+        self.state.events.key_down += self.action_menu.on_key_down
+        self.state.world.add_entity(self.action_menu)
+
+    def coll_player_wall(self, player, wall):
+        assert player is self
+        player.collision_response(wall)
+
     def add_money(self, amount):
         self.money += amount
         print 'Wuhooo, I\'m rich %d' % self.money
@@ -246,9 +273,9 @@ class Player(pyknic.entity.Entity):
             self.rect.center = self.position.as_xy_tuple()
         else:
             self.update_x(gdt, gt, dt, t, *args)
-            self.state.coll_detector.check()
+            self.coll_detector.check()
             self.update_y(gdt, gt, dt, t, *args)
-            self.state.coll_detector.check()
+            self.coll_detector.check()
 
         if self.velocity.lengthSQ:
             self.spr.play()
@@ -486,15 +513,13 @@ class Guard(pyknic.entity.Entity):
         self.update_y(gdt, gt, dt, t, *args)
 
 class Fog(pyknic.entity.Entity):
-    
     def __init__(self):
-        
         self.light_objects = {}
 
         # black surface filling the whole screen
         self.black = pygame.Surface((1024,768), pygame.SRCALPHA)
         self.black.fill((0,0,0,150))
-        
+
         self.layer = 99999
         self.rect = pygame.Rect(0,0,0,0)
         self.rect.size = self.black.get_size()
@@ -503,7 +528,7 @@ class Fog(pyknic.entity.Entity):
         # surface of the spotlight
         self.spot = pygame.Surface((200,200), pygame.SRCALPHA)
         self.spot.fill((0,0,0,255))
-        
+
         # image for the spotlight
         spot_png = pygame.image.load("data/images/player_light.png")
         self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
@@ -519,20 +544,20 @@ class Fog(pyknic.entity.Entity):
         self.light_objects[object][0] = state
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        
+
         fog = self.black.copy()
         for obj in self.light_objects.keys():
-            
+
             if self.light_objects[obj][0] is True:
                 # resize spotlight
                 resized_spot = pygame.transform.scale(self.spot, self.light_objects[obj][1])
-                
+
                 # calculate position
                 spot_x = obj.position.x - resized_spot.get_width()/2
                 spot_y = obj.position.y - resized_spot.get_height()/2
 
                 fog.blit(resized_spot, (spot_x,spot_y), None, pygame.BLEND_RGBA_MIN)
-        
+
         # when all lights are added, draw fog
         screen_surf.blit(fog, (self.rect.x, self.rect.y))
 
