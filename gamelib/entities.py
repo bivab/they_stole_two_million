@@ -97,7 +97,7 @@ class InteractiveDelegate(object):
         image = pygame.Surface((self.rect.width, self.rect.height))
         image.fill(self.color)
 
-        screen_surf.blit(image, (self.rect.x, self.rect.y))
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
     def __init__(self, properties, rect, entity):
@@ -397,7 +397,7 @@ class ActionMenu(pyknic.entity.Entity):
             y += 10
 
         # actually render
-        Entity.render(self, screen_surf)
+        Entity.render(self, screen_surf, offset)
 
 class Guard(pyknic.entity.Entity):
     def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None):
@@ -519,7 +519,6 @@ class Fog(pyknic.entity.Entity):
         self.light_objects[object][0] = state
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        
         fog = self.black.copy()
         for obj in self.light_objects.keys():
             
@@ -531,10 +530,11 @@ class Fog(pyknic.entity.Entity):
                 spot_x = obj.position.x - resized_spot.get_width()/2
                 spot_y = obj.position.y - resized_spot.get_height()/2
 
-                fog.blit(resized_spot, (spot_x,spot_y), None, pygame.BLEND_RGBA_MIN)
+                # place lights dependant on the world offset
+                fog.blit(resized_spot, (spot_x - offset.x ,spot_y - offset.y), None, pygame.BLEND_RGBA_MIN)
         
         # when all lights are added, draw fog
-        screen_surf.blit(fog, (self.rect.x, self.rect.y))
+        screen_surf.blit(fog, (self.rect.x, self.rect.y)) # the black surface is always drawn in (0,0)
 
 class LurkingGuard(pyknic.entity.Entity):
     def __init__(self, spr=None, position=None, velocity=None, acceleration=None, coll_rect=None, state=None, world=None, impassables=None):

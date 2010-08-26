@@ -190,7 +190,7 @@ class PlayState(pyknic.State):
                         self.game_time.event_update += thing.update
 
         cam_rect = pygame.display.get_surface().get_rect()
-        self.renderer1 = SimpleRenderer(self, cam_rect)
+        self.renderer1 = SimpleRenderer(self, cam_rect, self.player)
         self.world.add_renderer(self.renderer1)
 
         self.setup_update_events()
