@@ -407,6 +407,7 @@ class Guard(pyknic.entity.Entity):
         self.rect.size = img.get_size()
         self.switch_random_direction()
         self.state = state
+        self.steps_made = 0
 
     def update_x(self, gdt, gt, dt, t, *args, **kwargs):
         dt = gdt * self.t_speed
@@ -472,6 +473,10 @@ class Guard(pyknic.entity.Entity):
         self.collision_response(wall)
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
+        self.steps_made = self.steps_made + 1
+        if self.steps_made == 40:
+            self.switch_random_direction()
+            self.steps_made = 0
         self.state.enemy_coll_detector.check()
         self.update_x(gdt, gt, dt, t, *args)
         self.state.enemy_coll_detector.check()
