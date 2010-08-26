@@ -159,7 +159,7 @@ class PlayState(pyknic.State):
                         self.events.key_down += self.action_menu.on_key_down
                         self.events.key_up += self.player.on_key_up
                         self.game_time.event_update += self.action_menu.update
-                        self.fog.add(self.player, True, (200,200))
+                        self.fog.add(self.player, True, (300,300))
                     elif obj.type == 'LurkingGuard':
                         self.lguard = LurkingGuard(position=Vec3(obj.x, obj.y), world=self.world, impassables=impassables)
                         self.world.add_entity(self.lguard)
