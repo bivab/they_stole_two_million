@@ -30,5 +30,10 @@
     <property name="direction" value="horizontal"/>
    </properties>
   </object>
+  <object name="Door01" type="Door" x="368" y="318" width="12" height="65">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

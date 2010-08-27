@@ -842,7 +842,8 @@ class PatrollingGuard(Enlightened):
             # velocity = normalized(vector_to_player) * speed (double it to make him run a bit faster)
             self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed * 2
             self.at_home = False
-       
+        
+        # if you left the patrolling route(horizontal=y-axis, vertical=x-axis), head back for patrolling route
         elif self.direction == 'horizontal' and round(self.position.y) != round(self.start_position.y):
             # decrease speed, go back to patrolling point
             direction_vec = self.start_position - self.position
