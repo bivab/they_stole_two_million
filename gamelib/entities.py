@@ -318,7 +318,8 @@ class Enlightened(pyknic.entity.Entity):
         elif objekt.type == 'LurkingGuard':
             return LurkingGuard(pos, state)
         elif objekt.type == 'PatrollingGuard':
-            return PatrollingGuard(pos, state)
+            direction = objekt.properties['direction']
+            return PatrollingGuard(pos, state, direction)
 
 
 class Player(Enlightened):
@@ -779,7 +780,7 @@ class LurkingGuard(Enlightened):
         pygame.display.flip()
 
 class PatrollingGuard(Enlightened):
-    def __init__(self, position, state):
+    def __init__(self, position, state, direction):
         super(PatrollingGuard, self).__init__(position, state)
 
         # animation
@@ -800,9 +801,14 @@ class PatrollingGuard(Enlightened):
         self.random_move = False
         self.at_home = True                                 # on patrolling route?
         self.speed = 30                                     # speed
-        self.velocity = Vec3(self.speed,0)                  # initial velocity
         self.start_position = Vec3(position.x, position.y)  # save start vector
-
+        self.direction = direction
+        if self.direction == 'horizontal':
+            self.normal_velocity = Vec3(self.speed, 0)
+        else: # vertical
+            self.normal_velocity = Vec3(0, self.speed)
+        self.velocity = self.normal_velocity                # initial velocity
+        
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
@@ -836,13 +842,28 @@ class PatrollingGuard(Enlightened):
             # velocity = normalized(vector_to_player) * speed (double it to make him run a bit faster)
             self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed * 2
             self.at_home = False
-        elif round(self.position.y) != round(self.start_position.y):
+       
+        elif self.direction == 'horizontal' and round(self.position.y) != round(self.start_position.y):
             # decrease speed, go back to patrolling point
             direction_vec = self.start_position - self.position
             self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed
+        
+        elif self.direction == 'vertical' and round(self.position.x) != round(self.start_position.x):
+            # decrease speed, go back to patrolling point
+            direction_vec = self.start_position - self.position
+            self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed
+
         elif not self.at_home:
-            self.velocity = Vec3(self.speed,0)
+            self.velocity = self.normal_velocity
             self.at_home = True
+        
+        # animate
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
 
         super(PatrollingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
 
@@ -868,7 +889,7 @@ class PatrollingGuard(Enlightened):
         # smashing into wall from below
         if self.moving.y < 0 and self.rect.top < other.rect.bottom:
             self.rect.top = other.rect.bottom
-            self.velocity = Vec3(0, -self.speed)
+            self.velocity = Vec3(0, self.speed)
 
         self.moving = Vec3(0,0)
         self.position = Vec3(*self.rect.center)
