@@ -22,22 +22,13 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
             #ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
 
             ents = SortedList(self._world._entities, lambda e: -e.position.z + e.layer)
-            font = pygame.font.Font(None,25)
 
             for i, entity in enumerate(ents):
                 entity.render(clipped_surf, offset)
 
             self.state.lighting.render(clipped_surf, offset)
 
-            #pygame.draw.rect(clipped_surf, (255,0,0), self.rect, 1)
 
-            #center_rect = Rect(0,0,8,8)
-            #center_rect.center = self.vec_center.as_xy_tuple()
-            #pygame.draw.rect(clipped_surf, (255,0,0), center_rect, 1)
-
-            #s = 'player %(pos)s' % {'pos':str(self.target.position.as_xy_tuple())}
-            #text = font.render(s,1,(255,0,0))
-            #clipped_surf.blit(text, (1, clipped_surf.get_rect().bottom-25))
 
     def screen_to_world(self, coord):
         x = self.position.x + coord[0] - self.rect.topleft[0] - self.vec_center.x
@@ -54,4 +45,26 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
 
     def hit(self, coord):
         return self.rect.collidepoint(coord.as_xy_tuple())
+
+class StatusBar(pyknic.renderer.IRenderer):
+    def __init__(self, state, cam_rect):
+        super(StatusBar, self).__init__(cam_rect)
+        self.state = state
+        self.player = self.state.player
+
+    def render(self, screen_surf, offset=None):
+        clipped_surf = screen_surf.subsurface(self.rect)
+        clipped_surf.fill((255,255,0))
+
+        line_offset = 1
+        font = pygame.font.Font(None,25)
+
+        s = '$$$: %(money)d' % {'money':self.player.money}
+        text = font.render(s,1,(255,0,0))
+        clipped_surf.blit(text, (1, line_offset))
+
+        line_offset += text.get_height()
+
+
+
 

@@ -11,7 +11,7 @@ from pyknic.collision import AABBCollisionStrategy
 from world import TheWorld
 from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened, Lighting
 
-from ui import SimpleRenderer
+from ui import SimpleRenderer, StatusBar
 
 import pygame
 
@@ -150,15 +150,29 @@ class PlayState(pyknic.State):
 
                     self.world.add_entity(thing)
 
-        self.renderer1 = SimpleRenderer(self, pygame.display.get_surface().get_rect())
-        self.world.add_renderer(self.renderer1)
+        display_rect = pygame.display.get_surface().get_rect()
+
+        renderer_rect = display_rect.copy()
+        renderer_rect.height -= 50
+
+        renderer1 = SimpleRenderer(self, renderer_rect)
+        self.game_time.event_update += renderer1.update
+        self.world.add_renderer(renderer1)
+
+
+        scoreboard_rect = display_rect.copy()
+        scoreboard_rect.height = 50
+        scoreboard_rect.top = renderer_rect.bottom
+
+        scoreboard = StatusBar(self, scoreboard_rect)
+        self.game_time.event_update += scoreboard.update
+        self.world.add_renderer(scoreboard)
 
         self.setup_update_events()
 
     def setup_update_events(self):
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
-        self.game_time.event_update += self.renderer1.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()
