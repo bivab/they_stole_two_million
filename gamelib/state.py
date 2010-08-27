@@ -141,27 +141,17 @@ class PlayState(pyknic.State):
         for obj_group in world_map.object_groups:
             for obj in obj_group.objects:
                 if hasattr(obj, 'type'):
+                    thing = None
                     if obj.type == 'Player':
-                        self.player = Enlightened.factory(obj, self)
-                        self.world.add_entity(self.player)
+                        self.player = thing = Enlightened.factory(obj, self)
 
-                    elif obj.type == 'LurkingGuard':
-                        self.lguard = Enlightened.factory(obj, self)
-                        self.world.add_entity(self.lguard)
-
-                    elif obj.type == 'Guard':
-                        self.guard = Enlightened.factory(obj, self)
-                        self.world.add_entity(self.guard)
+                    elif obj.type in ['LurkingGuard', 'Guard']:
+                        thing = Enlightened.factory(obj, self)
 
                     else:
-                        thing = InteractiveThing(obj.x, obj.y, obj.width, \
-                                    obj.height, obj.properties, obj.type, \
-                                    self.impassables)
-                        self.actionables.append(thing.blow_up())
-                        self.impassables.append(thing)
+                        thing = InteractiveThing.build_from_object(obj, self)
 
-                        self.world.add_entity(thing)
-                        self.game_time.event_update += thing.update
+                    self.world.add_entity(thing)
 
         cam_rect = pygame.display.get_surface().get_rect()
         self.renderer1 = SimpleRenderer(self, cam_rect, self.player)

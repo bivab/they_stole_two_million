@@ -12,15 +12,25 @@ from pyknic.geometry import Vec3
 from random import randint
 
 class InteractiveThing(pyknic.entity.Entity):
-    def __init__(self, x, y, width, height, properties, thing_type, impassables):
-        Entity.__init__(self, None, Vec3(x, y))
-        self.rect.size = (width, height)
-        self.layer =  1
-        self.properties = properties
+    @staticmethod
+    def build_from_object(obj, state):
+        thing = InteractiveThing(Rect(obj.x, obj.y, obj.width, obj.height), state)
+        thing.properties = obj.properties
+        thing.thing_type = obj.type
+        state.actionables.append(thing.blow_up())
+        state.impassables.append(thing)
+        state.game_time.event_update += thing.update
+        return thing
+
+    def __init__(self, rect, state):
+        Entity.__init__(self, None, Vec3(rect.x, rect.y))
+        self.rect.size = (rect.w, rect.h)
+        self.properties = {}
         self.thing = None
         self.layer = 100
-        self.thing_type = thing_type
-        self.impassables = impassables
+        self.thing_type = None
+        self.state = state
+        self.impassables = state.impassables
 
     def get_actions(self, player):
         t = self.get_thing()
@@ -33,20 +43,18 @@ class InteractiveThing(pyknic.entity.Entity):
             elif self.thing_type == 'Door':
                 self.thing = Door(self.properties, self.rect, self)
 
-        # if not self.thing:
-        # self.thing = globals()[self.thing_type](self.properties, self.rect)
         return self.thing
 
     def label(self):
         return self.thing.label()
 
     def blow_up(self):
-        t = InteractiveThing(self.rect.x-15, self.rect.y-15, \
-                            self.rect.width+30, self.rect.height+30, \
-                            self.properties, self.thing_type, self.impassables)
+        rect = Rect(self.rect.x-15, self.rect.y-15,self.rect.width+30, self.rect.height+30)
+        t = InteractiveThing(rect, self.state)
+        t.properties = self.properties
+        t.thing_type = self.thing_type
         t.thing = self
         return t
-
 
     def update(self, *args, **kwargs):
         t = self.get_thing()
@@ -65,6 +73,8 @@ class InteractiveThing(pyknic.entity.Entity):
 
 
 class InteractiveDelegate(object):
+    image_files = {}
+
     def __init__(self, properties, rect, entity = None):
         self.properties = properties
         self.rect = rect
@@ -72,23 +82,36 @@ class InteractiveDelegate(object):
         self.timer = None
         self.entity = entity
         self.smashed = False
+        self.rotation = 0
         self.setup()
+        self.load_images()
+
+    def load_images(self):
+        self.images = dict([(k,pygame.transform.rotate(
+                            pygame.image.load(v).convert_alpha(),
+                            self.rotation)) for k,v in self.image_files.iteritems()])
 
     def setup(self):
-        xxx
+        if 'rotation' in self.properties:
+            try:
+                self.rotation = int(self.properties['rotation'])
+            except ValueError, e:
+                pass
 
     def label(self):
         return 'A Thing'
 
     def make_action(self, callback, timer):
         def func(player):
-            self.timer = [timer, callback, [player]]
+            self.timer = [timer, callback, player]
+            player.freeze()
         return func
 
     def update(self, *args, **kwargs):
         if self.timer:
             if self.timer[0] == 0 :
-                self.timer[1](*self.timer[2])
+                self.timer[1](self.timer[2])
+                self.timer[2].unfreeze()
                 self.timer = None
             else:
                 self.timer[0] -= 1
@@ -100,17 +123,21 @@ class InteractiveDelegate(object):
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
+    image_files = {"opened" : 'data/images/door_opened.png',"closed" : 'data/images/door_closed.png'}
+    
     def __init__(self, properties, rect, entity):
         InteractiveDelegate.__init__(self, properties, rect, entity)
         self.lockpick_time = 50
         self.smashed = False
         self.default_color = (123,123,123)
         self.color = self.default_color
+        self.current_state = "closed"
 
     def label(self):
         return 'Door'
 
     def setup(self):
+        InteractiveDelegate.setup(self)
         if 'locked' in self.properties:
             self.locked = self.properties['locked'] == 'true'
             self.closed = True
@@ -141,6 +168,11 @@ class Door(InteractiveDelegate):
             self.color = (0,0,0,255)
             self.closed = False
             self.entity.make_passable()
+            self.current_state = "opened"
+            
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = self.images[self.current_state]
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def lockpick(self, player):
         self.locked = False
@@ -151,22 +183,38 @@ class Door(InteractiveDelegate):
         self.closed = False
         self.smashed = True
         self.entity.make_passable()
+        self.current_state = "opened"
 
     def close(self, player):
         self.color = self.default_color
         self.closed = True
         self.entity.make_impassable()
+        self.current_state = "closed"
 
 class Desk(InteractiveDelegate):
+    image_files = {"robbed" : 'data/images/desk01.png',"default" : 'data/images/desk01_money.png'}
+
+
     def __init__(self, properties, rect):
         InteractiveDelegate.__init__(self, properties, rect)
         self.lockpick_time = 1
         self.smash_time = 0
         self.closed = True
+        self.current_state = "default"
+
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
+        image.fill(self.color)
+        img = pygame.transform.scale(self.images[self.current_state], image.get_size())
+        image.blit(img, (0,0))
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def label(self):
         return 'Desk'
+
     def setup(self):
+        InteractiveDelegate.setup(self)
         for key, value in self.properties.items():
             if key == 'rob':
                 self.value = int(value)
@@ -212,6 +260,7 @@ class Desk(InteractiveDelegate):
         self.color = (0, 55, 100)
 
     def rob(self, player):
+        self.current_state = "robbed"
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
@@ -292,9 +341,17 @@ class Player(Enlightened):
 
         self.state.fog.add(self, True, (300,300))
 
-        self.action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
-        self.state.events.key_down += self.action_menu.on_key_down
-        self.state.world.add_entity(self.action_menu)
+        action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
+        self.state.game_time.event_update += action_menu.update
+        self.state.events.key_down += action_menu.on_key_down
+        self.state.world.add_entity(action_menu)
+        self.frozen = False
+
+    def freeze(self):
+        self.frozen = True
+
+    def unfreeze(self):
+        self.frozen = False
 
     def coll_player_wall(self, player, wall):
         assert player is self
@@ -340,7 +397,12 @@ class Player(Enlightened):
         self.position = Vec3(*self.rect.center)
 
     def on_key_down(self, key, mod, unicode):
-        speed = 180
+        if self.frozen:
+            self.velocity = Vec3(0,0)
+            return
+
+        speed = 90
+        
         if key == K_UP:
             self.velocity.y = -speed
             self.state.fog.set_offset(self, Vec3(0,-75))
@@ -450,10 +512,16 @@ class Guard(Enlightened):
     def __init__(self, position, state):
         super(Guard, self).__init__(position, state)
 
-        img = pygame.Surface((16, 16))
-        img.fill((50, 0, 255))
-        self.spr = Spr(img, offset=Vec3(8,8))
-        self.rect.size = img.get_size()
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/copanim')
+
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+        self.rect.size = self.spr.image.get_size()
+
         self.switch_random_direction()
         self.steps_made = 0
 
@@ -515,6 +583,13 @@ class Guard(Enlightened):
             self.switch_random_direction()
             self.steps_made = 0
 
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
+
 class Fog(pyknic.entity.Entity):
     def __init__(self):
         self.light_objects = {}
@@ -563,7 +638,7 @@ class Fog(pyknic.entity.Entity):
 
                 # place lights dependant on the world offset
                 fog.blit(resized_spot, (spot_x - offset.x ,spot_y - offset.y), None, pygame.BLEND_RGBA_MIN)
-        
+
         # when all lights are added, draw fog
         screen_surf.blit(fog, (self.rect.x, self.rect.y)) # the black surface is always drawn in (0,0)
 
@@ -571,10 +646,16 @@ class LurkingGuard(Enlightened):
     def __init__(self, position, state):
         super(LurkingGuard, self).__init__(position, state)
 
-        img = pygame.Surface((16, 16))
-        img.fill((0, 255, 0))
-        self.spr = Spr(img, offset=Vec3(8,8))
-        self.rect.size = img.get_size()
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/copanim')
+
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+        self.rect.size = self.spr.image.get_size()
+
         self.world = self.state.world
         self.impassables = self.state.impassables
         self.steps_made = 0
@@ -707,12 +788,19 @@ class PatrollingGuard(Enlightened):
         self.state.fog.add(self, True, (150,150))
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
+        super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
+
         self.steps_made = self.steps_made + 1
         if self.steps_made == [64, 128][self.random_move]:
             self.find_direction()
             self.steps_made = 0
 
-        super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
+        if self.velocity.lengthSQ:
+            self.spr.play()
+            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
+            self.spr = self.sprites[dir]
+        else:
+            self.spr.pause()
 
     def find_direction(self):
         max_speed = 50.0

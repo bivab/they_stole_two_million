@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
   <image source="images/tileset_millions_1.png"/>
  </tileset>
- <tileset firstgid="65" source="images/tileset_millions_1.tsx"/>
+ <tileset firstgid="321" source="images/tileset_millions_1.tsx"/>
  <layer name="ground" width="200" height="200">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+3ToQ0AMRADwdOD9F9yGsiCZ4k0Iy038ZqZJUmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJP3ou2CDdGv+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IUmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEl6LQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAONlLxVR4AHECAA==
@@ -18,18 +18,23 @@
   </data>
  </layer>
  <objectgroup name="objects" width="200" height="200">
-  <object name="The boss desk" type="Desk" x="31" y="79" width="47" height="94">
+  <object name="The boss desk" type="Desk" x="31" y="79" width="32" height="64">
    <properties>
     <property name="locked" value="true"/>
     <property name="rob" value="1000000"/>
-    <property name="rotation" value=""/>
+    <property name="rotation" value="90"/>
    </properties>
   </object>
-  <object name="Boss" type="Door" x="273" y="96" width="13" height="63"/>
+  <object name="Boss" type="Door" x="273" y="96" width="13" height="63">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
   <object name="Kitchen" type="Door" x="481" y="94" width="13" height="63">
    <properties>
     <property name="closed" value="true"/>
     <property name="locked" value="true"/>
+    <property name="rotation" value="270"/>
    </properties>
   </object>
   <object name="other" type="Door" x="273" y="417" width="11" height="44">
