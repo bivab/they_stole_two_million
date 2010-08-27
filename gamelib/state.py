@@ -154,9 +154,7 @@ class PlayState(pyknic.State):
         renderer_rect.height -= 50
 
         renderer1 = SimpleRenderer(self, renderer_rect)
-        self.game_time.event_update += renderer1.update
         self.world.add_renderer(renderer1)
-
 
         scoreboard_rect = display_rect.copy()
         scoreboard_rect.height = 50

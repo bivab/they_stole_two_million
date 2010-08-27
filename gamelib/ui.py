@@ -14,6 +14,8 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
         self.target = self.state.player
 
     def render(self, screen_surf, offset=None):
+        self.position = self.target.position
+
         if self._world:
             clipped_surf = screen_surf.subsurface(self.rect)
             offset = (self.position - self.vec_center)
