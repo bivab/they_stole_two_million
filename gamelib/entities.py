@@ -124,7 +124,7 @@ class InteractiveDelegate(object):
 
 class Door(InteractiveDelegate):
     image_files = {"opened" : 'data/images/door_opened.png',"closed" : 'data/images/door_closed.png'}
-    
+
     def __init__(self, properties, rect, entity):
         InteractiveDelegate.__init__(self, properties, rect, entity)
         self.lockpick_time = 50
@@ -169,7 +169,7 @@ class Door(InteractiveDelegate):
             self.closed = False
             self.entity.make_passable()
             self.current_state = "opened"
-            
+
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = self.images[self.current_state]
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
@@ -365,13 +365,6 @@ class Player(Enlightened):
         print 'Wuhooo, I\'m rich %d' % self.money
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
-        
-        # update fog
-        m = max(abs(self.velocity.x), abs(self.velocity.y))
-        if m != 0:
-            fog_dir = self.velocity / m * 50
-            self.state.fog.set_offset(self, fog_dir)
-
         super(Player, self).update(gdt, gt, dt, t, *args, **kwargs)
 
         if self.velocity.lengthSQ:
@@ -409,8 +402,8 @@ class Player(Enlightened):
             self.velocity = Vec3(0,0)
             return
 
-        speed = 90
-        
+        speed = 500
+
         if key == K_UP:
             self.velocity.y = -speed
             #self.state.fog.set_offset(self, Vec3(0,-75))
@@ -601,23 +594,9 @@ class Guard(Enlightened):
 class Fog(pyknic.entity.Entity):
     def __init__(self):
         self.light_objects = {}
-
+        self.light_image = pygame.image.load("data/images/player_light.png").convert_alpha()
+        self.spr_offset = Vec3(*self.light_image.get_rect().center)
         # black surface filling the whole screen
-        self.black = pygame.Surface((1024,768), pygame.SRCALPHA)
-        self.black.fill((0,0,0,150))
-
-        self.layer = 99999
-        self.rect = pygame.Rect(0,0,0,0)
-        self.rect.size = self.black.get_size()
-        self.position = Vec3(0,0)
-
-        # surface of the spotlight
-        self.spot = pygame.Surface((200,200), pygame.SRCALPHA)
-        self.spot.fill((0,0,0,255))
-
-        # image for the spotlight
-        spot_png = pygame.image.load("data/images/player_light.png")
-        self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
 
     def add(self, object, state, size, offset=Vec3(0,0)):
         # object = entity, state = boolean, size = (widht, height)
@@ -636,22 +615,22 @@ class Fog(pyknic.entity.Entity):
         self.light_objects[object][2] = offset
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        fog = self.black.copy()
-        for obj in self.light_objects.keys():
+        fog = pygame.Surface(screen_surf.get_rect().size, pygame.SRCALPHA)
+        fog.fill((0,0,0,150))
 
-            if self.light_objects[obj][0] is True:
-                # resize spotlight
-                resized_spot = pygame.transform.scale(self.spot, self.light_objects[obj][1])
+        for light in self.light_objects:
+            img = self.light_image
+            spr_offset = self.spr_offset
 
-                # calculate position
-                spot_x = obj.position.x - resized_spot.get_width()/2 + self.light_objects[obj][2].x
-                spot_y = obj.position.y - resized_spot.get_height()/2 + self.light_objects[obj][2].y
+            if self.light_objects[light][0] is True:
+                img = pygame.transform.scale(img, self.light_objects[light][1])
+                spr_offset = Vec3(*img.get_rect().center)
 
-                # place lights dependant on the world offset
-                fog.blit(resized_spot, (spot_x - offset.x ,spot_y - offset.y), None, pygame.BLEND_RGBA_MIN)
+            light_offset = self.light_objects[light][2]
 
-        # when all lights are added, draw fog
-        screen_surf.blit(fog, (self.rect.x, self.rect.y)) # the black surface is always drawn in (0,0)
+            fog.blit(img, (light.position - offset - spr_offset + light_offset).as_xy_tuple(), None, pygame.BLEND_RGBA_SUB)
+
+        screen_surf.blit(fog, (0,0))
 
 class LurkingGuard(Enlightened):
     def __init__(self, position, state):
@@ -793,7 +772,7 @@ class PatrollingGuard(Enlightened):
         self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
 
         self.rect.size = self.spr.image.get_size()
-        
+
         # some values
         self.world = self.state.world
         self.impassables = self.state.impassables
@@ -808,14 +787,14 @@ class PatrollingGuard(Enlightened):
         else: # vertical
             self.normal_velocity = Vec3(0, self.speed)
         self.velocity = self.normal_velocity                # initial velocity
-        
+
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
         self.state.fog.add(self, True, (200,200))
-    
+
     def update(self, gdt, gt, dt, t, *args, **kwargs):
-        
+
         # update fog (depending on direction the guard is looking)
         fog_offset = 50
         fog_width = self.state.fog.get(self)[1][0]/2
@@ -825,10 +804,10 @@ class PatrollingGuard(Enlightened):
             self.state.fog.set_offset(self, fog_dir)
         else:
             fog_dir = self.position
-        
+
         # set the view of the guard = the position of the fog
         watch_x = self.position.x + fog_dir.x - fog_width/2 # position + offset - width(needed to get the center)
-        watch_y = self.position.y + fog_dir.y - fog_width/2 
+        watch_y = self.position.y + fog_dir.y - fog_width/2
         watch_rect = pygame.Rect(watch_x, watch_y, fog_width, fog_width)
         entities = self.world.get_entities_in_region(watch_rect)
         found_player = None
@@ -842,13 +821,13 @@ class PatrollingGuard(Enlightened):
             # velocity = normalized(vector_to_player) * speed (double it to make him run a bit faster)
             self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed * 2
             self.at_home = False
-        
+
         # if you left the patrolling route(horizontal=y-axis, vertical=x-axis), head back for patrolling route
         elif self.direction == 'horizontal' and round(self.position.y) != round(self.start_position.y):
             # decrease speed, go back to patrolling point
             direction_vec = self.start_position - self.position
             self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed
-        
+
         elif self.direction == 'vertical' and round(self.position.x) != round(self.start_position.x):
             # decrease speed, go back to patrolling point
             direction_vec = self.start_position - self.position
@@ -857,7 +836,7 @@ class PatrollingGuard(Enlightened):
         elif not self.at_home:
             self.velocity = self.normal_velocity
             self.at_home = True
-        
+
         # animate
         if self.velocity.lengthSQ:
             self.spr.play()

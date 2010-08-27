@@ -1,4 +1,6 @@
 import pyknic, pygame
+import math
+from pygame.locals import *
 from pyknic.geometry import Vec3
 from pyknic.utilities import SortedList
 from pyknic.timing import GameTime
@@ -6,23 +8,36 @@ from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
 
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
-    def __init__(self, state, cam_rect, player):
-        # cam_rect = resolution, world_rect = visible, world
+    def __init__(self, state, cam_rect):
         super(SimpleRenderer, self).__init__(cam_rect)
-        self.player = player
         self.state = state
+        self.target = self.state.player
 
     def render(self, screen_surf, offset=None):
         if self._world:
-            # place word relatively to the players position
-            offset = Vec3(self.player.position.x-screen_surf.get_width()/2, self.player.position.y-screen_surf.get_height()/2)
             clipped_surf = screen_surf.subsurface(self.rect)
-            # also change the display rect
-            search_rect = pygame.Rect(offset.x, offset.y, screen_surf.get_width(), screen_surf.get_height())
-            ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
-            #ents = SortedList(self._world._entities, lambda e: -e.position.z + e.layer)
-            for entity in ents:
-                entity.render(clipped_surf, offset, self.screen_pos)
+            offset = (self.position - self.vec_center)
+
+            #search_rect = self.rect.move(offset.as_xy_tuple())
+            #ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
+
+            ents = SortedList(self._world._entities, lambda e: -e.position.z + e.layer)
+            font = pygame.font.Font(None,25)
+
+            for i, entity in enumerate(ents):
+                entity.render(clipped_surf, offset)
+
+            self.state.fog.render(clipped_surf, offset)
+
+            #pygame.draw.rect(clipped_surf, (255,0,0), self.rect, 1)
+
+            #center_rect = Rect(0,0,8,8)
+            #center_rect.center = self.vec_center.as_xy_tuple()
+            #pygame.draw.rect(clipped_surf, (255,0,0), center_rect, 1)
+
+            #s = 'player %(pos)s' % {'pos':str(self.target.position.as_xy_tuple())}
+            #text = font.render(s,1,(255,0,0))
+            #clipped_surf.blit(text, (1, clipped_surf.get_rect().bottom-25))
 
     def screen_to_world(self, coord):
         x = self.position.x + coord[0] - self.rect.topleft[0] - self.vec_center.x

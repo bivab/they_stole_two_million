@@ -125,17 +125,14 @@ class PlayState(pyknic.State):
                             layer_img.blit(screen_img.convert(), (x + offx, y + offy))
 
                 layer_img.set_alpha(int(255. * float(abs(layer.opacity))))
-                spr = Spr()
-                spr.image = layer_img.convert_alpha()
-                ent = Entity(spr, Vec3(0, 0))
-                ent.rect.size = spr.image.get_size()
+                spr = Spr(layer_img.convert_alpha())
+                ent = Entity(spr, Vec3(0,0))
+                ent.rect = layer_img.get_rect()
                 ent.layer = layernum * 10
-
                 self.world.add_entity(ent)
-                self.game_time.event_update += ent.update
 
         self.fog = Fog()     # the light class (add objects to 'enlight' them)
-        self.world.add_entity(self.fog)
+        #self.world.add_entity(self.fog)
 
         # map objects
         for obj_group in world_map.object_groups:
@@ -153,8 +150,7 @@ class PlayState(pyknic.State):
 
                     self.world.add_entity(thing)
 
-        cam_rect = pygame.display.get_surface().get_rect()
-        self.renderer1 = SimpleRenderer(self, cam_rect, self.player)
+        self.renderer1 = SimpleRenderer(self, pygame.display.get_surface().get_rect())
         self.world.add_renderer(self.renderer1)
 
         self.setup_update_events()
