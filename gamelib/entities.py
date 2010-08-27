@@ -594,6 +594,8 @@ class Guard(Enlightened):
 class Lighting(object):
     def __init__(self):
         self._lights = []
+        self.layer = 999999
+        self.position =Vec3(0,0,0)
 
     def create_light(self, obj, enabled, size, offset=Vec3(0,0)):
         light = Light(obj)

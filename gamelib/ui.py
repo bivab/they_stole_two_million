@@ -21,12 +21,10 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
             #search_rect = self.rect.move(offset.as_xy_tuple())
             #ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
 
-            ents = SortedList(self._world._entities, lambda e: -e.position.z + e.layer)
+            layers = [self.state.lighting] + self._world._entities
 
-            for i, entity in enumerate(ents):
-                entity.render(clipped_surf, offset)
-
-            self.state.lighting.render(clipped_surf, offset)
+            for layer in SortedList(layers, lambda e: -e.position.z + e.layer):
+                layer.render(clipped_surf, offset)
 
 
 
