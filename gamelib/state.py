@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened
+from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened, Lighting
 
 from ui import SimpleRenderer
 
@@ -91,6 +91,7 @@ class PlayState(pyknic.State):
         assert world_map.orientation == "orthogonal"
         self.impassables = []
         self.actionables = []
+        self.lighting = Lighting()
 
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
@@ -131,7 +132,6 @@ class PlayState(pyknic.State):
                 ent.layer = layernum * 10
                 self.world.add_entity(ent)
 
-        self.fog = Fog()     # the light class (add objects to 'enlight' them)
         #self.world.add_entity(self.fog)
 
         # map objects

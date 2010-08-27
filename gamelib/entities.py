@@ -342,7 +342,7 @@ class Player(Enlightened):
         self.state.events.key_down += self.on_key_down
         self.state.events.key_up += self.on_key_up
 
-        self.state.fog.add(self, False, (300,300))
+        self.light = self.state.lighting.create_light(self, False, (300,300))
 
         action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
         self.state.game_time.event_update += action_menu.update
@@ -527,7 +527,7 @@ class Guard(Enlightened):
         self.steps_made = 0
 
         self.collides_with('walls', [self.state.player]+self.state.impassables, self.collidate_wall)
-        self.state.fog.add(self, True, (100,100))
+        self.light = self.state.lighting.create_light(self, True, (100,100))
 
     def switch_random_direction(self, wrong_direction=0):
         import random
@@ -614,23 +614,49 @@ class Fog(pyknic.entity.Entity):
     def set_offset(self, object, offset):
         self.light_objects[object][2] = offset
 
+
+class Lighting(object):
+    def __init__(self):
+        self._lights = []
+
+    def create_light(self, obj, enabled, size, offset=Vec3(0,0)):
+        light = Light(obj)
+        light.enabled = enabled
+        light.size = size
+        light.offset = offset
+
+        self._lights.append(light)
+        return light
+
+
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         fog = pygame.Surface(screen_surf.get_rect().size, pygame.SRCALPHA)
         fog.fill((0,0,0,150))
 
-        for light in self.light_objects:
-            img = self.light_image
-            spr_offset = self.spr_offset
-
-            if self.light_objects[light][0] is True:
-                img = pygame.transform.scale(img, self.light_objects[light][1])
-                spr_offset = Vec3(*img.get_rect().center)
-
-            light_offset = self.light_objects[light][2]
-
-            fog.blit(img, (light.position - offset - spr_offset + light_offset).as_xy_tuple(), None, pygame.BLEND_RGBA_SUB)
+        for light in self._lights:
+            light.render(fog, offset)
 
         screen_surf.blit(fog, (0,0))
+
+class Light(object):
+    def __init__(self, entity = None):
+        self.attached = entity
+        self.enabled = True
+        self.size = (200,200)
+        self.offset = Vec3(0,0)
+        self._light_image = pygame.image.load("data/images/player_light.png").convert_alpha()
+
+    def img(self):
+        return pygame.transform.scale(self._light_image, self.size)
+
+    def sprite_offset(self):
+        return Vec3((self.size[0]/2), (self.size[1]/2))
+
+    def position(self):
+        return self.attached.position - self.sprite_offset() + self.offset
+
+    def render(self, surface, offset):
+        surface.blit(self.img(), (self.position() - offset).as_xy_tuple(), None, pygame.BLEND_RGBA_SUB)
 
 class LurkingGuard(Enlightened):
     def __init__(self, position, state):
@@ -655,7 +681,7 @@ class LurkingGuard(Enlightened):
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
-        self.state.fog.add(self, True, (150,150))
+        self.light = self.state.lighting.create_light(self, True, (150,150))
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         self.steps_made = self.steps_made + 1
@@ -791,17 +817,17 @@ class PatrollingGuard(Enlightened):
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
-        self.state.fog.add(self, True, (200,200))
+        self.light = self.state.lighting.create_light(self, True, (200,200))
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
 
-        # update fog (depending on direction the guard is looking)
+        ## update fog (depending on direction the guard is looking)
         fog_offset = 50
-        fog_width = self.state.fog.get(self)[1][0]/2
+        fog_width = self.light.size[0]/2 #self.state.fog.get(self)[1][0]/2
         m = max(abs(self.velocity.x), abs(self.velocity.y))
         if m != 0:
             fog_dir = self.velocity / m * fog_offset
-            self.state.fog.set_offset(self, fog_dir)
+            self.light.offset = fog_dir
         else:
             fog_dir = self.position
 

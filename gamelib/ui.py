@@ -27,7 +27,7 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
             for i, entity in enumerate(ents):
                 entity.render(clipped_surf, offset)
 
-            self.state.fog.render(clipped_surf, offset)
+            self.state.lighting.render(clipped_surf, offset)
 
             #pygame.draw.rect(clipped_surf, (255,0,0), self.rect, 1)
 
