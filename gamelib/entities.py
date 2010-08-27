@@ -305,6 +305,8 @@ class Player(Enlightened):
         print 'Wuhooo, I\'m rich %d' % self.money
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
+        
+        print self.position + Vec3(1024/2, 768/2)
         super(Player, self).update(gdt, gt, dt, t, *args, **kwargs)
 
         if self.velocity.lengthSQ:
@@ -338,20 +340,25 @@ class Player(Enlightened):
         self.position = Vec3(*self.rect.center)
 
     def on_key_down(self, key, mod, unicode):
-        speed = 90
+        speed = 180
         if key == K_UP:
             self.velocity.y = -speed
+            self.state.fog.set_offset(self, Vec3(0,-75))
         if key == K_DOWN:
             self.velocity.y = speed
+            self.state.fog.set_offset(self, Vec3(0,75))
         if key == K_LEFT:
             self.velocity.x = -speed
+            self.state.fog.set_offset(self, Vec3(-75,0))
         if key == K_RIGHT:
             self.velocity.x = speed
+            self.state.fog.set_offset(self, Vec3(75,0))
         #print key, mod, unicode
 
     def on_key_up(self, key, mod):
         if key == K_UP:
             self.velocity.y = 0
+
         if key == K_DOWN:
             self.velocity.y = 0
         if key == K_LEFT:
@@ -529,15 +536,18 @@ class Fog(pyknic.entity.Entity):
         spot_png = pygame.image.load("data/images/player_light.png")
         self.spot.blit(spot_png, (0,0), None, pygame.BLEND_RGBA_SUB)
 
-    def add(self, object, state, size):
+    def add(self, object, state, size, offset=Vec3(0,0)):
         # object = entity, state = boolean, size = (widht, height)
-        self.light_objects[object] = (state, size)
+        self.light_objects[object] = [state, size, offset]
 
     def remove(self, object):
         self.light_objects.pop(object)
 
     def set_state(self, object, state):
         self.light_objects[object][0] = state
+
+    def set_offset(self, object, offset):
+        self.light_objects[object][2] = offset
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         fog = self.black.copy()
@@ -548,8 +558,8 @@ class Fog(pyknic.entity.Entity):
                 resized_spot = pygame.transform.scale(self.spot, self.light_objects[obj][1])
 
                 # calculate position
-                spot_x = obj.position.x - resized_spot.get_width()/2
-                spot_y = obj.position.y - resized_spot.get_height()/2
+                spot_x = obj.position.x - resized_spot.get_width()/2 + self.light_objects[obj][2].x
+                spot_y = obj.position.y - resized_spot.get_height()/2 + self.light_objects[obj][2].y
 
                 # place lights dependant on the world offset
                 fog.blit(resized_spot, (spot_x - offset.x ,spot_y - offset.y), None, pygame.BLEND_RGBA_MIN)
@@ -574,7 +584,7 @@ class LurkingGuard(Enlightened):
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
-        self.state.fog.add(self, True, (100,100))
+        self.state.fog.add(self, True, (150,150))
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         self.steps_made = self.steps_made + 1
@@ -588,7 +598,127 @@ class LurkingGuard(Enlightened):
         max_speed = 50.0
         pos_x = self.position.x
         pos_y = self.position.y
-        lurk_rect = pygame.Rect((64,64), (pos_x-32, pos_y-32))
+        lurk_rect = pygame.Rect(pos_x - 75, pos_y - 75, 150, 150)
+        entities = self.world.get_entities_in_region(lurk_rect)
+        found_player = None
+        for e in entities:
+            if isinstance(e, Player):
+                found_player = e
+        if found_player:
+            self.random_move = False
+            p_pos_x = found_player.position.x
+            p_pos_y = found_player.position.y
+            if p_pos_x<pos_x:
+                left = p_pos_x
+                width = pos_x-p_pos_x
+            else:
+                left = pos_x
+                width = p_pos_x-pos_x
+            if p_pos_y<pos_y:
+                top = p_pos_y
+                height = pos_y-p_pos_y
+            else:
+                top = pos_y
+                height = p_pos_y-pos_y
+            check_rect = pygame.Rect(left, top, width, height)
+            e_collision=False
+            for e in entities:
+                if not isinstance(e, (Player, Guard, LurkingGuard)):
+                    if check_rect.colliderect(e.rect) and e in self.impassables:
+                            e_collision=True
+            v_x = p_pos_x-pos_x
+            v_y = p_pos_y-pos_y
+            if v_x>max_speed or v_y>max_speed:
+                if v_x>v_y:
+                    scale = v_x/max_speed
+                else:
+                    scale = v_y/max_speed
+                v_x = v_x/scale
+                v_y = v_y/scale
+            if not e_collision:
+                self.velocity.x = v_x
+                self.velocity.y = v_y
+            else:
+                if v_x>v_y:
+                    self.velocity.x = v_x
+                    self.velocity.y = 0
+                else:
+                    self.velocity.x = 0
+                    self.velocity.y = v_y
+        else:
+            self.random_move = True
+            self.velocity.x = randint(-max_speed,max_speed)
+            self.velocity.y = randint(-max_speed,max_speed)
+
+    def collision_response(self, other):
+        if not self.rect.colliderect(other.rect):
+            return
+
+        # smashing into wall from left
+        if self.moving.x > 0 and self.rect.right > other.rect.left:
+            self.rect.right = other.rect.left
+
+        # smashing into wall from right
+        if self.moving.x < 0 and self.rect.left < other.rect.right:
+            self.rect.left = other.rect.right
+
+        # smashing into wall from above
+        if self.moving.y > 0 and self.rect.bottom > other.rect.top:
+            self.rect.bottom = other.rect.top
+
+        # smashing into wall from below
+        if self.moving.y < 0 and self.rect.top < other.rect.bottom:
+            self.rect.top = other.rect.bottom
+
+        self.moving = Vec3(0,0)
+        self.position = Vec3(*self.rect.center)
+
+        self.find_direction()
+
+    def collidate_wall(self, player, wall, dummy = 0):
+        self.collision_response(wall)
+
+    def collidate_player(self, player, wall, dummy = 0):
+        self.velocity.x = 0
+        self.velocity.y = 0
+        font = pygame.font.SysFont("Dejavu Sans", 32)
+        title = font.render("GAME OVER", True, (255, 0, 0))
+        s = pygame.display.get_surface()
+        r = s.blit(title, (0,0))
+        pygame.display.flip()
+
+class PatrollingGuard(Enlightened):
+    def __init__(self, position, state):
+        super(LurkingGuard, self).__init__(position, state)
+
+        img = pygame.Surface((16, 16))
+        img.fill((0, 255, 0))
+        self.spr = Spr(img, offset=Vec3(8,8))
+        self.rect.size = img.get_size()
+        self.world = self.state.world
+        self.impassables = self.state.impassables
+        self.steps_made = 0
+        self.random_move = False
+        self.find_direction()
+
+        self.collides_with('walls', self.state.impassables, self.collidate_wall)
+        self.collides_with('player', [self.state.player], self.collidate_player, Player)
+
+        self.state.fog.add(self, True, (150,150))
+
+    def update(self, gdt, gt, dt, t, *args, **kwargs):
+        self.steps_made = self.steps_made + 1
+        if self.steps_made == [64, 128][self.random_move]:
+            self.find_direction()
+            self.steps_made = 0
+
+        super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
+
+    def find_direction(self):
+        max_speed = 50.0
+        pos_x = self.position.x
+        pos_y = self.position.y
+        lurk_rect = pygame.Rect(pos_x - 75, pos_y - 75, 150, 150)
         entities = self.world.get_entities_in_region(lurk_rect)
         found_player = None
         for e in entities:
