@@ -591,30 +591,6 @@ class Guard(Enlightened):
         else:
             self.spr.pause()
 
-class Fog(pyknic.entity.Entity):
-    def __init__(self):
-        self.light_objects = {}
-        self.light_image = pygame.image.load("data/images/player_light.png").convert_alpha()
-        self.spr_offset = Vec3(*self.light_image.get_rect().center)
-        # black surface filling the whole screen
-
-    def add(self, object, state, size, offset=Vec3(0,0)):
-        # object = entity, state = boolean, size = (widht, height)
-        self.light_objects[object] = [state, size, offset]
-
-    def get(self, object):
-        return self.light_objects[object]
-
-    def remove(self, object):
-        self.light_objects.pop(object)
-
-    def set_state(self, object, state):
-        self.light_objects[object][0] = state
-
-    def set_offset(self, object, offset):
-        self.light_objects[object][2] = offset
-
-
 class Lighting(object):
     def __init__(self):
         self._lights = []

@@ -9,7 +9,7 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened, Lighting
+from entities import InteractiveThing, Player, Enlightened, Lighting
 
 from ui import SimpleRenderer, StatusBar
 
@@ -131,8 +131,6 @@ class PlayState(pyknic.State):
                 ent.rect = layer_img.get_rect()
                 ent.layer = layernum * 10
                 self.world.add_entity(ent)
-
-        #self.world.add_entity(self.fog)
 
         # map objects
         for obj_group in world_map.object_groups:
