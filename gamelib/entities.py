@@ -43,8 +43,6 @@ class InteractiveThing(pyknic.entity.Entity):
             elif self.thing_type == 'Door':
                 self.thing = Door(self.properties, self.rect, self)
 
-        # if not self.thing:
-        # self.thing = globals()[self.thing_type](self.properties, self.rect)
         return self.thing
 
     def label(self):
@@ -75,6 +73,8 @@ class InteractiveThing(pyknic.entity.Entity):
 
 
 class InteractiveDelegate(object):
+    image_files = []
+
     def __init__(self, properties, rect, entity = None):
         self.properties = properties
         self.rect = rect
@@ -82,10 +82,21 @@ class InteractiveDelegate(object):
         self.timer = None
         self.entity = entity
         self.smashed = False
+        self.rotation = 0
         self.setup()
+        self.load_images()
+
+    def load_images(self):
+        self.images = [pygame.transform.rotate(
+                            pygame.image.load(i).convert_alpha(),
+                            self.rotation) for i in self.image_files]
 
     def setup(self):
-        xxx
+        if 'rotation' in self.properties:
+            try:
+                self.rotation = int(self.properties['rotation'])
+            except ValueError, e:
+                pass
 
     def label(self):
         return 'A Thing'
@@ -123,6 +134,7 @@ class Door(InteractiveDelegate):
         return 'Door'
 
     def setup(self):
+        InteractiveDelegate.setup(self)
         if 'locked' in self.properties:
             self.locked = self.properties['locked'] == 'true'
             self.closed = True
@@ -170,25 +182,27 @@ class Door(InteractiveDelegate):
         self.entity.make_impassable()
 
 class Desk(InteractiveDelegate):
+    image_files = ['data/images/desk01.png']
+
     def __init__(self, properties, rect):
         InteractiveDelegate.__init__(self, properties, rect)
         self.lockpick_time = 1
         self.smash_time = 0
         self.closed = True
 
-        self.img = pygame.image.load("data/images/desk01.png").convert_alpha()
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         image.fill(self.color)
-        image.blit(self.img, (0,0))
+        image.blit(self.images[0], (0,0))
 
-        screen_surf.blit(image, (self.rect.x, self.rect.y))
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def label(self):
         return 'Desk'
+
     def setup(self):
+        InteractiveDelegate.setup(self)
         for key, value in self.properties.items():
             if key == 'rob':
                 self.value = int(value)
@@ -600,7 +614,7 @@ class Fog(pyknic.entity.Entity):
 
                 # place lights dependant on the world offset
                 fog.blit(resized_spot, (spot_x - offset.x ,spot_y - offset.y), None, pygame.BLEND_RGBA_MIN)
-        
+
         # when all lights are added, draw fog
         screen_surf.blit(fog, (self.rect.x, self.rect.y)) # the black surface is always drawn in (0,0)
 
@@ -631,7 +645,7 @@ class LurkingGuard(Enlightened):
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
-        
+
         self.steps_made = self.steps_made + 1
         if self.steps_made == [64, 128][self.random_move]:
             self.find_direction()
