@@ -5,7 +5,7 @@
  </tileset>
  <layer name="ground" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3csU7bQACAYUsFwQIIVgZYeYjO7VpQpxY24P3fAEdiYCAiEXb8E77hWyzlcne/ZDnKyefDMJyT9GN0NaHricebysGCe7LNfH6NLic09XhTzmvTHrtYw7r56PH9evwZ3c7sTo+Ne/wb/Z/ZvR566KHHnvQ4GTZ/Fj3VY/YeNXq06NGiR4seLXq06NGiR4seLXq07KrH73euPY6eZvYc2ONiD/T4ivRo0aNlVz0OA2v9Cr77+ZIaPVr0aNGjRY8WPVrW9fg5THtuexdnZfaB34MterTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4tb3tcvLHNex7ncvQJq8+fvXP95oPvPAj1+Mz698XS9wU99CjTo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GhZ+n+G1Xt3jl8tvRcAAAAs4y8pDwAAAAAAG3oBAmzL50CcAAA=
+   H4sIAAAAAAAAC+3csU7bQACAYUsFwQIIVgZYeYjO7VpQpxY24P3fAEdiYCAiEXb8E77hWyzlcne/ZDnKyefDMJyT9GN0NaHricebysGCe7LNfH6NLic09XhTzmvTHrtYw7r56PH9evwZ3c7sTo+Ne/wb/Z/ZvR566KHHnvQ4GTZ/Fj3VY/YeNXq06NGiR4seLXq06NGiR4seLXq07KrH73euPY6eZvYc2ONiD/T4ivRo0aNlVz0OA2v9Cr77+ZIaPVr0aNGjRY8WPVrW9fg5THtuexdnZfaB34MterTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4tb3tcvLHNex7ncvQJq8+fvXP95oPvPAj1+Mz698XS9wU99CjTo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GhZ+n+G1Xt3jl8tvRcAAAAs4y8pDwAAAAAAG3oBAmzL50CcAAA=
   </data>
  </layer>
  <layer name="wall" width="100" height="100">
@@ -13,16 +13,21 @@
    <property name="passable" value="false"/>
   </properties>
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3dQUoEMRRF0QJ1qC7BnuoedKr7X5E6EAx0tBOTvCu5BwpEqvJ//VcNUmnwOER19XE8DDxOg9cbdVwHZ9LSz2tDn5cYvd4oLX2tuIdaDfP427m9zGPOub3MY865vcxjzrm9zGPOub12z+P5uPxv0bsF/eyeB60v82AxDxbzYDEPFvNgMQ8W82AxDxbzYFmVx9vg9UbZNQ8q2n3Wnltan7PQ7tPPB4t5sKzK42bweqPsmgftvr/Q+jIPFvNgMQ8W82AxD5ZaPy3fg7nkeKr8/vTt5/szfTwO7uO3vk6V837qrXZNz/Fyps6nVc/Nf3k+R1/TupZ5zL2mdS3zmHtN61q75tGzTzNyb8c8WMyDxTxY0nlQ99VT0nnQ9OzTjNzbMY/S7n/v0pgHy+550PbVd8+D9jnsea9de3ft+92/S/fj56OU7sc8Sul+zKOUfl9gHizmwWIeLObBYh6l9PsC8yil+zGPUrof8yil+zGPUrof8yil+zGPUrqfWv3bY+73ymfsHbR8J711/2GV9PNAk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jSr9hlqx4r/USVJkiRJkiRJkiRJkiRpvHfnrNFHQJwAAA==
+   H4sIAAAAAAAAC+3dQUoEMRRF0QJ1qC7BnuoedKr7X5E6EAx0tBOTvCu5BwpEqvJ//VcNUmnwOER19XE8DDxOg9cbdVwHZ9LSz2tDn5cYvd4oLX2tuIdaDfP427m9zGPOub3MY865vcxjzrm9zGPOub12z+P5uPxv0bsF/eyeB60v82AxDxbzYDEPFvNgMQ8W82AxDxbzYFmVx9vg9UbZNQ8q2n3Wnltan7PQ7tPPB4t5sKzK42bweqPsmgftvr/Q+jIPFvNgMQ8W82AxD5ZaPy3fg7nkeKr8/vTt5/szfTwO7uO3vk6V837qrXZNz/Fyps6nVc/Nf3k+R1/TupZ5zL2mdS3zmHtN61q75tGzTzNyb8c8WMyDxTxY0nlQ99VT0nnQ9OzTjNzbMY/S7n/v0pgHy+550PbVd8+D9jnsea9de3ft+92/S/fj56OU7sc8Sul+zKOUfl9gHizmwWIeLObBYh6l9PsC8yil+zGPUrof8yil+zGPUrof8yil+zGPUrqfWv3bY+73ymfsHbR8J711/2GV9PNAk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jSr9hlqx4r/USVJkiRJkiRJkiRJkiRpvHfnrNFHQJwAAA==
   </data>
  </layer>
  <objectgroup name="Entities" width="100" height="100">
   <object name="Player" type="Player" x="216" y="298" width="41" height="39"/>
-  <object name="Guard 1" type="LurkingGuard" x="415" y="211" width="31" height="27"/>
-  <object name="Guard 2" type="Guard" x="494" y="441" width="31" height="27"/>
-  <object name="PatrollingGuard" type="PatrollingGuard" x="720" y="381" width="23" height="25">
+  <object name="Guard 1" type="LurkingGuard" x="246" y="707" width="31" height="27"/>
+  <object name="Guard 2" type="Guard" x="164" y="590" width="31" height="27"/>
+  <object name="PatrollingGuard01" type="PatrollingGuard" x="417" y="339" width="23" height="25">
    <properties>
     <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard02" type="PatrollingGuard" x="544" y="447" width="23" height="25">
+   <properties>
+    <property name="direction" value="horizontal"/>
    </properties>
   </object>
  </objectgroup>
