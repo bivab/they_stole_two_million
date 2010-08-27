@@ -206,9 +206,8 @@ class Desk(InteractiveDelegate):
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         image.fill(self.color)
-                
-        image.blit(self.images[self.current_state], (0,0))
-
+        img = pygame.transform.scale(self.images[self.current_state], image.get_size())
+        image.blit(img, (0,0))
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def label(self):
