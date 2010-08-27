@@ -73,7 +73,7 @@ class InteractiveThing(pyknic.entity.Entity):
 
 
 class InteractiveDelegate(object):
-    image_files = []
+    image_files = {}
 
     def __init__(self, properties, rect, entity = None):
         self.properties = properties
@@ -87,9 +87,9 @@ class InteractiveDelegate(object):
         self.load_images()
 
     def load_images(self):
-        self.images = [pygame.transform.rotate(
-                            pygame.image.load(i).convert_alpha(),
-                            self.rotation) for i in self.image_files]
+        self.images = dict([(k,pygame.transform.rotate(
+                            pygame.image.load(v).convert_alpha(),
+                            self.rotation)) for k,v in self.image_files.iteritems()])
 
     def setup(self):
         if 'rotation' in self.properties:
@@ -123,12 +123,15 @@ class InteractiveDelegate(object):
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
+    image_files = {"opened" : 'data/images/door_opened.png',"closed" : 'data/images/door_closed.png'}
+    
     def __init__(self, properties, rect, entity):
         InteractiveDelegate.__init__(self, properties, rect, entity)
         self.lockpick_time = 50
         self.smashed = False
         self.default_color = (123,123,123)
         self.color = self.default_color
+        self.current_state = "closed"
 
     def label(self):
         return 'Door'
@@ -165,6 +168,11 @@ class Door(InteractiveDelegate):
             self.color = (0,0,0,255)
             self.closed = False
             self.entity.make_passable()
+            self.current_state = "opened"
+            
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = self.images[self.current_state]
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def lockpick(self, player):
         self.locked = False
@@ -175,26 +183,31 @@ class Door(InteractiveDelegate):
         self.closed = False
         self.smashed = True
         self.entity.make_passable()
+        self.current_state = "opened"
 
     def close(self, player):
         self.color = self.default_color
         self.closed = True
         self.entity.make_impassable()
+        self.current_state = "closed"
 
 class Desk(InteractiveDelegate):
-    image_files = ['data/images/desk01.png']
+    image_files = {"robbed" : 'data/images/desk01.png',"default" : 'data/images/desk01_money.png'}
+
 
     def __init__(self, properties, rect):
         InteractiveDelegate.__init__(self, properties, rect)
         self.lockpick_time = 1
         self.smash_time = 0
         self.closed = True
+        self.current_state = "default"
 
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         image.fill(self.color)
-        image.blit(self.images[0], (0,0))
+                
+        image.blit(self.images[self.current_state], (0,0))
 
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
@@ -248,6 +261,7 @@ class Desk(InteractiveDelegate):
         self.color = (0, 55, 100)
 
     def rob(self, player):
+        self.current_state = "robbed"
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
