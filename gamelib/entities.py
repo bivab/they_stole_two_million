@@ -317,6 +317,8 @@ class Enlightened(pyknic.entity.Entity):
             return Guard(pos, state)
         elif objekt.type == 'LurkingGuard':
             return LurkingGuard(pos, state)
+        elif objekt.type == 'PatrollingGuard':
+            return PatrollingGuard(pos, state)
 
 
 class Player(Enlightened):
@@ -339,7 +341,7 @@ class Player(Enlightened):
         self.state.events.key_down += self.on_key_down
         self.state.events.key_up += self.on_key_up
 
-        self.state.fog.add(self, True, (300,300))
+        self.state.fog.add(self, False, (300,300))
 
         action_menu = ActionMenu(self.state.the_app.screen, self, self.state.actionables)
         self.state.game_time.event_update += action_menu.update
@@ -363,7 +365,12 @@ class Player(Enlightened):
 
     def update(self, gdt, gt, dt, t, *args, **kwargs):
         
-        print self.position + Vec3(1024/2, 768/2)
+        # update fog
+        m = max(abs(self.velocity.x), abs(self.velocity.y))
+        if m != 0:
+            fog_dir = self.velocity / m * 50
+            self.state.fog.set_offset(self, fog_dir)
+
         super(Player, self).update(gdt, gt, dt, t, *args, **kwargs)
 
         if self.velocity.lengthSQ:
@@ -405,16 +412,16 @@ class Player(Enlightened):
         
         if key == K_UP:
             self.velocity.y = -speed
-            self.state.fog.set_offset(self, Vec3(0,-75))
+            #self.state.fog.set_offset(self, Vec3(0,-75))
         if key == K_DOWN:
             self.velocity.y = speed
-            self.state.fog.set_offset(self, Vec3(0,75))
+            #self.state.fog.set_offset(self, Vec3(0,75))
         if key == K_LEFT:
             self.velocity.x = -speed
-            self.state.fog.set_offset(self, Vec3(-75,0))
+            #self.state.fog.set_offset(self, Vec3(-75,0))
         if key == K_RIGHT:
             self.velocity.x = speed
-            self.state.fog.set_offset(self, Vec3(75,0))
+            #self.state.fog.set_offset(self, Vec3(75,0))
         #print key, mod, unicode
 
     def on_key_up(self, key, mod):
@@ -615,6 +622,9 @@ class Fog(pyknic.entity.Entity):
         # object = entity, state = boolean, size = (widht, height)
         self.light_objects[object] = [state, size, offset]
 
+    def get(self, object):
+        return self.light_objects[object]
+
     def remove(self, object):
         self.light_objects.pop(object)
 
@@ -770,93 +780,71 @@ class LurkingGuard(Enlightened):
 
 class PatrollingGuard(Enlightened):
     def __init__(self, position, state):
-        super(LurkingGuard, self).__init__(position, state)
+        super(PatrollingGuard, self).__init__(position, state)
 
-        img = pygame.Surface((16, 16))
-        img.fill((0, 255, 0))
-        self.spr = Spr(img, offset=Vec3(8,8))
-        self.rect.size = img.get_size()
+        # animation
+        anims = pyknic.animation.load_animation(self.state.game_time, 'data/copanim')
+        self.sprites = {}
+        self.sprites[pyknic.utilities.utilities.Direction.N] = anims['up']
+        self.sprites[pyknic.utilities.utilities.Direction.S] = anims['down']
+        self.sprites[pyknic.utilities.utilities.Direction.E] = anims['right']
+        self.sprites[pyknic.utilities.utilities.Direction.W] = anims['left']
+        self.spr = self.sprites[pyknic.utilities.utilities.Direction.N]
+
+        self.rect.size = self.spr.image.get_size()
+        
+        # some values
         self.world = self.state.world
         self.impassables = self.state.impassables
         self.steps_made = 0
         self.random_move = False
-        self.find_direction()
+        self.at_home = True                                 # on patrolling route?
+        self.speed = 30                                     # speed
+        self.velocity = Vec3(self.speed,0)                  # initial velocity
+        self.start_position = Vec3(position.x, position.y)  # save start vector
 
         self.collides_with('walls', self.state.impassables, self.collidate_wall)
         self.collides_with('player', [self.state.player], self.collidate_player, Player)
 
-        self.state.fog.add(self, True, (150,150))
-
+        self.state.fog.add(self, True, (200,200))
+    
     def update(self, gdt, gt, dt, t, *args, **kwargs):
-        super(LurkingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
-
-        self.steps_made = self.steps_made + 1
-        if self.steps_made == [64, 128][self.random_move]:
-            self.find_direction()
-            self.steps_made = 0
-
-        if self.velocity.lengthSQ:
-            self.spr.play()
-            dir = pyknic.utilities.utilities.get_4dir(self.velocity.angle)
-            self.spr = self.sprites[dir]
+        
+        # update fog (depending on direction the guard is looking)
+        fog_offset = 50
+        fog_width = self.state.fog.get(self)[1][0]/2
+        m = max(abs(self.velocity.x), abs(self.velocity.y))
+        if m != 0:
+            fog_dir = self.velocity / m * fog_offset
+            self.state.fog.set_offset(self, fog_dir)
         else:
-            self.spr.pause()
-
-    def find_direction(self):
-        max_speed = 50.0
-        pos_x = self.position.x
-        pos_y = self.position.y
-        lurk_rect = pygame.Rect(pos_x - 75, pos_y - 75, 150, 150)
-        entities = self.world.get_entities_in_region(lurk_rect)
+            fog_dir = self.position
+        
+        # set the view of the guard = the position of the fog
+        watch_x = self.position.x + fog_dir.x - fog_width/2 # position + offset - width(needed to get the center)
+        watch_y = self.position.y + fog_dir.y - fog_width/2 
+        watch_rect = pygame.Rect(watch_x, watch_y, fog_width, fog_width)
+        entities = self.world.get_entities_in_region(watch_rect)
         found_player = None
         for e in entities:
             if isinstance(e, Player):
                 found_player = e
+
         if found_player:
-            self.random_move = False
-            p_pos_x = found_player.position.x
-            p_pos_y = found_player.position.y
-            if p_pos_x<pos_x:
-                left = p_pos_x
-                width = pos_x-p_pos_x
-            else:
-                left = pos_x
-                width = p_pos_x-pos_x
-            if p_pos_y<pos_y:
-                top = p_pos_y
-                height = pos_y-p_pos_y
-            else:
-                top = pos_y
-                height = p_pos_y-pos_y
-            check_rect = pygame.Rect(left, top, width, height)
-            e_collision=False
-            for e in entities:
-                if not isinstance(e, (Player, Guard, LurkingGuard)):
-                    if check_rect.colliderect(e.rect) and e in self.impassables:
-                            e_collision=True
-            v_x = p_pos_x-pos_x
-            v_y = p_pos_y-pos_y
-            if v_x>max_speed or v_y>max_speed:
-                if v_x>v_y:
-                    scale = v_x/max_speed
-                else:
-                    scale = v_y/max_speed
-                v_x = v_x/scale
-                v_y = v_y/scale
-            if not e_collision:
-                self.velocity.x = v_x
-                self.velocity.y = v_y
-            else:
-                if v_x>v_y:
-                    self.velocity.x = v_x
-                    self.velocity.y = 0
-                else:
-                    self.velocity.x = 0
-                    self.velocity.y = v_y
-        else:
-            self.random_move = True
-            self.velocity.x = randint(-max_speed,max_speed)
-            self.velocity.y = randint(-max_speed,max_speed)
+            # increase speed, follow player
+            direction_vec = found_player.position - self.position
+            # velocity = normalized(vector_to_player) * speed (double it to make him run a bit faster)
+            self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed * 2
+            self.at_home = False
+        elif round(self.position.y) != round(self.start_position.y):
+            # decrease speed, go back to patrolling point
+            direction_vec = self.start_position - self.position
+            self.velocity = direction_vec / max(abs(direction_vec.x), abs(direction_vec.y)) * self.speed
+        elif not self.at_home:
+            self.velocity = Vec3(self.speed,0)
+            self.at_home = True
+
+        super(PatrollingGuard, self).update(gdt, gt, dt, t, *args, **kwargs)
 
     def collision_response(self, other):
         if not self.rect.colliderect(other.rect):
@@ -865,23 +853,25 @@ class PatrollingGuard(Enlightened):
         # smashing into wall from left
         if self.moving.x > 0 and self.rect.right > other.rect.left:
             self.rect.right = other.rect.left
+            self.velocity = Vec3(-self.speed,0)
 
         # smashing into wall from right
         if self.moving.x < 0 and self.rect.left < other.rect.right:
             self.rect.left = other.rect.right
+            self.velocity = Vec3(self.speed,0)
 
         # smashing into wall from above
         if self.moving.y > 0 and self.rect.bottom > other.rect.top:
             self.rect.bottom = other.rect.top
+            self.velocity = Vec3(0, -self.speed)
 
         # smashing into wall from below
         if self.moving.y < 0 and self.rect.top < other.rect.bottom:
             self.rect.top = other.rect.bottom
+            self.velocity = Vec3(0, -self.speed)
 
         self.moving = Vec3(0,0)
         self.position = Vec3(*self.rect.center)
-
-        self.find_direction()
 
     def collidate_wall(self, player, wall, dummy = 0):
         self.collision_response(wall)

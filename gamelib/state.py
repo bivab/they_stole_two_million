@@ -145,7 +145,7 @@ class PlayState(pyknic.State):
                     if obj.type == 'Player':
                         self.player = thing = Enlightened.factory(obj, self)
 
-                    elif obj.type in ['LurkingGuard', 'Guard']:
+                    elif obj.type in ['LurkingGuard', 'Guard', 'PatrollingGuard']:
                         thing = Enlightened.factory(obj, self)
 
                     else:
