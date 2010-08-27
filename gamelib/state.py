@@ -9,9 +9,9 @@ from pyknic.collision import AABBCollisionStrategy
 
 
 from world import TheWorld
-from entities import InteractiveThing, Player, ActionMenu, Guard, LurkingGuard, Fog, Enlightened
+from entities import InteractiveThing, Player, Enlightened, Lighting
 
-from ui import SimpleRenderer
+from ui import SimpleRenderer, StatusBar
 
 import pygame
 
@@ -91,6 +91,7 @@ class PlayState(pyknic.State):
         assert world_map.orientation == "orthogonal"
         self.impassables = []
         self.actionables = []
+        self.lighting = Lighting()
 
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
@@ -125,17 +126,11 @@ class PlayState(pyknic.State):
                             layer_img.blit(screen_img.convert(), (x + offx, y + offy))
 
                 layer_img.set_alpha(int(255. * float(abs(layer.opacity))))
-                spr = Spr()
-                spr.image = layer_img.convert_alpha()
-                ent = Entity(spr, Vec3(0, 0))
-                ent.rect.size = spr.image.get_size()
+                spr = Spr(layer_img.convert_alpha())
+                ent = Entity(spr, Vec3(0,0))
+                ent.rect = layer_img.get_rect()
                 ent.layer = layernum * 10
-
                 self.world.add_entity(ent)
-                self.game_time.event_update += ent.update
-
-        self.fog = Fog()     # the light class (add objects to 'enlight' them)
-        self.world.add_entity(self.fog)
 
         # map objects
         for obj_group in world_map.object_groups:
@@ -153,16 +148,27 @@ class PlayState(pyknic.State):
 
                     self.world.add_entity(thing)
 
-        cam_rect = pygame.display.get_surface().get_rect()
-        self.renderer1 = SimpleRenderer(self, cam_rect, self.player)
-        self.world.add_renderer(self.renderer1)
+        display_rect = pygame.display.get_surface().get_rect()
+
+        renderer_rect = display_rect.copy()
+        renderer_rect.height -= 50
+
+        renderer1 = SimpleRenderer(self, renderer_rect)
+        self.world.add_renderer(renderer1)
+
+        scoreboard_rect = display_rect.copy()
+        scoreboard_rect.height = 50
+        scoreboard_rect.top = renderer_rect.bottom
+
+        scoreboard = StatusBar(self, scoreboard_rect)
+        self.game_time.event_update += scoreboard.update
+        self.world.add_renderer(scoreboard)
 
         self.setup_update_events()
 
     def setup_update_events(self):
         self.game_time.event_update += self.update
         self.game_time.event_update += self.render
-        self.game_time.event_update += self.renderer1.update
 
     def render(self, gdt, gt, dt, t, get_surface=pygame.display.get_surface, flip=pygame.display.flip):
         screen_surf = get_surface()

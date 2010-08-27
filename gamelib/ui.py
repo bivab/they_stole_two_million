@@ -1,4 +1,6 @@
 import pyknic, pygame
+import math
+from pygame.locals import *
 from pyknic.geometry import Vec3
 from pyknic.utilities import SortedList
 from pyknic.timing import GameTime
@@ -6,23 +8,27 @@ from pyknic.resources.tiledtmxloader import TileMapParser, ImageLoaderPygame
 
 class SimpleRenderer(pyknic.renderer.IRenderer):
 
-    def __init__(self, state, cam_rect, player):
-        # cam_rect = resolution, world_rect = visible, world
+    def __init__(self, state, cam_rect):
         super(SimpleRenderer, self).__init__(cam_rect)
-        self.player = player
         self.state = state
+        self.target = self.state.player
 
     def render(self, screen_surf, offset=None):
+        self.position = self.target.position
+
         if self._world:
-            # place word relatively to the players position
-            offset = Vec3(self.player.position.x-screen_surf.get_width()/2, self.player.position.y-screen_surf.get_height()/2)
             clipped_surf = screen_surf.subsurface(self.rect)
-            # also change the display rect
-            search_rect = pygame.Rect(offset.x, offset.y, screen_surf.get_width(), screen_surf.get_height())
-            ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
-            #ents = SortedList(self._world._entities, lambda e: -e.position.z + e.layer)
-            for entity in ents:
-                entity.render(clipped_surf, offset, self.screen_pos)
+            offset = (self.position - self.vec_center)
+
+            #search_rect = self.rect.move(offset.as_xy_tuple())
+            #ents = SortedList(self._world.get_entities_in_region(search_rect), lambda e: -e.position.z + e.layer)
+
+            layers = [self.state.lighting] + self._world._entities
+
+            for layer in SortedList(layers, lambda e: -e.position.z + e.layer):
+                layer.render(clipped_surf, offset)
+
+
 
     def screen_to_world(self, coord):
         x = self.position.x + coord[0] - self.rect.topleft[0] - self.vec_center.x
@@ -39,4 +45,26 @@ class SimpleRenderer(pyknic.renderer.IRenderer):
 
     def hit(self, coord):
         return self.rect.collidepoint(coord.as_xy_tuple())
+
+class StatusBar(pyknic.renderer.IRenderer):
+    def __init__(self, state, cam_rect):
+        super(StatusBar, self).__init__(cam_rect)
+        self.state = state
+        self.player = self.state.player
+
+    def render(self, screen_surf, offset=None):
+        clipped_surf = screen_surf.subsurface(self.rect)
+        clipped_surf.fill((255,255,0))
+
+        line_offset = 1
+        font = pygame.font.Font(None,25)
+
+        s = '$$$: %(money)d' % {'money':self.player.money}
+        text = font.render(s,1,(255,0,0))
+        clipped_surf.blit(text, (1, line_offset))
+
+        line_offset += text.get_height()
+
+
+
 
