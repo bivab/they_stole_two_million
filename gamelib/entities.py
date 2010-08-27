@@ -771,13 +771,7 @@ class LurkingGuard(Enlightened):
         self.collision_response(wall)
 
     def collidate_player(self, player, wall, dummy = 0):
-        self.velocity.x = 0
-        self.velocity.y = 0
-        font = pygame.font.SysFont("Dejavu Sans", 32)
-        title = font.render("GAME OVER", True, (255, 0, 0))
-        s = pygame.display.get_surface()
-        r = s.blit(title, (0,0))
-        pygame.display.flip()
+        self.state.game_over()
 
 class PatrollingGuard(Enlightened):
     def __init__(self, position, state, direction):
@@ -899,10 +893,4 @@ class PatrollingGuard(Enlightened):
         self.collision_response(wall)
 
     def collidate_player(self, player, wall, dummy = 0):
-        self.velocity.x = 0
-        self.velocity.y = 0
-        font = pygame.font.SysFont("Dejavu Sans", 32)
-        title = font.render("GAME OVER", True, (255, 0, 0))
-        s = pygame.display.get_surface()
-        r = s.blit(title, (0,0))
-        pygame.display.flip()
+        self.state.game_over()

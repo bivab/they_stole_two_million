@@ -173,3 +173,43 @@ class PlayState(pyknic.State):
 
     def update(self, gdt, gt, dt, t, *args):
         pass
+    
+    def game_over(self):
+        self.the_app.replace_state(GameOverState(self.player.money))
+
+class GameOverState(pyknic.State):
+
+    def __init__(self, money=0, *args, **kwargs):
+        super(GameOverState, self).__init__(*args, **kwargs)
+        self.money = money
+
+    def on_init(self, app):
+        titlefont = pygame.font.Font("./data/TopSecret.ttf", 64)
+        font = pygame.font.SysFont("Dejavu Sans", 18)
+        title = titlefont.render('[GAME OVER]', True, (0, 255, 0))
+        left = (self.the_app.config['display']['width']-title.get_width())/2
+        top = 64
+        s = pygame.display.get_surface()
+        s.fill((0,0,0))
+        r = s.blit(title, (left,top))
+
+        text = font.render("You reached $%i, thanks for playing!" % self.money, True, (0,255,0))
+        left = (self.the_app.config['display']['width']-text.get_width())/2
+        r = s.blit(text, (left, r.bottom+16))
+
+        lock = pygame.image.load('./data/images/icon_lockpicks.png')
+        s.blit(lock, (16, self.the_app.config['display']['height']-16-lock.get_height()))
+        rob = pygame.image.load('./data/images/rob.png')
+        s.blit(rob, (self.the_app.config['display']['width']-16-rob.get_width(), self.the_app.config['display']['height']-16-rob.get_height()))
+
+        pygame.display.flip()
+
+
+    def on_key_down(self, key, mod, unicode):
+        u"""Default event handler for key presses.
+         - escape: pops this state
+         - F3: take a screenshot
+
+        """
+        if pygame.K_ESCAPE == key:
+            self.on_quit()
