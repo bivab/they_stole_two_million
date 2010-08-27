@@ -184,6 +184,7 @@ class Desk(InteractiveDelegate):
         image.blit(self.img, (0,0))
 
         screen_surf.blit(image, (self.rect.x, self.rect.y))
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def label(self):
         return 'Desk'
