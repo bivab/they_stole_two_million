@@ -41,7 +41,7 @@ class InteractiveThing(pyknic.entity.Entity):
             try:
                 import gamelib.delegates
                 klass = getattr(gamelib.delegates, self.thing_type)
-                self.thing = klass(self.properties, self.rect, self)
+                self.thing = klass(self.properties, self.rect, self, self.state)
             except AttributeError, e:
                 print 'Unknown type %s' % self.thing_type
 

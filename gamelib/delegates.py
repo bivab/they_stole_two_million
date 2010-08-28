@@ -12,12 +12,13 @@ from random import randint
 class InteractiveDelegate(object):
     image_files = {}
 
-    def __init__(self, properties, rect, entity = None):
+    def __init__(self, properties, rect, entity, game_state):
         self.properties = properties
         self.rect = rect
         self.color = (255, 100, 0)
         self.timer = None
         self.entity = entity
+        self.game_state = game_state
         self.smash_cost = 10
         self.rotation = 0
         self.setup()
@@ -44,18 +45,17 @@ class InteractiveDelegate(object):
         if self.timer:
             return lambda *args:()
         def func(player):
-            self.timer = [timer, callback, player]
+            self.timer = True
+            def f(*args):
+                self.timer = None
+                callback(player)
+                player.unfreeze()
+            self.game_state.game_time.schedule(timer, f, player)
             player.freeze()
         return func
 
     def update(self, *args, **kwargs):
-        if self.timer:
-            if self.timer[0] == 0 :
-                self.timer[1](self.timer[2])
-                self.timer[2].unfreeze()
-                self.timer = None
-            else:
-                self.timer[0] -= 1
+        pass
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         f = self.images.get(self.state, self.images['default'])
@@ -68,8 +68,8 @@ class Door(InteractiveDelegate):
             "closed" : 'data/images/door_closed.png',
             "locked" : 'data/images/door_closed.png'}
 
-    def __init__(self, properties, rect, entity):
-        InteractiveDelegate.__init__(self, properties, rect, entity)
+    def __init__(self, *args):
+        InteractiveDelegate.__init__(self, *args)
         self.lockpick_time = 50
         if self.state == 'default':
             self.state = "locked"
@@ -126,7 +126,7 @@ class Desk(InteractiveDelegate):
     states = ['closed', 'opened', 'smashed', 'locked']
 
     def __init__(self, properties, rect, *args):
-        InteractiveDelegate.__init__(self, properties, rect)
+        InteractiveDelegate.__init__(self, properties, rect, *args)
         if self.state not in self.states:
             self.state = "locked"
         self.lockpick_time = 10
@@ -234,7 +234,7 @@ class Safe(InteractiveDelegate):
         self.close_time = 10
         self.rob_time = 5
         self.value = 0
-        InteractiveDelegate.__init__(self, properties, rect)
+        InteractiveDelegate.__init__(self, properties, rect, *args)
         self.state = "locked"
 
 
@@ -314,10 +314,10 @@ class Showcase(InteractiveDelegate):
 
     def __init__(self, properties, rect, *args):
         self.state = "closed"
-        self.smash_time = 20
+        self.smash_time = 10
         self.rob_time = 5
         self.value = 0
-        InteractiveDelegate.__init__(self, properties, rect)
+        InteractiveDelegate.__init__(self, properties, rect, *args)
 
     def setup(self):
         InteractiveDelegate.setup(self)
@@ -350,13 +350,13 @@ class Dispenser(InteractiveDelegate):
 
     def __init__(self, properties, rect, *args):
         self.state = 'filled'
-        self.smash_time = 10
-        self.drink_time = 5
+        self.smash_time = 5
+        self.drink_time = 2
         self.fill = 20
         self.cost = 1
         self.cup_size = 10
 
-        InteractiveDelegate.__init__(self, properties, rect)
+        InteractiveDelegate.__init__(self, properties, rect, *args)
 
 
     def label(self):
@@ -374,7 +374,7 @@ class Dispenser(InteractiveDelegate):
             return actions
 
         if self.state == 'filled' and self.fill >= self.cup_size and player.money >= self.cost:
-            actions.append(('Drink', self.make_action(self.drink, self.drink_time)))
+            actions.append(('Drink (%ss)' % self.drink_time, self.make_action(self.drink, self.drink_time)))
         actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
         return actions
 
