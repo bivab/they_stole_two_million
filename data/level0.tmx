@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="130" height="110" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="time" value="180"/>
+ </properties>
+ <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
+  <image source="images/tileset_millions_1.png"/>
+ </tileset>
+ <layer name="ground" width="130" height="110">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3DAQkAAAwEoavw/csux0DBVVNVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX13QMOanA/cN8AAA==
+  </data>
+ </layer>
+ <layer name="Street" width="130" height="110">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3SsQqAMBAFQTv//49l29gazsAMvDYcYa+L09wfjPPpgOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogOiA6IDogEx1oLm3yX/Y0cEXb9p5W03fYzowHZgObH6r6XtMB6YD04HNbzV9j/2jA86jA6IDogOiA6IDsqODB0A3QB1w3wAA
+  </data>
+ </layer>
+ <layer name="Building Ground" width="130" height="110">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3cO07DQBiFUe+DVQESTXiIAtj/DvBVlMYYxYwdz290Pum20WR8iiRFhkGVer2yt35H045xoMSBEgdKHKzr2v1dVr2qDu4Osr846H3W3zYsOD8HHHDAAQcccMABBxxwwAEHHHDAAQccDAvOz8E2DnqfkwMOOOh/fxysq/fdtOxIz54D48A4uO3uxz1M9ljgXBzsu9O458leCpzryA563wsHHHDAAQcccMABBxxwcI4DDhIHHCQOOEgccJA44CBxwEHigIPEAQeJAw4SBxwkDjhIFR2k3nfDAQcccMBBHQe974UDDjjggAMOOOCAAw44OMcBB4kDDhIHHCQOOEgccJA44CBxwEHigIPEAQeJAw4SBxwkDjhIHHCQOOAgVXSQet8NBxy07GPc52RfBc7FgXFgHBgH223uf/RbV/3/9xMH8zsNPz//t67694bEAQeJAw4SBxwkDjhIHMxv7vfB1lX/XTFxYImDZffS0vQ1ej9vDra9kzXr+d444IADDjjggAMOOOCAAw7+k4NLLe9pbbd2ULFeDm5517b9ODAOjAPjwDgwDmxvB092qL3PP0ZJkiRJkiRJkiRJkqTufQOyQT+QcN8AAA==
+  </data>
+ </layer>
+ <layer name="Walls" width="130" height="110">
+  <properties>
+   <property name="passable" value="false"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3dwW4TMRSF4UhQwYZWdB0JFlCpXbRPQLft+z8RuYtIwWoYO/a1z735P8mbTDRzbA5RZjrK7HZQsV8dAAAAyFH9fvDpMH50jp+DX/tofJ48J6/RMo+Z3pz28d7xvtpjjHjvbKrZvHow+lj0wBc9mEs1Gz2YSzUbPZhLNZtXD2463ld7jIhU5+HVg57Xao8Rkeo8RuTqOUekBxq8co3+9+X7ga+MPVCmOg96AEMPYEasb8854rV9P1D1Z9f/N7Snga/dfZDx8TC+VLznuP31opWYQ7WjqrlKfB74irJm9MBXlDVryVl7TwPiidLXLVnmsUqW9csyj1WyrJ/qPFRzlaLk3JJlHqu0rF/tPQ0r0IM+Wc4blbNFQA98qeYqZekB+tADGHoAk6UHqtlUc5Wy9EBVlDWjB76irBk98BVlzbL0QDWbaq4SPfClmqtED3yp5irRAxh6AEMPYLL0QFWUNaMHMPQAJksPlLNFkKUHqqKsGT2AoQcwWXqgnC0CeuBLNVeJHvhSzVWiB75Uc5XogS/VXCV64Es1VylLD1RFWTN6AEMPYLL0QDlbBC2/gcbvpbWjnwCwBp+/MKo9UM1VavkNNH4vrZ1qrhLnjb5GPH9h5HPiz43bhjl9u2D/s4bqsyFW9tP72Ir/9xQzGXowl2ImszKX93U/xeuK9ABGdb1Vc2XFegPAed7X/ZSvK6rhvHEuxUxmZS67lrn1bNaacW4fitfu6EH9sX8dxv3J+N24fWv/KylmMoo9eDiM7ydj37h9a/8rKWZa7Rp7gHqjeoDY6MF8ip+dmXuguN6G74lzrcz09WSUrx/v3TlVnp97bPvfPUajenCc24r5ndvWcl/VtXve/dvdl8btAAAAAAAAAAAAAAAAAAAAAABgvr/1pWOMcN8AAA==
+  </data>
+ </layer>
+ <layer name="Window Walls" width="130" height="110">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3YQWrDQBBEUd/Ex8n9bxR6IcgmkE1aX+P3wCsvXCpKw+DXCwAAAAAA+M3X3QFIsAOGHQAX5wGjvINyttOUuy5nY48dABfnAcMOGNUdVHOxyw4YdgBcnAcMO2DYAeyrvnfVXKeq9l3Ndapq39VccDLvHcMOGHYAADyFewvDDhh2sEvfjOoOqrlOVe27motddrBL34zqDqq5TlXtu5qLXXYAAAD3cy9nVHdQzXWqat/VXOyyg136ZlR3UM11qmrf1VzssgMAAAAA/sL/SLuqfVdznaradzXXqfQNADyFe8uuat935vrv3y52Xsw07GBXMdPdPnEH8ATvH5+N77ZtP1/p2QEAAAAAAAAAAAAAALZ8A7wtxz5w3wAA
+  </data>
+ </layer>
+ <objectgroup name="Windows" width="130" height="110">
+  <object name="Window" type="Window" x="144" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="256" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="368" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="480" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1040" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1152" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1264" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1376" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1488" y="1360" width="48" height="16"/>
+  <object name="Window" type="Window" x="1584" y="1280" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="1168" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="992" y="1296" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="608" y="1296" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="1280" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="1168" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="992" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="928" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="784" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="720" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="656" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="496" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="432" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="112" y="368" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="960" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="896" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="752" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="688" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="544" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="480" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="320" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="1584" y="256" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="960" y="240" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Window" type="Window" x="960" y="176" width="16" height="48">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="Doors" width="130" height="110">
+  <object name="Door" type="Door" x="848" y="304" width="64" height="16">
+   <properties>
+    <property name="rotation" value="180"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="640" y="1232" width="64" height="16">
+   <properties>
+    <property name="rotation" value="180"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="912" y="1232" width="64" height="16">
+   <properties>
+    <property name="rotation" value="180"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="608" y="1136" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="991" y="1135" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="784" y="976" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="960" y="976" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="384" y="224" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="464" y="112" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="544" y="224" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="624" y="112" width="16" height="64">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="704" y="304" width="64" height="16">
+   <properties>
+    <property name="rotation" value="180"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="Desks &amp; Stuff" width="130" height="110">
+  <object name="Desk" type="Desk" x="1031" y="161" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1167" y="162" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1327" y="459" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1474" y="164" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1472" y="457" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1332" y="162" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1170" y="459" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1028" y="457" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1026" y="740" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1170" y="740" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1328" y="744" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="1472" y="743" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Safe" type="Safe" x="130" y="99" width="48" height="49">
+   <properties>
+    <property name="rob" value="10000"/>
+   </properties>
+  </object>
+  <object name="Safe" type="Safe" x="224" y="99" width="48" height="49">
+   <properties>
+    <property name="rob" value="10000"/>
+   </properties>
+  </object>
+  <object name="Safe" type="Safe" x="315" y="100" width="48" height="49">
+   <properties>
+    <property name="rob" value="10000"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="143" y="254" width="112" height="41">
+   <properties>
+    <property name="rob" value="10000"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="773" y="1173" width="64" height="32">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="0"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="1271" y="1107" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="1429" y="1108" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="1077" y="1102" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="464" y="1300" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="314" y="1299" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="147" y="1297" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="204" y="1152" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="146" y="1007" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="324" y="1008" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="505" y="1008" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="1264" y="1011" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="699" y="737" width="32" height="64">
+   <properties>
+    <property name="rob" value="0"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="151" y="748" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="314" y="750" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="152" y="472" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Showcase" type="Showcase" x="320" y="474" width="112" height="46">
+   <properties>
+    <property name="rob" value="100"/>
+   </properties>
+  </object>
+  <object name="Desk" type="Desk" x="649" y="227" width="32" height="64">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Dispenser" type="Dispenser" x="982" y="907" width="39" height="42"/>
+  <object name="Dispenser" type="Dispenser" x="139" y="860" width="39" height="42"/>
+ </objectgroup>
+ <objectgroup name="Entities" width="130" height="110">
+  <object name="Player" type="Player" x="1713" y="854" width="41" height="39"/>
+  <object name="Car" type="Car" x="1712" y="688" width="79" height="140">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="Guards" width="130" height="110">
+  <object name="PatrollingGuard" type="PatrollingGuard" x="645" y="1006" width="46" height="44">
+   <properties>
+    <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard" type="PatrollingGuard" x="857" y="369" width="46" height="44">
+   <properties>
+    <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard" type="PatrollingGuard" x="1248" y="165" width="46" height="44">
+   <properties>
+    <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard" type="PatrollingGuard" x="65" y="1419" width="46" height="44">
+   <properties>
+    <property name="direction" value="horizontal"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard" type="PatrollingGuard" x="1633" y="1431" width="46" height="44">
+   <properties>
+    <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard" type="PatrollingGuard" x="713" y="367" width="46" height="44">
+   <properties>
+    <property name="direction" value="horizontal"/>
+   </properties>
+  </object>
+  <object name="LurkingGuard" type="LurkingGuard" x="1453" y="887" width="47" height="47"/>
+  <object name="LurkingGuard" type="LurkingGuard" x="1218" y="1227" width="47" height="47"/>
+ </objectgroup>
+ <layer name="Impassible Stuff" width="130" height="110" visible="0">
+  <properties>
+   <property name="passable" value="false"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3ZMQrDMAwF0FykWdv7n7DRUDAZ7GCSqlHfAw9Giwdb36BlAQAAAAAAAAAAKnhsa80+BOme23plHwIO0LMIetb1vDWCtwYAAAAAAFRlHkYwDwM+5AKhci7s73j2nhz7O569BwAAAAAAgGrMRglmowDfIXcJcheAlv8Bwf8A4ByzuSqPa5nNVXkM99D2bP37f7U9W/8GAAAAAAAA7mw0++7VZ2v8ntHsu1efrQEAAAAAAAAAAAAAAEBVbxX4VUNw3wAA
+  </data>
+ </layer>
+ <layer name="Stuff" width="130" height="110" visible="0">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3OwQkAMAgAMRcvDuHCffdfESQZ4LgIAADYqaYHPsnpAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGCVbO6f5j4AAAAAAAAAAAAAAACvCxxSly5w3wAA
+  </data>
+ </layer>
+ <layer name="void" width="130" height="110">
+  <properties>
+   <property name="passable" value="false"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3SAQkAQRDEsPG8/uEpnItPoA56204af+cD4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gNy0usDY1VFUnDfAAA=
+  </data>
+ </layer>
+</map>
