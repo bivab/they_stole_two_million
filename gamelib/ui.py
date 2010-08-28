@@ -1,5 +1,7 @@
-import pyknic, pygame
 import math
+import datetime
+
+import pyknic, pygame
 from pygame.locals import *
 from pyknic.geometry import Vec3
 from pyknic.utilities import SortedList
@@ -59,10 +61,18 @@ class StatusBar(pyknic.renderer.IRenderer):
         line_offset = 1
         font = pygame.font.Font(None,25)
 
-        values = {'money':self.player.money, 'energy':self.player.energy}
-        s = '$$$: %(money)d | Energy: %(energy)d' % values
+        s = '$$$: %(money)d' % {'money': self.player.money}
         text = font.render(s,1,(255,0,0))
         clipped_surf.blit(text, (1, line_offset))
+
+
+        s = 'Energy: %(energy)d' % {'energy':self.player.energy}
+        text = font.render(s,1,(255,0,0))
+        clipped_surf.blit(text, (300, line_offset))
+
+        s = 'Time: %s' % datetime.timedelta(seconds=int(self.state.get_remaining_time()))
+        text = font.render(s,1,(255,0,0))
+        clipped_surf.blit(text, (700, line_offset))
 
         line_offset += text.get_height()
 

@@ -83,6 +83,7 @@ class PlayState(pyknic.State):
         super(PlayState, self).__init__(*args, **kwargs)
         self.world = TheWorld()
         self.game_time = pyknic.timing.GameTime()
+        self.remaining = self.time = 60
         self.level = level
 
 
@@ -131,6 +132,7 @@ class PlayState(pyknic.State):
                 ent.rect = layer_img.get_rect()
                 ent.layer = layernum * 10
                 self.world.add_entity(ent)
+                self.game_time.schedule_repeated(0.1, self.update_time)
 
         # map objects
         for obj_group in world_map.object_groups:
@@ -185,6 +187,17 @@ class PlayState(pyknic.State):
 
     def game_won(self):
         self.the_app.replace_state(WonState(self.player.money))
+
+    def update_time(self, gdt, gt, dt, t):
+        self.remaining = int(self.time - gt)
+        if self.remaining <= 0:
+            self.game_over()
+            return pyknic.timing.GameTime.SCHEDULE_STOP
+        return pyknic.timing.GameTime.SCHEDULE_AGAIN
+
+    def get_remaining_time(self):
+        return self.remaining
+
 
 class EndState(pyknic.State):
     def __init__(self, money=0, *args, **kwargs):
