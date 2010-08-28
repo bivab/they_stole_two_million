@@ -221,7 +221,10 @@ class Car(InteractiveDelegate):
         return 'Car'
 
 class Safe(InteractiveDelegate):
-    image_files = {"money" : 'data/images/safe_closed.png',"default" : 'data/images/safe_opened.png'}
+    image_files = { "default" : 'data/images/safe_closed.png',
+                    "opened_money":'data/images/safe_opened_money.png',
+                    "opened":'data/images/safe_opened.png',
+                    }
     states = ['closed', 'opened', 'smashed', 'locked']
 
     def __init__(self, properties, rect, *args):
@@ -237,9 +240,11 @@ class Safe(InteractiveDelegate):
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
-        image.fill(self.color)
-        if self.value > 0 and self.state == 'opened':
-            f = self.images['money']
+        if self.state == 'opened':
+            if self.value <= 0:
+                f = self.images['opened']
+            else:
+                f = self.images['opened_money']
         else:
             f = self.images['default']
         img = pygame.transform.scale(f, image.get_size())
