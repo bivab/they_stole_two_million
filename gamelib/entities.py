@@ -295,7 +295,7 @@ class ActionMenu(pyknic.entity.Entity):
         # setup sprite for menu
         height = 50 + len(self.items) * item_height + \
                 len(set(self.names)) * name_height
-        i_width = 20 + reduce(max, [len(i) for i in self.items]) * item_height
+        i_width = 20 + reduce(max, [len(i) for i, v in self.items]) * item_height
         n_width = 20 + reduce(max, [len(i) for i in self.names])  * name_height
         width = max(i_width, n_width, min_width)
 
