@@ -198,13 +198,16 @@ class PlayState(pyknic.State):
     def game_over(self):
         self.the_app.replace_state(GameOverState(self.player.money))
 
+    def game_over_timeout(self):
+        self.the_app.replace_state(TimeOutState(self.player.money))
+
     def game_won(self):
         self.the_app.replace_state(WonState(self.player.money))
 
     def update_time(self, gdt, gt, dt, t):
         self.remaining = int(self.time - gt)
         if self.remaining <= 0:
-            self.game_over()
+            self.game_over_timeout()
             return pyknic.timing.GameTime.SCHEDULE_STOP
         return pyknic.timing.GameTime.SCHEDULE_AGAIN
 
@@ -260,6 +263,21 @@ class GameOverState(EndState):
 
     def on_init(self, app):
         self.draw(app, '[GAME OVER]', "You reached $%i, thanks for playing!" % self.money)
+
+
+    def on_key_down(self, key, mod, unicode):
+        u"""Default event handler for key presses.
+         - escape: pops this state
+         - F3: take a screenshot
+
+        """
+        if pygame.K_ESCAPE == key:
+            self.on_quit()
+
+class TimeOutState(EndState):
+
+    def on_init(self, app):
+        self.draw(app, '[GAME OVER]', "Time's up! You reached $%i, thanks for playing!" % self.money)
 
 
     def on_key_down(self, key, mod, unicode):
