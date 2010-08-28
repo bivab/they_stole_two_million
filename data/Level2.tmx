@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="120" height="100" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="time" value="180"/>
+ </properties>
  <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
   <image source="images/tileset_millions_1.png"/>
  </tileset>
  <layer name="ground" width="120" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3dO07DQBRAUUsEQQMotCBBQ8EiqKEFRMW3Iex/B0wkChcR8SjP9pubW9zGkifjOYqlKP4su65bWpq+Sh8VfZbe/qk/9kHpKrDr4PGiWlSsd/SabJvPmL73pYvAoseLnNdQ3ymOoT8fffXN7PtYehq5Z31n833dMp+I3vXVV1999W3S96Qb/tvlVN/mfLOlr7766qtvzvTVV1999c2Zvvrqq6++OWvV92HDtu/SauR+Epjtg6/pa/rS05ddq76HCdauhVr19Xygr+lLT192+rLTl91Uvndd7H1xU1xbSqjV76/pa/rS05edvuz0ZacvO33Z6ctOX3b6stOXnb7s9GWnLzt92enLTl92+rLTl52+7PRlpy87fdnpy05fdvqy05edvuzG9D3vVfPeibE62qH1/mcbtt9u+cwF2HeX9aQ093lLX3311Vdfffcxfdnpy05fdvqy05edvuz0ZacvO33Z6ctu7v9F189hPf5LX3b6stOXnb7s9GWnLzt92enLTl920b4vlqoa2yG+teNZrvRlpy87fdnpy05fdvqy05edvuz0ZVfz/A3L0U2gr+XrUl90kb6/jaf4rIC7AAA=
+   H4sIAAAAAAAAA+3dvUrDUACG4YCKLip1raCLgxfhXFcVJ38X9f7vwBQcOhTb0JPm5MszvEsgpyfnoYHS/Myappmpmj7b3jv00fb6T6tjH7RdFey68HilOuyw3qXXZNN8+vRdtM0LVnq8kvPa1ncfx7A6H758a/Z9aHvsuSe+g/m+bJhPid748uXLl+8ofU+b7X+7nPEdnW9t8eXLly/fOuPLly9fvnXGly9fvnzrbKy+92u2fbV999xPBWZT8BVf8U2Pb3Zj9T2qYO3G0Fh9nQ/4im96fLPjmx3f7Pble9eUvS9uH9eWJjTW76/4im96fLPjmx3f7Phmxzc7vtnxzY5vdnyz45sd3+z4Zsc3O77Z8c2Ob3Z8s+ObHd/s+GbHNzu+2fHNjm92fLPjm12fvhcrdXnvRF8d79By//M12283fOZhsO8u65nS0Octvnz58uXLd4oN7Tvny5cvX758J9jQvgu+fPny5ct3gvHNjm92Q/8vunwO68lffLPjmx3f7Phmxzc7vtnxzY5vdnyzK+37rKrqYruNb9fxVFd8s+ObHd/s+GbHNzu+2fHNjm92fLPr8vwN1dFNQV/V1yXf6Er6/gJiobVKgLsAAA==
   </data>
  </layer>
  <layer name="wall" width="120" height="100">
@@ -13,11 +16,11 @@
    <property name="passable" value="false"/>
   </properties>
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3bQU7DQBSD4UrAEjgC3cIdYAv3PxEsSdRAmjix4/6fFAmhMvNiA1I77emEW3H3c70Ir7N4PdV1b8xk7TxrfIavp3LNXHvcw1450e+6xy5Fv1r0m7meCv1mrqdCv5nrqdBv5noq76f5z12edpiHfrXS5qJfrbS56FcrbS761Uqbi3610uaiX620uehXK20u+tVKm4t+tdLmol+ttLmO2u+XeD0V+u2Wdp97/R2k3fdW0u6Tv1+ttPukX620+zxqvw/i9VToN3M9lbS56FcrbS761Uqbi3610uaiX620uehXK22uvea55n2jc663ie+ff339fGGOV/Ec/811nnjcX7NN/cyS6+PCPls46v+JtZbMo7yHttzpd7u1bmmfuej3mPvMteR8Tnmm15Z7Wr9ubbnT71Bb7vQ71JZ76vuyXNr6TbPknFp5tk2/2+L5UTf67Ua/Wmnvy6LfY+4z15Jzs6mzMc6P8vp1z9OWuzvPMfc8bbm78xxzz9OWuzvPMffraW25p/Xr1pY7/Q615U6/Q2250+9QW+5p/bpfT2vLPa1f9zxtubvzHHPP05a7O88x9zxtubvzHHPP05a7O88x9zxtubvzHHPPs9f+j6dtP7e3xdnpNZ/5c5+/TnH/frVz5+vev507X/f+7dz5uvdv587XvX878u1Gv93ot5u7X/f+7dz5uvdv587XvX87d77u/du583Xv386dr3v/du583fu32+tcdOp62v4WAQAAAAAAAAAAAAAAAAAAgArfWbbA7oC7AAA=
+   H4sIAAAAAAAAA+3bQU7DQBSD4UrAEjgC3cIdYAv3PxEsSdRAmjix4/6fFAmhMvNiA1I77emEW3H3c70Ir7N4PdV1b8xk7TxrfIavp3LNXHvcw1450e+6xy5Fv1r0m7meCv1mrqdCv5nrqdBv5noq76f5z12edpiHfrXS5qJfrbS56FcrbS761Uqbi3610uaiX620uehXK20u+tVKm4t+tdLmol+ttLmO2u+XeD0V+u2Wdp97/R2k3fdW0u6Tv1+ttPukX620+zxqvw/i9VToN3M9lbS56FcrbS761Uqbi3610uaiX620uehXK22uvea55n2jc663ie+ff339fGGOV/Ec/811nnjcX7NN/cyS6+PCPls46v+JtZbMo7yHttzpd7u1bmmfuej3mPvMteR8Tnmm15Z7Wr9ubbnT71Bb7vQ71JZ76vuyXNr6TbPknFp5tk2/2+L5UTf67Ua/Wmnvy6LfY+4z15Jzs6mzMc6P8vp1z9OWuzvPMfc8bbm78xxzz9OWuzvPMffraW25p/Xr1pY7/Q615U6/Q2250+9QW+5p/bpfT2vLPa1f9zxtubvzHHPP05a7O88x9zxtubvzHHPP05a7O88x9zxtubvzHHPPs9f+j6dtP7e3xdnpNZ/5c5+/TnH/frVz5+vev507X/f+7dz5uvdv587XvX878u1Gv93otxv9dnP3696/nTtf9/7t3Pm692/nzte9fzt3vu7927nzde/fbq9z0anraftbBAAAAAAAAAAAAAAAAAAAACp8A9pmYsqAuwAA
   </data>
  </layer>
  <objectgroup name="Entities" width="120" height="100">
-  <object name="Player" type="Player" x="216" y="298" width="41" height="39"/>
+  <object name="Player" type="Player" x="1633" y="774" width="41" height="39"/>
   <object name="Guard 1" type="LurkingGuard" x="246" y="707" width="31" height="27"/>
   <object name="Guard 2" type="Guard" x="164" y="590" width="31" height="27"/>
   <object name="PatrollingGuard01" type="PatrollingGuard" x="413" y="118" width="23" height="25">
@@ -40,9 +43,75 @@
     <property name="rotation" value="90"/>
    </properties>
   </object>
-  <object name="Door" type="Door" x="1552" y="1057" width="13" height="43">
+  <object name="Door" type="Door" x="1552" y="1057" width="12" height="60">
    <properties>
     <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="208" y="467" width="61" height="26">
+   <properties>
+    <property name="rob" value="100"/>
+    <property name="rotation" value="180"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="482" y="97" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="559" y="96" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="642" y="95" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="722" y="99" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="800" y="99" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="481" y="213" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="561" y="209" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="642" y="207" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="719" y="208" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="800" y="207" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
    </properties>
   </object>
  </objectgroup>
