@@ -386,3 +386,12 @@ class Dispenser(InteractiveDelegate):
     def smash(self, player):
         self.state = 'smashed'
         player.energy -= self.smash_cost
+
+class Window(Door):
+    image_files = {
+            "default" : 'data/images/window1.png',
+            "opened" : 'data/images/window1_open.png',
+            "smashed" : 'data/images/window1_open.png'}
+
+    def label(self):
+        return 'Window'
