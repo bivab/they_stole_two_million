@@ -83,7 +83,6 @@ class InteractiveDelegate(object):
         self.color = (255, 100, 0)
         self.timer = None
         self.entity = entity
-        self.smashed = False
         self.smash_cost = 10
         self.rotation = 0
         self.setup()
@@ -166,7 +165,7 @@ class Door(InteractiveDelegate):
             actions.append(('Open', self.make_action(self.open, 1)))
         elif self.state == 'opened':
             actions.append(('Close', self.make_action(self.close, 1)))
-        if self.state != 'smased' and player.energy > self.smash_cost:
+        if self.state != 'smased' and player.energy >= self.smash_cost:
             actions.append(('Smash', self.make_action(self.smash, 10)))
         return actions
 
@@ -189,11 +188,12 @@ class Door(InteractiveDelegate):
 
 class Desk(InteractiveDelegate):
     image_files = {"robbed" : 'data/images/desk01.png',"default" : 'data/images/desk01_money.png'}
-
+    states = ['closed', 'opened', 'smashed', 'locked']
 
     def __init__(self, properties, rect, *args):
-        self.state = "locked"
         InteractiveDelegate.__init__(self, properties, rect)
+        if self.state not in self.states:
+            self.state = "locked"
         self.lockpick_time = 10
         self.smash_time = 1
         self.open_time = 1
@@ -204,7 +204,10 @@ class Desk(InteractiveDelegate):
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         image.fill(self.color)
-        f = self.images.get(self.state, self.images['default'])
+        if self.value > 0:
+            f = self.images['default']
+        else:
+            f = self.images['robbed']
         img = pygame.transform.scale(f, image.get_size())
         image.blit(img, (0,0))
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
@@ -217,8 +220,11 @@ class Desk(InteractiveDelegate):
         for key, value in self.properties.items():
             if key == 'rob':
                 self.value = int(value)
-            elif key == 'locked' and value == 'false':
-                self.state = 'closed'
+            elif key == 'locked':
+                if value == 'false':
+                    self.state = 'closed'
+                else:
+                    self.state = 'locked'
             elif key == 'lockpick_time':
                 self.unlock_time = int(value)
             elif key == 'smash_time':
@@ -228,21 +234,21 @@ class Desk(InteractiveDelegate):
 
     def get_actions(self, player):
         actions = []
-        if not self.smashed:
-            if player.energy > self.smash_cost:
+        if self.state != 'smashed':
+            if player.energy >= self.smash_cost:
                 actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
             if self.state == 'locked':
                 actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
             if self.state == 'closed':
                 actions.append(('Open', self.make_action(self.open, self.open_time)))
-            if self.state == 'open':
+            if self.state == 'opened':
                 actions.append(('Close', self.make_action(self.close, self.close_time)))
-        if self.state == 'open' and self.value > 0:
+        if self.value > 0 and self.state in ['smashed', 'opened']:
             actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
         return actions
 
     def open(self, player):
-        self.state = 'open'
+        self.state = 'opened'
         self.color = (0, 255, 0)
 
     def close(self, player):
@@ -254,12 +260,15 @@ class Desk(InteractiveDelegate):
         self.color = (123,0, 122)
 
     def smash(self, player):
+        if self.state == 'smashed':
+            print 'It is already smashed'
+            return
         self.state = 'smashed'
         player.energy -= self.smash_cost
         self.color = (0, 55, 100)
 
     def rob(self, player):
-        self.state = "robbed"
+        assert self.state in ['smashed', 'opened']
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
