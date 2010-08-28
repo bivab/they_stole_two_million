@@ -19,7 +19,7 @@ class InteractiveDelegate(object):
         self.timer = None
         self.entity = entity
         self.game_state = game_state
-        self.smash_cost = 10
+        self.smash_cost = 5
         self.rotation = 0
         self.setup()
         self.load_images()
@@ -70,7 +70,10 @@ class Door(InteractiveDelegate):
 
     def __init__(self, *args):
         InteractiveDelegate.__init__(self, *args)
-        self.lockpick_time = 50
+        self.lockpick_time = 6
+        self.open_time = 1
+        self.close_time = 1
+        self.smash_time = 3
         if self.state == 'default':
             self.state = "locked"
 
@@ -95,13 +98,16 @@ class Door(InteractiveDelegate):
             return actions
 
         if self.state == 'locked':
-            actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            actions.append(('Lockpick (%ss)' % self.lockpick_time,
+                                    self.make_action(self.lockpick, self.lockpick_time)))
         elif self.state == 'closed':
-            actions.append(('Open', self.make_action(self.open, 1)))
+            actions.append(('Open (%ss)' % self.open_time, self.make_action(self.open, self.open_time)))
         elif self.state == 'opened':
-            actions.append(('Close', self.make_action(self.close, 1)))
-        if self.state != 'smased' and player.energy >= self.smash_cost:
-            actions.append(('Smash', self.make_action(self.smash, 10)))
+            actions.append(('Close (%ss)' % self.close_time,
+                                    self.make_action(self.close, self.close_time)))
+        if self.state != 'smashed' and player.energy >= self.smash_cost:
+            actions.append(('Smash (%ss)' % (self.smash_time),
+                                    self.make_action(self.smash, self.smash_time)))
         return actions
 
     def open(self, player):
@@ -171,15 +177,20 @@ class Desk(InteractiveDelegate):
         actions = []
         if self.state != 'smashed':
             if player.energy >= self.smash_cost:
-                actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+                actions.append(('Smash (%ss)' % self.smash_time,
+                                            self.make_action(self.smash, self.smash_time)))
             if self.state == 'locked':
-                actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+                actions.append(('Lockpick (%ss)' % self.lockpick_time,
+                                            self.make_action(self.lockpick, self.lockpick_time)))
             if self.state == 'closed':
-                actions.append(('Open', self.make_action(self.open, self.open_time)))
+                actions.append(('Open (%ss)' % self.open_time,
+                                            self.make_action(self.open, self.open_time)))
             if self.state == 'opened':
-                actions.append(('Close', self.make_action(self.close, self.close_time)))
+                actions.append(('Close (%ss)' % self.close_time,
+                                            self.make_action(self.close, self.close_time)))
         if self.value > 0 and self.state in ['smashed', 'opened']:
-            actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
+            actions.append(('Rob (%ss)' % self.rob_time,
+                                            self.make_action(self.rob, self.rob_time)))
         return actions
 
     def open(self, player):
@@ -211,8 +222,13 @@ class Desk(InteractiveDelegate):
 class Car(InteractiveDelegate):
     image_files = {'default':'data/images/car.png'}
 
+    def __init__(self, *args):
+        InteractiveDelegate.__init__(self, *args)
+        self.escape_time = 5
+
     def get_actions(self, player):
-        return [('Escape', self.make_action(self.escape, 5))]
+        return [('Escape (%ss)' % self.escape_time,
+                                self.make_action(self.escape, self.escape_time))]
 
     def escape(self, player):
         self.entity.state.game_won()
@@ -228,12 +244,12 @@ class Safe(InteractiveDelegate):
     states = ['closed', 'opened', 'smashed', 'locked']
 
     def __init__(self, properties, rect, *args):
-        self.lockpick_time = 50
-        self.smash_time = 20
-        self.open_time = 10
-        self.close_time = 10
+        self.lockpick_time = 15
+        self.smash_time = 10
+        self.open_time = 5
+        self.close_time = 5
         self.rob_time = 5
-        self.value = 0
+        self.value = 1000
         InteractiveDelegate.__init__(self, properties, rect, *args)
         self.state = "locked"
 
@@ -275,15 +291,19 @@ class Safe(InteractiveDelegate):
         actions = []
         if self.state != 'smashed':
             if player.energy >= self.smash_cost:
-                actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+                actions.append(('Smash (%ss)' % self.smash_time,
+                                            self.make_action(self.smash, self.smash_time)))
             if self.state == 'locked':
-                actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+                actions.append(('Lockpick (%ss)' % self.lockpick_time,
+                                            self.make_action(self.lockpick, self.lockpick_time)))
             if self.state == 'closed':
-                actions.append(('Open', self.make_action(self.open, self.open_time)))
+                actions.append(('Open (%ss)' % self.open_time,
+                                            self.make_action(self.open, self.open_time)))
             if self.state == 'opened':
-                actions.append(('Close', self.make_action(self.close, self.close_time)))
+                actions.append(('Close (%ss)' % self.close_time,
+                                            self.make_action(self.close, self.close_time)))
         if self.value > 0 and self.state in ['smashed', 'opened']:
-            actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
+            actions.append(('Rob (%ss)' % self.rob_time, self.make_action(self.rob, self.rob_time)))
         return actions
 
     def open(self, player):
@@ -314,9 +334,9 @@ class Showcase(InteractiveDelegate):
 
     def __init__(self, properties, rect, *args):
         self.state = "closed"
-        self.smash_time = 10
-        self.rob_time = 5
-        self.value = 0
+        self.smash_time = 3
+        self.rob_time = 2
+        self.value = 100
         InteractiveDelegate.__init__(self, properties, rect, *args)
 
     def setup(self):
@@ -327,10 +347,12 @@ class Showcase(InteractiveDelegate):
     def get_actions(self, player):
         actions = []
         if self.state != 'smashed':
-            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+            actions.append(('Smash (%ss)' % self.smash_time,
+                                    self.make_action(self.smash, self.smash_time)))
         else:
             if self.value > 0:
-                actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
+                actions.append(('Rob (%ss)' % self.rob_time,
+                                    self.make_action(self.rob, self.rob_time)))
         return actions
 
     def label(self):
@@ -375,7 +397,7 @@ class Dispenser(InteractiveDelegate):
 
         if self.state == 'filled' and self.fill >= self.cup_size and player.money >= self.cost:
             actions.append(('Drink (%ss)' % self.drink_time, self.make_action(self.drink, self.drink_time)))
-        actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+        actions.append(('Smash (%ss)' % self.smash_time, self.make_action(self.smash, self.smash_time)))
         return actions
 
     def drink(self, player):
