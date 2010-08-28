@@ -1,13 +1,12 @@
-﻿Your Game Title
-===============
+﻿They Stole Two Millions
+=======================
 
 CONTACT:
 
-Homepage: 
-Name: 
-Team: 
-Members: 
-
+Homepage: http://github.com/davidsch/they_stole_two_million 
+Name: They Stole Two Millions
+Team: jitters 
+Members: Armin Rigo, David Schneider, Evgeni Golov, Jens Bendisposto, John Wittulski, Lukas Diekmann, Nadine Fritz, Rene Bartelmus, Simon Probst, Stephan Zalewski, et. al.  
 
 DEPENDENCIES:
 
@@ -15,6 +14,13 @@ You might need to install some of these before running the game:
 
   Python:     http://www.python.org/
   PyGame:     http://www.pygame.org/
+
+
+
+This game was created with the help of:
+  - python-pyknic http://code.google.com/p/python-pyknic/
+  - Tiled http://www.mapeditor.org/
+  - Vast amounts of coffee and jolt-cola
 
 
 RUNNING THE GAME:
@@ -29,28 +35,44 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 
 HOW TO PLAY THE GAME:
 
-Move the cursor around the screen with the mouse.
+Use the arrow keys to move the player arround on the screen when approaching an
+object pressing A reveals the actions provided by the object. With the number
+showed left of the action you can trigger it. During the action the player is
+blocked from doing anything else, the action's duration is shown on the right
+of the action name.
 
-Press the left mouse button to fire the ducks.
+Most object can be opened or smashed. Smashing is faster but consumes energy.
+You can recover energy by drinking water from a dispenser, which isn't free, so
+you need to "collect" some money first.
 
-
-
-LICENSE:
-
-This game skellington has same license as pyknic.
-
-
-========= remove from here ===================================================
-
-FOR DEVELOPERS:
-
-- put your code into the gamelib/main.py
-- put your data (images, sound, etc.) into data/
-- the working directory is set to the directory where the run_game.py is
-- fill out this readme.txt so it describes your game
-- remove the unwanted run_game* files (run_game_debug.py should be removed also the py2exe script)
-- use the make_exe.py (uses py2exe) script at own risk
-  - fill in the fields in the make_exe.py
-  - run it (it will include the pygame *.dll files and default font file)
+The goal of the game is to sneak in the a building an steal as much money as
+you possible can from desks, safes and showcases without beeing caught by the
+patrolling guards. Once you are rich enough you have to return to your car an
+leave the scene. All this has to be acomplished before your time runs out and
+the alarm goes of.
 
 
+
+LICENSE (MIT):
+
+Copyright (c) 2010, jitters Team
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
+No cats were harmed during pyweek
