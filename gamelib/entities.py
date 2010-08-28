@@ -38,10 +38,12 @@ class InteractiveThing(pyknic.entity.Entity):
 
     def get_thing(self):
         if not self.thing:
-            if self.thing_type == 'Desk':
-                self.thing = Desk(self.properties, self.rect)
-            elif self.thing_type == 'Door':
-                self.thing = Door(self.properties, self.rect, self)
+            try:
+                import gamelib
+                klass = getattr(gamelib.entities, self.thing_type)
+                self.thing = klass(self.properties, self.rect, self)
+            except Exception, e:
+               print 'Unknown type %s' % self.thing_type
 
         return self.thing
 
@@ -86,6 +88,8 @@ class InteractiveDelegate(object):
         self.rotation = 0
         self.setup()
         self.load_images()
+        if not hasattr(self, 'state'):
+            self.state = 'default'
 
     def load_images(self):
         self.images = dict([(k,pygame.transform.rotate(
@@ -118,9 +122,8 @@ class InteractiveDelegate(object):
                 self.timer[0] -= 1
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        image = pygame.Surface((self.rect.width, self.rect.height))
-        image.fill(self.color)
-
+        f = self.images.get(self.state, self.images['default'])
+        image = pygame.transform.scale(f, f.get_size())
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
@@ -130,10 +133,10 @@ class Door(InteractiveDelegate):
             "locked" : 'data/images/door_closed.png'}
 
     def __init__(self, properties, rect, entity):
-        self.state = "locked"
         InteractiveDelegate.__init__(self, properties, rect, entity)
         self.lockpick_time = 50
-        import pdb; pdb.set_trace()
+        if self.state == 'default':
+            self.state = "locked"
 
     def label(self):
         return 'Door'
@@ -148,8 +151,7 @@ class Door(InteractiveDelegate):
                     self.properties['closed'] == 'true':
                 self.state = 'closed'
             else:
-                self.state = 'opened'
-                self.entity.make_passable()
+                self.state = 'locked'
 
     def get_actions(self, player):
         actions = []
@@ -171,11 +173,6 @@ class Door(InteractiveDelegate):
             self.entity.make_passable()
             self.state = "opened"
 
-    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        f = self.images.get(self.state, self.images['default'])
-        image = pygame.transform.scale(f, f.get_size())
-        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
-
     def lockpick(self, player):
         self.state = 'closed'
 
@@ -192,7 +189,7 @@ class Desk(InteractiveDelegate):
     image_files = {"robbed" : 'data/images/desk01.png',"default" : 'data/images/desk01_money.png'}
 
 
-    def __init__(self, properties, rect):
+    def __init__(self, properties, rect, *args):
         self.state = "locked"
         InteractiveDelegate.__init__(self, properties, rect)
         self.lockpick_time = 10
@@ -264,6 +261,15 @@ class Desk(InteractiveDelegate):
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
+
+class Car(InteractiveDelegate):
+    image_files = {'default':'data/images/car.png'}
+
+    def get_actions(self, player):
+        return [('Escape', self.make_action(self.escape, 5))]
+
+    def escape(self, player):
+        self.entity.state.game_won()
 
 
 class Enlightened(pyknic.entity.Entity):

@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" width="120" height="100" tilewidth="16" tileheight="16">
  <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
   <image source="images/tileset_millions_1.png"/>
  </tileset>
- <layer name="ground" width="100" height="100">
+ <layer name="ground" width="120" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3csU7bQACAYUsFwQIIVgZYeYjO7VpQpxY24P3fAEdiYCAiEXb8E77hWyzlcne/ZDnKyefDMJyT9GN0NaHricebysGCe7LNfH6NLic09XhTzmvTHrtYw7r56PH9evwZ3c7sTo+Ne/wb/Z/ZvR566KHHnvQ4GTZ/Fj3VY/YeNXq06NGiR4seLXq06NGiR4seLXq07KrH73euPY6eZvYc2ONiD/T4ivRo0aNlVz0OA2v9Cr77+ZIaPVr0aNGjRY8WPVrW9fg5THtuexdnZfaB34MterTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4terTo0aJHix4tb3tcvLHNex7ncvQJq8+fvXP95oPvPAj1+Mz698XS9wU99CjTo0WPFj1a9GjRo0WPFj1a9GjRo0WPFj1a9GhZ+n+G1Xt3jl8tvRcAAAAs4y8pDwAAAAAAG3oBAmzL50CcAAA=
+   H4sIAAAAAAAAA+3dO07DQBRAUUsEQQMotCBBQ8EiqKEFRMW3Iex/B0wkChcR8SjP9pubW9zGkifjOYqlKP4su65bWpq+Sh8VfZbe/qk/9kHpKrDr4PGiWlSsd/SabJvPmL73pYvAoseLnNdQ3ymOoT8fffXN7PtYehq5Z31n833dMp+I3vXVV1999W3S96Qb/tvlVN/mfLOlr7766qtvzvTVV1999c2Zvvrqq6++OWvV92HDtu/SauR+Epjtg6/pa/rS05ddq76HCdauhVr19Xygr+lLT192+rLTl91Uvndd7H1xU1xbSqjV76/pa/rS05edvuz0ZacvO33Z6ctOX3b6stOXnb7s9GWnLzt92enLTl92+rLTl52+7PRlpy87fdnpy05fdvqy05edvuzG9D3vVfPeibE62qH1/mcbtt9u+cwF2HeX9aQ093lLX3311Vdfffcxfdnpy05fdvqy05edvuz0ZacvO33Z6ctu7v9F189hPf5LX3b6stOXnb7s9GWnLzt92enLTl920b4vlqoa2yG+teNZrvRlpy87fdnpy05fdvqy05edvuz0ZVfz/A3L0U2gr+XrUl90kb6/jaf4rIC7AAA=
   </data>
  </layer>
- <layer name="wall" width="100" height="100">
+ <layer name="wall" width="120" height="100">
   <properties>
    <property name="passable" value="false"/>
   </properties>
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAC+3dQUoEMRRF0QJ1qC7BnuoedKr7X5E6EAx0tBOTvCu5BwpEqvJ//VcNUmnwOER19XE8DDxOg9cbdVwHZ9LSz2tDn5cYvd4oLX2tuIdaDfP427m9zGPOub3MY865vcxjzrm9zGPOub12z+P5uPxv0bsF/eyeB60v82AxDxbzYDEPFvNgMQ8W82AxDxbzYFmVx9vg9UbZNQ8q2n3Wnltan7PQ7tPPB4t5sKzK42bweqPsmgftvr/Q+jIPFvNgMQ8W82AxD5ZaPy3fg7nkeKr8/vTt5/szfTwO7uO3vk6V837qrXZNz/Fyps6nVc/Nf3k+R1/TupZ5zL2mdS3zmHtN61q75tGzTzNyb8c8WMyDxTxY0nlQ99VT0nnQ9OzTjNzbMY/S7n/v0pgHy+550PbVd8+D9jnsea9de3ft+92/S/fj56OU7sc8Sul+zKOUfl9gHizmwWIeLObBYh6l9PsC8yil+zGPUrof8yil+zGPUrof8yil+zGPUrqfWv3bY+73ymfsHbR8J711/2GV9PNAk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jTpeaTr06Tnka5Pk55Huj5Neh7p+jSr9hlqx4r/USVJkiRJkiRJkiRJkiRpvHfnrNFHQJwAAA==
+   H4sIAAAAAAAAA+3bQU7DQBSD4UrAEjgC3cIdYAv3PxEsSdRAmjix4/6fFAmhMvNiA1I77emEW3H3c70Ir7N4PdV1b8xk7TxrfIavp3LNXHvcw1450e+6xy5Fv1r0m7meCv1mrqdCv5nrqdBv5noq76f5z12edpiHfrXS5qJfrbS56FcrbS761Uqbi3610uaiX620uehXK20u+tVKm4t+tdLmol+ttLmO2u+XeD0V+u2Wdp97/R2k3fdW0u6Tv1+ttPukX620+zxqvw/i9VToN3M9lbS56FcrbS761Uqbi3610uaiX620uehXK22uvea55n2jc663ie+ff339fGGOV/Ec/811nnjcX7NN/cyS6+PCPls46v+JtZbMo7yHttzpd7u1bmmfuej3mPvMteR8Tnmm15Z7Wr9ubbnT71Bb7vQ71JZ76vuyXNr6TbPknFp5tk2/2+L5UTf67Ua/Wmnvy6LfY+4z15Jzs6mzMc6P8vp1z9OWuzvPMfc8bbm78xxzz9OWuzvPMffraW25p/Xr1pY7/Q615U6/Q2250+9QW+5p/bpfT2vLPa1f9zxtubvzHHPP05a7O88x9zxtubvzHHPP05a7O88x9zxtubvzHHPPs9f+j6dtP7e3xdnpNZ/5c5+/TnH/frVz5+vev507X/f+7dz5uvdv587XvX878u1Gv93ot5u7X/f+7dz5uvdv587XvX87d77u/du583Xv386dr3v/du583fu32+tcdOp62v4WAQAAAAAAAAAAAAAAAAAAgArfWbbA7oC7AAA=
   </data>
  </layer>
- <objectgroup name="Entities" width="100" height="100">
+ <objectgroup name="Entities" width="120" height="100">
   <object name="Player" type="Player" x="216" y="298" width="41" height="39"/>
   <object name="Guard 1" type="LurkingGuard" x="246" y="707" width="31" height="27"/>
   <object name="Guard 2" type="Guard" x="164" y="590" width="31" height="27"/>
-  <object name="PatrollingGuard01" type="PatrollingGuard" x="417" y="339" width="23" height="25">
+  <object name="PatrollingGuard01" type="PatrollingGuard" x="413" y="118" width="23" height="25">
    <properties>
     <property name="direction" value="vertical"/>
    </properties>
@@ -31,6 +31,16 @@
    </properties>
   </object>
   <object name="Door01" type="Door" x="368" y="318" width="12" height="65">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Car" type="Car" x="1632" y="608" width="79" height="140">
+   <properties>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Door" type="Door" x="1552" y="1057" width="13" height="43">
    <properties>
     <property name="rotation" value="270"/>
    </properties>
