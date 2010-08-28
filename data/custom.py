@@ -1,5 +1,5 @@
 display = {
-    'fps'    : 1000,
+    'fps'    : 30,
     'width'  : 1024,
     'height' : 768,
     'caption': 'They stole two millions',
