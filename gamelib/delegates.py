@@ -59,7 +59,7 @@ class InteractiveDelegate(object):
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         f = self.images.get(self.state, self.images['default'])
-        image = pygame.transform.scale(f, f.get_size())
+        image = pygame.transform.scale(f, (self.rect.width, self.rect.height))
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
