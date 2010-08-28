@@ -220,3 +220,164 @@ class Car(InteractiveDelegate):
     def label(self):
         return 'Car'
 
+class Safe(InteractiveDelegate):
+    image_files = {"money" : 'data/images/safe_closed.png',"default" : 'data/images/safe_opened.png'}
+    states = ['closed', 'opened', 'smashed', 'locked']
+
+    def __init__(self, properties, rect, *args):
+        self.lockpick_time = 50
+        self.smash_time = 20
+        self.open_time = 10
+        self.close_time = 10
+        self.rob_time = 5
+        self.value = 0
+        InteractiveDelegate.__init__(self, properties, rect)
+        self.state = "locked"
+
+
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
+        image.fill(self.color)
+        if self.value > 0 and self.state == 'opened':
+            f = self.images['money']
+        else:
+            f = self.images['default']
+        img = pygame.transform.scale(f, image.get_size())
+        image.blit(img, (0,0))
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
+
+    def label(self):
+        return 'Safe'
+
+    def setup(self):
+        InteractiveDelegate.setup(self)
+        for key, value in self.properties.items():
+            if key == 'rob':
+                self.value = int(value)
+            elif key == 'locked':
+                if value == 'false':
+                    self.state = 'closed'
+                else:
+                    self.state = 'locked'
+            elif key == 'lockpick_time':
+                self.unlock_time = int(value)
+            elif key == 'smash_time':
+                self.smash_time = int(value)
+            else:
+                pass
+
+    def get_actions(self, player):
+        actions = []
+        if self.state != 'smashed':
+            if player.energy >= self.smash_cost:
+                actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+            if self.state == 'locked':
+                actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
+            if self.state == 'closed':
+                actions.append(('Open', self.make_action(self.open, self.open_time)))
+            if self.state == 'opened':
+                actions.append(('Close', self.make_action(self.close, self.close_time)))
+        if self.value > 0 and self.state in ['smashed', 'opened']:
+            actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
+        return actions
+
+    def open(self, player):
+        self.state = 'opened'
+
+    def close(self, player):
+        self.state = 'closed'
+
+    def lockpick(self, player):
+        self.state = 'closed'
+
+    def smash(self, player):
+        if self.state == 'smashed':
+            print 'It is already smashed'
+            return
+        self.state = 'smashed'
+        player.energy -= self.smash_cost
+
+    def rob(self, player):
+        assert self.state in ['smashed', 'opened']
+        player.add_money(self.value)
+        self.value = 0
+
+class DisplayCase(InteractiveDelegate):
+    image_files = {"smashed" : 'data/images/showcase_smashed.png',"default" :
+    'data/images/showcase.png'}
+    states = ['closed', 'smashed']
+
+    def __init__(self, properties, rect, *args):
+        self.state = "closed"
+        self.smash_time = 20
+        self.rob_time = 5
+        self.value = 0
+        InteractiveDelegate.__init__(self, properties, rect)
+
+    def setup(self):
+        InteractiveDelegate.setup(self)
+        if 'rob' in self.properties:
+            self.value = int(self.properties['rob'])
+
+    def get_actions(self, player):
+        actions = []
+        if self.state != 'smashed':
+            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+        else:
+            if self.value > 0:
+                actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
+        return actions
+
+    def label(self):
+        return 'Showcase'
+
+    def smash(self, player):
+        self.state = 'smashed'
+        player.energy -= self.smash_cost
+
+    def rob(self, player):
+        assert state == 'smashed'
+        player.add_money(self.value)
+        self.value = 0
+
+class Dispenser(InteractiveDelegate):
+    image_files = {'default': 'data/images/water_dispender01.png'}
+
+    def __init__(self, properties, rect, *args):
+        self.state = 'filled'
+        self.smash_time = 10
+        self.drink_time = 5
+        self.fill = 20
+        self.cost = 1
+        self.cup_size = 10
+
+        InteractiveDelegate.__init__(self, properties, rect)
+
+
+    def label(self):
+        return 'Dispenser'
+
+    def setup(self):
+        if 'fill' in self.properties:
+            self.fill = int(self.properties['fill'])
+        if 'cost' in self.properties:
+            self.fill = int(self.properties['cost'])
+
+    def get_actions(self, player):
+        actions = []
+        if self.state == 'smashed':
+            return actions
+
+        if self.state == 'filled' and self.fill >= self.cup_size and player.money >= self.cost:
+            actions.append(('Drink', self.make_action(self.drink, self.drink_time)))
+        actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+        return actions
+
+    def drink(self, player):
+        self.fill -= self.cup_size
+        player.money -= self.cost
+        player.energy += self.cup_size
+
+    def smash(self, player):
+        self.state = 'smashed'
+        player.energy -= self.smash_cost
