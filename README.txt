@@ -8,6 +8,13 @@ Name: They Stole Two Millions
 Team: jitters 
 Members: Armin Rigo, David Schneider, Evgeni Golov, Jens Bendisposto, John Wittulski, Lukas Diekmann, Nadine Fritz, Rene Bartelmus, Simon Probst, Stephan Zalewski, et. al.  
 
+This game was created with the help of:
+  - python-pyknic http://code.google.com/p/python-pyknic/
+  - Tiled http://www.mapeditor.org/
+  - Vast amounts of coffee and jolt-cola
+
+This game is loosely based on the C-64 game 'They Stole a Million' 
+
 DEPENDENCIES:
 
 You might need to install some of these before running the game:
@@ -17,10 +24,6 @@ You might need to install some of these before running the game:
 
 
 
-This game was created with the help of:
-  - python-pyknic http://code.google.com/p/python-pyknic/
-  - Tiled http://www.mapeditor.org/
-  - Vast amounts of coffee and jolt-cola
 
 
 RUNNING THE GAME:
@@ -33,7 +36,7 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 
 
 
-HOW TO PLAY THE GAME:
+hOW TO PLAY THE GAME:
 
 Use the arrow keys to move the player arround on the screen when approaching an
 object pressing A reveals the actions provided by the object. With the number
