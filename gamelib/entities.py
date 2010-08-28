@@ -420,7 +420,7 @@ class Player(Enlightened):
             self.velocity = Vec3(0,0)
             return
 
-        speed = 500
+        speed = 180
 
         if key == K_UP:
             self.velocity.y = -speed
