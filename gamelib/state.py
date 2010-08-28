@@ -15,6 +15,12 @@ from ui import SimpleRenderer, StatusBar
 
 import pygame
 
+def rect_copy(rect):
+    if hasattr(pygame.Rect, 'copy'):
+        return rect.copy()
+    else:
+        return pygame.Rect(rect.x, rect.y, rect.w, rect.h)
+
 class StartState(pyknic.State):
     def __init__(self,  *args, **kwargs):
         super(StartState, self).__init__(*args, **kwargs)
@@ -152,13 +158,13 @@ class PlayState(pyknic.State):
 
         display_rect = pygame.display.get_surface().get_rect()
 
-        renderer_rect = display_rect.copy()
+        renderer_rect = rect_copy(display_rect)
         renderer_rect.height -= 50
 
         renderer1 = SimpleRenderer(self, renderer_rect)
         self.world.add_renderer(renderer1)
 
-        scoreboard_rect = display_rect.copy()
+        scoreboard_rect = rect_copy(display_rect)
         scoreboard_rect.height = 50
         scoreboard_rect.top = renderer_rect.bottom
 
