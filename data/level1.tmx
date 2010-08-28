@@ -1,50 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="200" height="200" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" width="130" height="110" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="time" value="180"/>
+ </properties>
  <tileset firstgid="1" name="tileset_millions_1" tilewidth="16" tileheight="16">
   <image source="images/tileset_millions_1.png"/>
  </tileset>
- <tileset firstgid="321" source="images/tileset_millions_1.tsx"/>
- <layer name="ground" width="200" height="200">
+ <layer name="ground" width="130" height="110">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3ToQ0AMRADwdOD9F9yGsiCZ4k0Iy038ZqZJUmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJP3ou2CDdGv+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IXX+IUmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEl6LQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAONlLxVR4AHECAA==
+   H4sIAAAAAAAAA+3dvUoDQRiG0QEVbVRiG0EbCy/CWlsVK/+mUe//DtxACgvNzpJZZ/JxigchkGSd9xgQNS5SSgvtVG/rFj8+Kn75x/YlvQ+9bKj15yMOxIE4UAwHe0MXFbus/Hi12m94JmPXk0d2/w8Ht0PLitV+vJrX1epMxq4nF2zPAQdRHNwPPczc44Rz56CNg+eR667R64Rz54ADDjjggIPjVP493clM23PQ3kFvccABBxxwwAEHHHDAAQcccMABBxxwwAEHKd39ctvH0OfMfXWwLQfiQByIA3HwdwcdnPEuFN2B1xcOOOCAAw444IADDjiI4+Am1f073v/4ne8I9ebA1y8HHHDAAQcctI8DcSAOxIE4EAfiQByIA3EgDsSBOBAH4kAciANxIA7EgTgQB+JAHIgDRXVwtqEp/79qrg63aHX/019uvx55zv0G27d2sM05R6316yAHfcSBOBAH6snBMnHQQxyIA3GgnhzcJg56iANxIA7EgThof+Y91vrn7av3Iz9alwu25yB+uWB7DuKXC7bnIH65YHsO4pcLtucgfrlgew7ilwu25yB+uWB7DuKXC7bnIH65YPsaDp7UdVMMbONg6vOo7zgQB+JAHIgDcSAOxIE40JwONr0/kvroqmD/bR1suo/66Lxgfw7ix4E4EAfiQC0cSN9J82JbcN8AAA==
   </data>
  </layer>
- <layer name="walls" width="200" height="200">
+ <layer name="void" width="130" height="110">
   <properties>
    <property name="passable" value="false"/>
   </properties>
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XuQ3AIBQFQXqh/x5dwSb4ks2MREj2N3hjnDcf+gNfpA9o+oCmD2j6gKYPAAAAeJ99Dk0f0PQBbS4+2IFbh6YPaPqApg/+anVb29rs4Irb1gc0fUDTBzR9QNMHNH1A0wcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB3OwD4DTDXAHECAA==
+   H4sIAAAAAAAAA+3SAQkAQRDEsPG8/uEpnItPoA56204af+cD4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gPiA+ID4gNy0usDY1VFUnDfAAA=
   </data>
  </layer>
- <objectgroup name="objects" width="200" height="200">
-  <object name="The boss desk" type="Desk" x="31" y="79" width="32" height="64">
+ <layer name="wall" width="130" height="110">
+  <properties>
+   <property name="passable" value="false"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3bQUrEQBCF4QF1qR7B2eoddKv3P5GGpsE0E53pdPo9qv4PAiIx9apSLsbE0wkAAAAA+tz9HC8Dj/Pg64067oUz2Ztnhk/z641yS64ZPbjNiT3Yd24vtzmxB/vO7eU2J/Zg37m93ObEHuw7t5fbnNiDfef2cptTlj14P13/me5pQh63OWXZA7dc0fO49Ve55Yqex62/yi1X9Dxu/VVuuaLnceuvcssVPY9bf5Vbruh53Pqr3HJFz+PWX+WWK3oet/4qt1zR87j1V7nlip7na/D1Rok+973c8hzFrU+33xe3+RzFrU/yaLj1SR4Ntz6j53kYfL1Ros99Lz43akTP49Zf5ZYreh63/iq3XNHzuPVXueWKnsetv8otV/Q8bv1Vbrnc8tzyPvc1x9vG98+/vn6+kON1cI7/cp03zvsr29bP9BwfF+oozdpLt/3vyTOyhwjzcK5zLfZgjT049mdmXGuErHvQ89x35LNit3lk3QM1t3mwBxpu82APNNzmMSuP23tYaln3wE3PexIj361wm7tbnln43LjmlmcW9mDNLc8s7MHarDxu7y2yB2tZPzf2PGfdepbK80a/OtdS51HXb7EHOeu32IOc9VtZ90D99023eWTdAzW3ebAHGm7zYA803ObBHmi4zSPrHqj/vuk2j6x7oM6jrt9iD3LWb7EHOeu32IOc9VvsQc76LfYgZ/3W4+nY/zM+4tn9Lf+j7Pr8320PslLfB3V9FOr7oK6PQn0f1PVRqO+Duj4K7gMW7AEW7AEW7AEW6j1Q10ehvg/q+ijU90FdH4X6Pqjro1DfB3V9FOr7oK6PYtbz9q3j6fgWAQAAAAAAAAAAAAAAAAAAAAAAAAAApL4BbETkH3DfAAA=
+  </data>
+ </layer>
+ <objectgroup name="Entities" width="130" height="110">
+  <object name="Player" type="Player" x="1713" y="854" width="41" height="39"/>
+  <object name="Guard 1" type="LurkingGuard" x="326" y="787" width="31" height="27"/>
+  <object name="Guard 2" type="Guard" x="244" y="670" width="31" height="27"/>
+  <object name="PatrollingGuard01" type="PatrollingGuard" x="493" y="198" width="23" height="25">
    <properties>
-    <property name="locked" value="true"/>
-    <property name="rob" value="1000000"/>
+    <property name="direction" value="vertical"/>
+   </properties>
+  </object>
+  <object name="PatrollingGuard02" type="PatrollingGuard" x="624" y="527" width="23" height="25">
+   <properties>
+    <property name="direction" value="horizontal"/>
+   </properties>
+  </object>
+  <object name="Door01" type="Door" x="448" y="398" width="12" height="65">
+   <properties>
+    <property name="rotation" value="270"/>
+   </properties>
+  </object>
+  <object name="Car" type="Car" x="1712" y="688" width="79" height="140">
+   <properties>
     <property name="rotation" value="90"/>
    </properties>
   </object>
-  <object name="Boss" type="Door" x="273" y="96" width="13" height="63">
+  <object name="Door" type="Door" x="1632" y="1137" width="12" height="60">
    <properties>
     <property name="rotation" value="270"/>
    </properties>
   </object>
-  <object name="Kitchen" type="Door" x="481" y="94" width="13" height="63">
+  <object name="Desk1" type="Desk" x="288" y="547" width="61" height="26">
    <properties>
-    <property name="closed" value="true"/>
-    <property name="locked" value="true"/>
-    <property name="rotation" value="270"/>
+    <property name="rob" value="100"/>
+    <property name="rotation" value="180"/>
    </properties>
   </object>
-  <object name="other" type="Door" x="273" y="417" width="11" height="44">
+  <object name="Desk1" type="Desk" x="562" y="177" width="30" height="60">
    <properties>
-    <property name="closed" value="true"/>
-    <property name="locked" value="true"/>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
    </properties>
   </object>
- </objectgroup>
- <objectgroup name="Entities" width="200" height="200">
-  <object name="Player" type="Player" x="180" y="96" width="28" height="34"/>
+  <object name="Desk1" type="Desk" x="639" y="176" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="722" y="175" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="802" y="179" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="880" y="179" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="561" y="293" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="641" y="289" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="722" y="287" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="799" y="288" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
+  <object name="Desk1" type="Desk" x="880" y="287" width="30" height="60">
+   <properties>
+    <property name="rob" value="10"/>
+    <property name="rotation" value="90"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
