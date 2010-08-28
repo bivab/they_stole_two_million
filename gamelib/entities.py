@@ -124,15 +124,16 @@ class InteractiveDelegate(object):
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
 class Door(InteractiveDelegate):
-    image_files = {"opened" : 'data/images/door_opened.png',"closed" : 'data/images/door_closed.png'}
+    image_files = {
+            "default" : 'data/images/door_opened.png',
+            "closed" : 'data/images/door_closed.png',
+            "locked" : 'data/images/door_closed.png'}
 
     def __init__(self, properties, rect, entity):
+        self.state = "locked"
         InteractiveDelegate.__init__(self, properties, rect, entity)
         self.lockpick_time = 50
-        self.smashed = False
-        self.default_color = (123,123,123)
-        self.color = self.default_color
-        self.current_state = "closed"
+        import pdb; pdb.set_trace()
 
     def label(self):
         return 'Door'
@@ -140,75 +141,72 @@ class Door(InteractiveDelegate):
     def setup(self):
         InteractiveDelegate.setup(self)
         if 'locked' in self.properties:
-            self.locked = self.properties['locked'] == 'true'
-            self.closed = True
+            if not self.properties['locked'] == 'true':
+                self.state = 'closed'
         else:
-            self.locked = True
-            if 'closed' in self.properties:
-                self.closed = self.properties['closed'] == 'true'
+            if 'closed' in self.properties and \
+                    self.properties['closed'] == 'true':
+                self.state = 'closed'
             else:
-                self.closed = True
+                self.state = 'opened'
+                self.entity.make_passable()
 
     def get_actions(self, player):
         actions = []
-        if self.smashed:
+        if self.state == 'smashed':
             return actions
 
-        if self.locked:
+        if self.state == 'locked':
             actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
-        elif self.closed:
+        elif self.state == 'closed':
             actions.append(('Open', self.make_action(self.open, 1)))
-        elif not self.closed:
+        elif self.state == 'opened':
             actions.append(('Close', self.make_action(self.close, 1)))
-        if not self.smashed and player.energy > self.smash_cost:
+        if self.state != 'smased' and player.energy > self.smash_cost:
             actions.append(('Smash', self.make_action(self.smash, 10)))
         return actions
 
     def open(self, player):
-        if not self.locked:
-            self.color = (0,0,0,255)
-            self.closed = False
+        if self.state != 'locked':
             self.entity.make_passable()
-            self.current_state = "opened"
+            self.state = "opened"
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
-        image = self.images[self.current_state]
+        f = self.images.get(self.state, self.images['default'])
+        image = pygame.transform.scale(f, f.get_size())
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
     def lockpick(self, player):
-        self.locked = False
+        self.state = 'closed'
 
     def smash(self, player):
-        self.color = (1,1,1, 255)
-        self.locked = False
-        self.closed = False
-        self.smashed = True
+        self.state = 'smashed'
         player.energy -= self.smash_cost
         self.entity.make_passable()
-        self.current_state = "opened"
 
     def close(self, player):
-        self.color = self.default_color
-        self.closed = True
         self.entity.make_impassable()
-        self.current_state = "closed"
+        self.state = "closed"
 
 class Desk(InteractiveDelegate):
     image_files = {"robbed" : 'data/images/desk01.png',"default" : 'data/images/desk01_money.png'}
 
 
     def __init__(self, properties, rect):
+        self.state = "locked"
         InteractiveDelegate.__init__(self, properties, rect)
-        self.lockpick_time = 1
-        self.smash_time = 0
-        self.closed = True
-        self.current_state = "default"
+        self.lockpick_time = 10
+        self.smash_time = 1
+        self.open_time = 1
+        self.close_time = 3
+        self.rob_time = 5
 
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
         image = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
         image.fill(self.color)
-        img = pygame.transform.scale(self.images[self.current_state], image.get_size())
+        f = self.images.get(self.state, self.images['default'])
+        img = pygame.transform.scale(f, image.get_size())
         image.blit(img, (0,0))
         screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
 
@@ -220,8 +218,8 @@ class Desk(InteractiveDelegate):
         for key, value in self.properties.items():
             if key == 'rob':
                 self.value = int(value)
-            elif key == 'locked' and value == 'true':
-                self.locked = True
+            elif key == 'locked' and value == 'false':
+                self.state = 'closed'
             elif key == 'lockpick_time':
                 self.unlock_time = int(value)
             elif key == 'smash_time':
@@ -234,37 +232,35 @@ class Desk(InteractiveDelegate):
         if not self.smashed:
             if player.energy > self.smash_cost:
                 actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
-            if self.locked:
+            if self.state == 'locked':
                 actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
-            if self.closed and not self.locked:
-                actions.append(('Open', self.make_action(self.open, 1)))
-            if not self.closed:
-                actions.append(('Close', self.make_action(self.close, 1)))
-        if not self.closed and self.value:
-            actions.append(('Rob', self.make_action(self.rob, 1)))
+            if self.state == 'closed':
+                actions.append(('Open', self.make_action(self.open, self.open_time)))
+            if self.state == 'open':
+                actions.append(('Close', self.make_action(self.close, self.close_time)))
+        if self.state == 'open' and self.value > 0:
+            actions.append(('Rob', self.make_action(self.rob, self.rob_time)))
         return actions
 
     def open(self, player):
-        self.closed = False
+        self.state = 'open'
         self.color = (0, 255, 0)
 
     def close(self, player):
-        self.closed = True
+        self.state = 'closed'
         self.color = (255, 100, 0)
 
     def lockpick(self, player):
-        self.locked = False
+        self.state = 'closed'
         self.color = (123,0, 122)
 
     def smash(self, player):
-        self.locked = False
-        self.closed = False
-        self.smashed = True
+        self.state = 'smashed'
         player.energy -= self.smash_cost
         self.color = (0, 55, 100)
 
     def rob(self, player):
-        self.current_state = "robbed"
+        self.state = "robbed"
         player.add_money(self.value)
         self.value = 0
         self.color = (255, 100, 0)
