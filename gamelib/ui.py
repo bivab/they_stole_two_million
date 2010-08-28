@@ -59,7 +59,8 @@ class StatusBar(pyknic.renderer.IRenderer):
         line_offset = 1
         font = pygame.font.Font(None,25)
 
-        s = '$$$: %(money)d' % {'money':self.player.money}
+        values = {'money':self.player.money, 'energy':self.player.energy}
+        s = '$$$: %(money)d | Energy: %(energy)d' % values
         text = font.render(s,1,(255,0,0))
         clipped_surf.blit(text, (1, line_offset))
 

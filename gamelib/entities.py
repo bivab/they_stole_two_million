@@ -82,6 +82,7 @@ class InteractiveDelegate(object):
         self.timer = None
         self.entity = entity
         self.smashed = False
+        self.smash_cost = 10
         self.rotation = 0
         self.setup()
         self.load_images()
@@ -159,7 +160,7 @@ class Door(InteractiveDelegate):
             actions.append(('Open', self.make_action(self.open, 1)))
         elif not self.closed:
             actions.append(('Close', self.make_action(self.close, 1)))
-        if not self.smashed:
+        if not self.smashed and player.energy > self.smash_cost:
             actions.append(('Smash', self.make_action(self.smash, 10)))
         return actions
 
@@ -182,6 +183,7 @@ class Door(InteractiveDelegate):
         self.locked = False
         self.closed = False
         self.smashed = True
+        player.energy -= self.smash_cost
         self.entity.make_passable()
         self.current_state = "opened"
 
@@ -230,7 +232,8 @@ class Desk(InteractiveDelegate):
     def get_actions(self, player):
         actions = []
         if not self.smashed:
-            actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
+            if player.energy > self.smash_cost:
+                actions.append(('Smash', self.make_action(self.smash, self.smash_time)))
             if self.locked:
                 actions.append(('Lockpick', self.make_action(self.lockpick, self.lockpick_time)))
             if self.closed and not self.locked:
@@ -257,6 +260,7 @@ class Desk(InteractiveDelegate):
         self.locked = False
         self.closed = False
         self.smashed = True
+        player.energy -= self.smash_cost
         self.color = (0, 55, 100)
 
     def rob(self, player):
@@ -326,6 +330,7 @@ class Player(Enlightened):
     def __init__(self, position, state):
         super(Player, self).__init__(position, state)
         self.money = 0
+        self.energy = 50
 
         anims = pyknic.animation.load_animation(self.state.game_time, 'data/myanim')
 
