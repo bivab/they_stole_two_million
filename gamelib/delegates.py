@@ -307,7 +307,7 @@ class Safe(InteractiveDelegate):
         player.add_money(self.value)
         self.value = 0
 
-class DisplayCase(InteractiveDelegate):
+class Showcase(InteractiveDelegate):
     image_files = {"smashed" : 'data/images/showcase_smashed.png',"default" :
     'data/images/showcase.png'}
     states = ['closed', 'smashed']
