@@ -14,11 +14,19 @@ from entities import InteractiveThing, Player, Enlightened, Lighting
 from ui import SimpleRenderer, StatusBar
 
 import pygame
+import os
+import glob
+
+def rect_copy(rect):
+    if hasattr(pygame.Rect, 'copy'):
+        return rect.copy()
+    else:
+        return pygame.Rect(rect.x, rect.y, rect.w, rect.h)
 
 class StartState(pyknic.State):
     def __init__(self,  *args, **kwargs):
         super(StartState, self).__init__(*args, **kwargs)
-        self.levels = ['testtile', 'level1', 'Level2']
+        self.levels = glob.glob('data/*.tmx')
         self.selected_level = 0
 
     def on_init(self, app):
@@ -63,7 +71,8 @@ class StartState(pyknic.State):
                 color = (255,0,0)
             else:
                 color = (0,255,0)
-            levelfont = font.render(level, True, color)
+            level_s = os.path.splitext(os.path.basename(level))[0]
+            levelfont = font.render(level_s, True, color)
             r = s.blit(levelfont, (left, r.bottom+16))
 
         lock = pygame.image.load('./data/images/icon_lockpicks.png')
@@ -88,7 +97,7 @@ class PlayState(pyknic.State):
 
 
     def on_init(self, app):
-        world_map = TileMapParser().parse_decode_load("data/%s.tmx" % self.level, ImageLoaderPygame())
+        world_map = TileMapParser().parse_decode_load(self.level, ImageLoaderPygame())
         assert world_map.orientation == "orthogonal"
         self.impassables = []
         self.actionables = []
@@ -156,13 +165,13 @@ class PlayState(pyknic.State):
 
         display_rect = pygame.display.get_surface().get_rect()
 
-        renderer_rect = display_rect.copy()
+        renderer_rect = rect_copy(display_rect)
         renderer_rect.height -= 50
 
         renderer1 = SimpleRenderer(self, renderer_rect)
         self.world.add_renderer(renderer1)
 
-        scoreboard_rect = display_rect.copy()
+        scoreboard_rect = rect_copy(display_rect)
         scoreboard_rect.height = 50
         scoreboard_rect.top = renderer_rect.bottom
 
