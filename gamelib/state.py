@@ -83,7 +83,7 @@ class PlayState(pyknic.State):
         super(PlayState, self).__init__(*args, **kwargs)
         self.world = TheWorld()
         self.game_time = pyknic.timing.GameTime()
-        self.remaining = self.time = 60
+        self.remaining = self.time = 42
         self.level = level
 
 
@@ -93,7 +93,11 @@ class PlayState(pyknic.State):
         self.impassables = []
         self.actionables = []
         self.lighting = Lighting()
-
+        try:
+            self.remaining = self.time = int(world_map.properties['time'])
+        except KeyError, e:
+            # Keep default
+            pass
         for layernum, layer in enumerate(world_map.layers[:]):
             if layer.visible:
                 layer_img = pygame.Surface((layer.pixel_width, layer.pixel_height), pygame.SRCALPHA)
