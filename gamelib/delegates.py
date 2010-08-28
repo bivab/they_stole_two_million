@@ -80,6 +80,11 @@ class Door(InteractiveDelegate):
     def label(self):
         return 'Door'
 
+    def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        f = self.images.get(self.state, self.images['default'])
+        image = pygame.transform.scale(f, f.get_size())
+        screen_surf.blit(image, (self.rect.x - offset.x, self.rect.y - offset.y))
+
     def setup(self):
         InteractiveDelegate.setup(self)
         if 'locked' in self.properties:
