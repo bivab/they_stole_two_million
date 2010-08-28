@@ -483,35 +483,45 @@ class ActionMenu(pyknic.entity.Entity):
         self.update_items()
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
+        item_height = 10
+        name_height = 15
+        min_width = 90
         if not self.visible:
             return
         # align to player
         self.position = Vec3(self.player.position.x+10, self.player.position.y +10)
 
         # setup sprite for menu
-        self.spr.image = pygame.Surface((200, 100))
+        height = 50 + len(self.items) * item_height + \
+                len({}.fromkeys(self.names).keys()) * name_height
+        i_width = 20 + reduce(max, [len(i) for i in self.items]) * item_height
+        n_width = 20 + reduce(max, [len(i) for i in self.names])  * name_height
+        width = max(i_width, n_width, min_width)
+
+        self.spr.image = pygame.Surface((width, height))
+        self.spr.image.set_alpha(200)
         self.spr.image.fill((255, 0,0))
 
         # draw menu title
         font = pygame.font.Font(None,25)
         text = font.render("Actions",1,(255,255,255,0))
-        self.spr.image.blit(text,(0,0))
+        self.spr.image.blit(text,(10,10))
 
         # draw menu items
         fonta = pygame.font.Font(None,20)
         fontb = pygame.font.Font(None,15)
-        y = 15
+        y = 35
         label_text = ''
         for i in range(len(self.items)):
             item, _ = self.items[i]
             if self.names[i] != label_text:
                 label_text = self.names[i]
                 label = fonta.render(label_text, 1, (255,255,255))
-                self.spr.image.blit(label,(0,y))
-                y +=15
+                self.spr.image.blit(label,(10,y))
+                y += name_height
             text = fontb.render("%d: %s" % (i+1, item),1,(255,255,255,0))
-            self.spr.image.blit(text,(0,y))
-            y += 10
+            self.spr.image.blit(text,(10,y))
+            y += item_height
 
         # actually render
         Entity.render(self, screen_surf, offset)
