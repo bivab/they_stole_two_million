@@ -63,16 +63,19 @@ class StatusBar(pyknic.renderer.IRenderer):
 
         s = '$$$: %(money)d' % {'money': self.player.money}
         text = font.render(s,1,(255,0,0))
-        clipped_surf.blit(text, (1, line_offset))
+        left = 10
+        clipped_surf.blit(text, (left, line_offset))
 
 
         s = 'Energy: %(energy)d' % {'energy':self.player.energy}
         text = font.render(s,1,(255,0,0))
-        clipped_surf.blit(text, (300, line_offset))
+        left = clipped_surf.get_width()/2-text.get_width()/2
+        clipped_surf.blit(text, (left, line_offset))
 
         s = 'Time: %s' % datetime.timedelta(seconds=int(self.state.get_remaining_time()))
         text = font.render(s,1,(255,0,0))
-        clipped_surf.blit(text, (700, line_offset))
+        left = clipped_surf.get_width()-text.get_width()-10
+        clipped_surf.blit(text, (left, line_offset))
 
         line_offset += text.get_height()
 
