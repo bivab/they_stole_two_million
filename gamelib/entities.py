@@ -107,6 +107,8 @@ class InteractiveDelegate(object):
         return 'A Thing'
 
     def make_action(self, callback, timer):
+        if self.timer:
+            return lambda *args:()
         def func(player):
             self.timer = [timer, callback, player]
             player.freeze()
