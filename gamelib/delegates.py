@@ -70,10 +70,10 @@ class Door(InteractiveDelegate):
 
     def __init__(self, *args):
         InteractiveDelegate.__init__(self, *args)
-        self.lockpick_time = 6
-        self.open_time = 1
-        self.close_time = 1
-        self.smash_time = 3
+        self.lockpick_time = 0.6
+        self.open_time = 0.1
+        self.close_time = 0.1
+        self.smash_time = 0.3
         if self.state == 'default':
             self.state = "locked"
 
@@ -140,11 +140,11 @@ class Desk(InteractiveDelegate):
         InteractiveDelegate.__init__(self, properties, rect, *args)
         if self.state not in self.states:
             self.state = "locked"
-        self.lockpick_time = 10
-        self.smash_time = 1
-        self.open_time = 1
-        self.close_time = 3
-        self.rob_time = 5
+        self.lockpick_time = 1.0
+        self.smash_time = 0.3
+        self.open_time = 0.1
+        self.close_time = 0.3
+        self.rob_time = 0.5
 
 
     def render(self, screen_surf, offset=Vec3(0,0), screen_offset=Vec3(0,0)):
@@ -172,9 +172,9 @@ class Desk(InteractiveDelegate):
                 else:
                     self.state = 'locked'
             elif key == 'lockpick_time':
-                self.unlock_time = int(value)
+                self.unlock_time = float(value)
             elif key == 'smash_time':
-                self.smash_time = int(value)
+                self.smash_time = float(value)
             else:
                 pass
 
@@ -229,7 +229,7 @@ class Car(InteractiveDelegate):
 
     def __init__(self, *args):
         InteractiveDelegate.__init__(self, *args)
-        self.escape_time = 5
+        self.escape_time = 0.5
 
     def get_actions(self, player):
         return [('Escape (%ss)' % self.escape_time,
@@ -249,11 +249,11 @@ class Safe(InteractiveDelegate):
     states = ['closed', 'opened', 'smashed', 'locked']
 
     def __init__(self, properties, rect, *args):
-        self.lockpick_time = 15
-        self.smash_time = 10
-        self.open_time = 5
-        self.close_time = 5
-        self.rob_time = 5
+        self.lockpick_time = 1.5
+        self.smash_time = 1.0
+        self.open_time = 0.5
+        self.close_time = 0.5
+        self.rob_time = 0.5
         self.value = 1000
         InteractiveDelegate.__init__(self, properties, rect, *args)
         self.state = "locked"
@@ -286,9 +286,9 @@ class Safe(InteractiveDelegate):
                 else:
                     self.state = 'locked'
             elif key == 'lockpick_time':
-                self.unlock_time = int(value)
+                self.unlock_time = float(value)
             elif key == 'smash_time':
-                self.smash_time = int(value)
+                self.smash_time = float(value)
             else:
                 pass
 
@@ -339,8 +339,8 @@ class Showcase(InteractiveDelegate):
 
     def __init__(self, properties, rect, *args):
         self.state = "closed"
-        self.smash_time = 3
-        self.rob_time = 2
+        self.smash_time = 0.3
+        self.rob_time = 0.2
         self.value = 100
         InteractiveDelegate.__init__(self, properties, rect, *args)
 
@@ -377,8 +377,8 @@ class Dispenser(InteractiveDelegate):
 
     def __init__(self, properties, rect, *args):
         self.state = 'filled'
-        self.smash_time = 5
-        self.drink_time = 2
+        self.smash_time = 0.5
+        self.drink_time = 0.2
         self.fill = 20
         self.cost = 1
         self.cup_size = 10
